@@ -1,7 +1,7 @@
 import React from 'react';
 import { useStoreLogic } from '../hooks/useStoreLogic';
-import ProductCard from '../components/ProductCard'; 
-import FilterSidebar from '../components/FilterSidebar'; 
+import ProductCard from '../components/common/ProductCard'; 
+import FilterSidebar from '../components/features/FilterSidebar'; 
 
 const Store = () => {
   const { 
