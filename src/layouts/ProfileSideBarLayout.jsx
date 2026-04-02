@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { User, MapPin, ClipboardList, LogOut } from 'lucide-react';
-import { useProfileLogic } from '../../hooks/useProfileLogic';
+import { useProfileLogic } from '../hooks/useProfileLogic';
 
 const ProfileSideBarLayout = () => {
   const { user, handleLogout } = useProfileLogic();

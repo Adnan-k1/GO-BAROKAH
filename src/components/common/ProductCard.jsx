@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, Star, Heart, Eye } from 'lucide-react';
-import { useCart } from '../context/CartContext';
-import { formatIDR } from '../utils/formatCurrency';
+import { useCart } from '../../context/CartContext';
+import { formatIDR } from '../../utils/formatCurrency';
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
