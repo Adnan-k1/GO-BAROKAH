@@ -6,8 +6,8 @@ import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext'; 
 
 
-import Navbar from './components/layouts/Navbar';
-import ProfileLayout from './components/layouts/ProfileSideBarLayout'; 
+import Navbar from './layouts/Navbar';
+import ProfileLayout from './layouts/ProfileSideBarLayout'; 
 
 
 import Home from './pages/Home';
