@@ -2,7 +2,7 @@ import React from 'react';
 
 const FilterSidebar = ({ categories, activeFilters, onFilterChange, onClear }) => {
   return (
-    <aside className="w-48 flex-shrink-0">
+    <aside className="w-48 shrink-0">
       <div className="flex justify-between items-center mb-4 border-b pb-2">
         <h3 className="font-bold text-sm uppercase tracking-tighter">Filters</h3>
         {activeFilters.length > 0 && (
