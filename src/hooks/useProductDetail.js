@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { ALL_PRODUCTS } from '../data/products';
-
+import toast from 'react-hot-toast';
 export const useProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -24,7 +24,20 @@ export const useProductDetail = () => {
   const onAddToCart = () => {
     if (!product) return;
     for (let i = 0; i < quantity; i++) addToCart(product);
-    alert(`${quantity} ${product.name} berhasil ditambahkan!`);
+    toast.success(`${quantity} ${product.name} berhasil ditambahkan!`, {
+      icon: '🛒',
+      duration: 3000,
+      style: {
+        borderRadius: '16px',
+        background: '#2D5A43', 
+        color: '#fff',
+        fontWeight: 'bold',
+      },
+      iconTheme: {
+        primary: '#fff',
+        secondary: '#2D5A43',
+      },
+    });
   };
 
   return {

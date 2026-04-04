@@ -1,15 +1,14 @@
 import React from 'react';
 import { useProfileLogic } from '../hooks/useProfileLogic';
-
 import Button from '../components/common/Button';
 import FormInput from '../components/common/FormInput';
 
 const ProfileInfoPage = () => {
-  const { user, nameParts } = useProfileLogic();
+  const { formData, handleChange, saveProfile } = useProfileLogic();
 
   const handleSaveProfile = (e) => {
     e.preventDefault();
-    console.log("Simpan perubahan profil...");
+    saveProfile();
   };
 
   return (
@@ -24,39 +23,52 @@ const ProfileInfoPage = () => {
           <FormInput 
             label="Nama Depan"
             name="firstName"
-            defaultValue={nameParts[0]}
+            type="text"
+            value={formData?.firstName || ''}
+            onChange={handleChange}
             placeholder="Masukkan nama depan Anda"
             required
           />
           <FormInput 
             label="Nama Belakang"
             name="lastName"
-            defaultValue={nameParts[1]}
+            type="text"
+            value={formData?.lastName || ''}
+            onChange={handleChange}
             placeholder="Masukkan nama belakang Anda"
             required
           />
         </div>
+
         <FormInput 
           label="Email"
           name="email"
           type="email"
-          defaultValue={user?.email}
+          value={formData?.email || ''}
           placeholder="Masukkan email Anda"
           required
+          className="bg-gray-50 opacity-70 cursor-not-allowed"
         />
+
         <FormInput 
           label="Nomor Telepon"
           name="phone"
-          type="number"
+          type="text"          
+          value={formData?.phone || ''}
+          onChange={handleChange}
           placeholder="Contoh: 08123456789"
           required
         />
+
         <FormInput 
           label="Tanggal Lahir"
           name="birthDate"
           type="text"
           placeholder="dd/mm/yyyy"
+          value={formData?.birthDate || ''}
+          onChange={handleChange}
         />
+
         <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-50">
           <Button 
             type="button" 
@@ -68,7 +80,7 @@ const ProfileInfoPage = () => {
           </Button>
           <Button 
             type="submit" 
-            className="px-10 py-3 text-sm shadow-lg shadow-green-900/10"
+            className="px-10 py-3 text-sm shadow-lg shadow-[#2D5A43]/10"
           >
             Simpan Perubahan
           </Button>

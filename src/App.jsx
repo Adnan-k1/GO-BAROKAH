@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext'; 
@@ -22,6 +23,20 @@ function App() {
       <CartProvider>
         <Router>
           <ScrollToTop />
+          <Toaster 
+            position="top-center" 
+            reverseOrder={false} 
+            toastOptions={{
+              className: 'font-sans text-sm',
+              success: {
+                style: {
+                  background: '#2D5A43', // Hijau UD Barokah
+                  color: '#fff',
+                  borderRadius: '12px',
+                },
+              },
+            }}
+          />
           <MainLayout>
             <Routes>
               <Route path="/" element={<Home />} />
