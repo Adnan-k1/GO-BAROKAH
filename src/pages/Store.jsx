@@ -1,4 +1,3 @@
-import React from 'react';
 import { useStoreLogic } from '../hooks/useStoreLogic';
 import ProductCard from '../components/common/ProductCard'; 
 import FilterSidebar from '../components/features/FilterSidebar'; 
