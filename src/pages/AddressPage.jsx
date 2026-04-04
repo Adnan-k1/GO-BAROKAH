@@ -1,133 +1,113 @@
 import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, MapPin, X } from 'lucide-react';
+import { Plus, Trash2, MapPin, Check, PencilLine, Star } from 'lucide-react';
+
+import Button from '../components/common/Button';
+import AddressModal from '../components/forms/AddressModal'; 
 
 const AddressPage = () => {
   const [addresses, setAddresses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const [formData, setFormData] = useState({
-    label: '',
-    name: '',
-    phone: '',
-    address: '',
-    city: ''
-  });
+  const [editId, setEditId] = useState(null);
+  const [formData, setFormData] = useState({ label: '', name: '', phone: '', address: '', city: '' });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newAddress = {
-      ...formData,
-      id: Date.now(),
-      isDefault: addresses.length === 0
-    };
-
-    setAddresses([...addresses, newAddress]);
-    setIsModalOpen(false);
-    setFormData({ label: '', name: '', phone: '', address: '', city: '' });
+  const openModal = (item = null) => {
+    if (item) {
+      setEditId(item.id);
+      setFormData({ ...item });
+    } else {
+      setEditId(null);
+      setFormData({ label: '', name: '', phone: '', address: '', city: '' });
+    }
+    setIsModalOpen(true);
   };
 
- 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (editId) {
+      setAddresses(addresses.map(addr => 
+        addr.id === editId ? { ...formData, id: editId, isDefault: addr.isDefault } : addr
+      ));
+    } else {
+      setAddresses([...addresses, { ...formData, id: Date.now(), isDefault: addresses.length === 0 }]);
+    }
+    setIsModalOpen(false);
+  };
+
+  const setDefaultAddress = (id) => {
+    setAddresses(addresses.map(addr => ({ ...addr, isDefault: addr.id === id })));
+  };
+
   const deleteAddress = (id) => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus alamat ini?')) {
-      const updatedAddresses = addresses.filter(item => item.id !== id);
-      
-      
-      if (updatedAddresses.length > 0 && !updatedAddresses.some(a => a.isDefault)) {
-        updatedAddresses[0].isDefault = true;
-      }
-      
-      setAddresses(updatedAddresses);
+    if (window.confirm('Hapus alamat ini?')) {
+      const updated = addresses.filter(item => item.id !== id);
+      if (updated.length > 0 && !updated.some(a => a.isDefault)) updated[0].isDefault = true;
+      setAddresses(updated);
     }
   };
 
   return (
-    <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm min-h-[500px]">
-      <div className="flex justify-between items-center mb-8">
-        <h3 className="text-xl font-bold text-gray-900">Alamat Saya</h3>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 bg-[#4B5E53] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#3d4d44] transition-all"
-        >
+    <div className="bg-white rounded-[32px] p-8 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] min-h-[600px]">
+      <div className="flex justify-between items-center mb-10">
+        <div>
+          <h3 className="text-2xl font-bold text-gray-900 tracking-tight">Alamat Saya</h3>
+          <p className="text-sm text-gray-400 mt-1">Kelola alamat pengiriman pesanan Anda</p>
+        </div>
+        <Button onClick={() => openModal()} className="px-6 py-3 text-[14px]">
           <Plus size={18} /> Tambah Alamat
-        </button>
+        </Button>
       </div>
 
       {addresses.length === 0 ? (
-        <div className="flex flex-col items-center justify-center text-center py-20 text-gray-400">
-          <MapPin size={48} className="mb-4 opacity-20" />
+        <div className="flex flex-col items-center justify-center py-32 text-gray-400">
+          <MapPin size={32} className="text-gray-200 mb-4" />
           <p>Belum ada alamat pengiriman.</p>
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-6">
           {addresses.map((item) => (
-            <div 
-              key={item.id} 
-              className={`p-6 rounded-2xl border-2 transition-all ${
-                item.isDefault ? 'border-[#2D5A43]' : 'border-gray-100'
-              }`}
-            >
+            <div key={item.id} className={`p-6 rounded-[24px] border-2 transition-all ${item.isDefault ? 'border-[#2D5A43] bg-[#fdfdfd]' : 'border-gray-50 bg-white'}`}>
               <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                  <span className="font-bold text-gray-900">{item.label}</span>
-                  {item.isDefault && (
-                    <span className="bg-gray-500 text-white text-[10px] px-2 py-0.5 rounded uppercase font-bold">
-                      Default
-                    </span>
-                  )}
-                </div>
+                <span className="font-bold text-gray-900">{item.label}</span>
+                {item.isDefault ? (
+                  <span className="bg-[#2D5A43] text-white text-[10px] px-2.5 py-1 rounded-lg uppercase font-bold flex items-center gap-1">
+                    <Check size={10} /> Utama
+                  </span>
+                ) : (
+                  <button onClick={() => setDefaultAddress(item.id)} className="text-[11px] font-bold text-[#2D5A43] hover:underline flex items-center gap-1">
+                    <Star size={12} /> Jadikan Utama
+                  </button>
+                )}
               </div>
-
-              <div className="text-sm text-gray-600 space-y-1">
+              <div className="text-[14px] text-gray-500 space-y-1">
                 <p className="font-bold text-gray-800">{item.name}</p>
                 <p>{item.phone}</p>
                 <p>{item.address}, {item.city}</p>
               </div>
-
-              
-              <div className="mt-6 flex items-center gap-4 text-xs font-bold uppercase tracking-wider">
-                <button className="flex items-center gap-1.5 text-gray-400 hover:text-gray-600">
-                  <Edit2 size={14} /> Edit
+              <div className="mt-6 pt-6 border-t border-gray-50 flex gap-4">
+                <button onClick={() => openModal(item)} className="flex items-center gap-2 text-[13px] font-bold text-gray-600 hover:text-[#2D5A43]">
+                  <PencilLine size={16} /> UBAH
                 </button>
-                <button 
-                  onClick={() => deleteAddress(item.id)}
-                  className="flex items-center gap-1.5 text-red-400 hover:text-red-600 transition-colors"
-                >
-                  <Trash2 size={14} /> Delete
-                </button>
+                <Button variant="danger" className="text-[13px] px-4" onClick={() => deleteAddress(item.id)}>
+                   <Trash2 size={15} /> HAPUS
+                </Button>
               </div>
             </div>
           ))}
         </div>
       )}
-
-      
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-bold">Tambah Alamat Baru</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                <X size={24} />
-              </button>
-            </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input required name="label" placeholder="Label Alamat (Rumah/Kantor)" onChange={handleInputChange} className="w-full bg-gray-50 p-3 rounded-xl outline-none" />
-              <input required name="name" placeholder="Nama Penerima" onChange={handleInputChange} className="w-full bg-gray-50 p-3 rounded-xl outline-none" />
-              <input required name="phone" placeholder="No. Telepon" onChange={handleInputChange} className="w-full bg-gray-50 p-3 rounded-xl outline-none" />
-              <textarea required name="address" placeholder="Alamat Lengkap" onChange={handleInputChange} className="w-full bg-gray-50 p-3 rounded-xl outline-none h-24 resize-none" />
-              <input required name="city" placeholder="Kota / Kode Pos" onChange={handleInputChange} className="w-full bg-gray-50 p-3 rounded-xl outline-none" />
-              <button type="submit" className="w-full py-4 bg-[#2D5A43] text-white rounded-2xl font-bold hover:bg-[#234735]">
-                Simpan Alamat
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
+      <AddressModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmit}
+        formData={formData}
+        onChange={handleInputChange}
+        isEdit={!!editId}
+      />
     </div>
   );
 };

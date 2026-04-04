@@ -1,5 +1,3 @@
-import React from 'react';
-
 const FilterSidebar = ({ categories, activeFilters, onFilterChange, onClear }) => {
   return (
     <aside className="w-48 shrink-0">

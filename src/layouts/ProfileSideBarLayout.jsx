@@ -1,6 +1,5 @@
-import React from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
-import { User, MapPin, ClipboardList, LogOut } from 'lucide-react';
+import { User, MapPin, ShoppingBag, LogOut } from 'lucide-react';
 import { useProfileLogic } from '../hooks/useProfileLogic';
 
 const ProfileSideBarLayout = () => {
@@ -9,70 +8,71 @@ const ProfileSideBarLayout = () => {
   const navLinkStyle = ({ isActive }) => 
     `flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 ${
       isActive 
-        ? 'bg-[#D1E2D9] text-[#2D5A43] font-bold shadow-sm' 
-        : 'text-gray-500 hover:bg-white hover:text-[#2D5A43]'
+        ? 'bg-[#E8F5EE] text-[#2D5A43] font-medium shadow-sm' 
+        : 'text-gray-900 hover:bg-gray-50'
     }`;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 pt-10 pb-20 flex flex-col lg:flex-row gap-8">
- 
-      <aside className="w-full lg:w-1/3">
-        <div className="bg-[#F3F5F7] rounded-[32px] p-8 border border-gray-100 text-center">
+    <div className="max-w-7xl mx-auto px-6 pt-10 pb-20">
+      <div className="flex flex-col lg:flex-row items-start gap-8">
+        <aside className="w-full lg:w-[360px] sticky top-10">
+          <div className="bg-white rounded-[32px] p-8 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+            <div className="flex flex-col items-center text-center pb-8 border-b border-gray-100 mb-8">
+              <div className="w-20 h-20 bg-[#E8F5EE] rounded-full flex items-center justify-center mb-4">
+                <User size={32} className="text-[#2D5A43]" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 tracking-tight capitalize">
+                {user?.name || 'Gian Adnan'}
+              </h2>
+              <p className="text-gray-400 text-sm font-normal">
+                {user?.email || 'gianadnan@gmail.com'}
+              </p>
+            </div>
+            <nav className="space-y-2">
+              <NavLink to="/profile" end className={navLinkStyle}>
+                <User size={22} strokeWidth={1.5} />
+                <div className="flex flex-col">
+                  <span className="text-[15px] font-semibold leading-tight">Informasi Profil</span>
+                  <span className="text-[12px] text-gray-400 font-normal">Kelola informasi profil Anda</span>
+                </div>
+              </NavLink>
 
-          <div className="w-24 h-24 bg-[#D1E2D9] rounded-full mx-auto mb-4 flex items-center justify-center border-4 border-white shadow-sm">
-            <User size={48} className="text-[#2D5A43]" />
+              <NavLink to="/profile/address" className={navLinkStyle}>
+                <MapPin size={22} strokeWidth={1.5} />
+                <div className="flex flex-col">
+                  <span className="text-[15px] font-semibold leading-tight">Alamat</span>
+                  <span className="text-[12px] text-gray-400 font-normal">Kelola alamat pengiriman Anda</span>
+                </div>
+              </NavLink>
+
+              <NavLink to="/profile/orders" className={navLinkStyle}>
+                <ShoppingBag size={22} strokeWidth={1.5} />
+                <div className="flex flex-col">
+                  <span className="text-[15px] font-semibold leading-tight">Riwayat Pesanan</span>
+                  <span className="text-[12px] text-gray-400 font-normal">Lihat riwayat pesanan Anda</span>
+                </div>
+              </NavLink>
+
+              <button 
+                onClick={handleLogout} 
+                className="w-full flex items-center gap-4 p-4 rounded-2xl text-red-500 hover:bg-red-50 transition-all mt-2 group"
+              >
+                <LogOut size={22} strokeWidth={1.5} />
+                <div className="flex flex-col text-left">
+                  <span className="text-[15px] font-semibold leading-tight">Logout</span>
+                  <span className="text-[12px] text-gray-400 font-normal group-hover:text-red-300">Logout dari akun</span>
+                </div>
+              </button>
+            </nav>
           </div>
-          <h2 className="text-xl font-bold text-gray-900 capitalize">
-            {user?.name || 'User Barokah'}
-          </h2>
-          <p className="text-xs text-gray-400 mt-1">{user?.email}</p>
+        </aside>
+        <main className="flex-1 w-full">
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <Outlet />
+          </div>
+        </main>
 
-       
-          <nav className="mt-10 space-y-3 text-left">
-            <NavLink to="/profile" end className={navLinkStyle}>
-              <User size={20} />
-              <div className="flex flex-col">
-                <span className="text-sm">Informasi Profil</span>
-                <span className="text-[10px] font-normal opacity-60">Kelola info profil Anda</span>
-              </div>
-            </NavLink>
-
-            <NavLink to="/profile/address" className={navLinkStyle}>
-              <MapPin size={20} />
-              <div className="flex flex-col">
-                <span className="text-sm">Alamat</span>
-                <span className="text-[10px] font-normal opacity-60">Kelola alamat pengiriman</span>
-              </div>
-            </NavLink>
-
-            <NavLink to="/profile/orders" className={navLinkStyle}>
-              <ClipboardList size={20} />
-              <div className="flex flex-col">
-                <span className="text-sm">Riwayat Pesanan</span>
-                <span className="text-[10px] font-normal opacity-60">Lihat transaksi Anda</span>
-              </div>
-            </NavLink>
-
-            <button 
-              onClick={handleLogout} 
-              className="w-full flex items-center gap-4 p-4 rounded-2xl text-red-500 hover:bg-red-50 transition-all mt-4 font-bold"
-            >
-              <LogOut size={20} />
-              <div className="flex flex-col text-left">
-                <span className="text-sm">Logout</span>
-                <span className="text-[10px] font-normal opacity-60">Keluar dari akun</span>
-              </div>
-            </button>
-          </nav>
-        </div>
-      </aside>
-
-     
-      <main className="flex-1">
-        <div className="animate-in fade-in duration-500">
-          <Outlet />
-        </div>
-      </main>
+      </div>
     </div>
   );
 };

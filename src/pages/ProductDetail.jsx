@@ -1,4 +1,3 @@
-import React from 'react';
 import { Star, ShoppingBag, Heart, Minus, Plus, ArrowLeft } from 'lucide-react';
 import { formatIDR } from '../utils/formatCurrency';
 import { useProductDetail } from '../hooks/useProductDetail';

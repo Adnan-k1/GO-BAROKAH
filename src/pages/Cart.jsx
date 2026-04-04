@@ -1,5 +1,4 @@
-import React from 'react';
-import { Trash2, Minus, Plus, ShoppingBag, ArrowRight } from 'lucide-react';
+import { Minus, Plus, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCartLogic } from '../hooks/useCartLogic';
 import { Link } from 'react-router-dom';
 
