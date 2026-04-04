@@ -35,6 +35,7 @@ const AddressModal = ({ isOpen, onClose, onSubmit, formData, onChange, isEdit })
                 value={formData.name} 
                 required 
                 onChange={onChange} 
+                placeholder="Contoh: Roberto Carlos"
               />
               <FormInput 
                 label="No. Telepon" 
@@ -42,6 +43,7 @@ const AddressModal = ({ isOpen, onClose, onSubmit, formData, onChange, isEdit })
                 value={formData.phone} 
                 required 
                 onChange={onChange} 
+                placeholder="Contoh: 081234567890"
               />
             </div>
 
@@ -51,6 +53,7 @@ const AddressModal = ({ isOpen, onClose, onSubmit, formData, onChange, isEdit })
               value={formData.address} 
               required 
               onChange={onChange} 
+              placeholder="Contoh: Jl. Merdeka No. 123, RT 01/RW 02, Kel. Sukamaju"
             />
             
             <FormInput 
@@ -59,6 +62,7 @@ const AddressModal = ({ isOpen, onClose, onSubmit, formData, onChange, isEdit })
               value={formData.city} 
               required 
               onChange={onChange} 
+              placeholder="Contoh: Jakarta, 12345"
             />
             <div className="flex gap-4 pt-4">
               <Button 

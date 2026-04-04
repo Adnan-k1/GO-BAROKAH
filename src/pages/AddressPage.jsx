@@ -1,14 +1,31 @@
 import React, { useState } from 'react';
 import { Plus, Trash2, MapPin, Check, PencilLine, Star } from 'lucide-react';
-
+import toast from 'react-hot-toast';
 import Button from '../components/common/Button';
 import AddressModal from '../components/forms/AddressModal'; 
+import ConfirmModal from '../components/forms/ConfirmModal';
 
 const AddressPage = () => {
   const [addresses, setAddresses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({ label: '', name: '', phone: '', address: '', city: '' });
+
+  const triggerDelete = (id) => {
+    setSelectedId(id);
+    setIsConfirmOpen(true);
+  }
+
+  const handleConfirmDelete = () => {
+    const updated = addresses.filter(item => item.id !== selectedId);
+    if (updated.length > 0 && !updated.some(a => a.isDefault)) updated[0].isDefault = true;
+    
+    setAddresses(updated);
+    setIsConfirmOpen(false);
+    toast.error('Alamat telah dihapus', { icon: '🗑️' });
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -35,7 +52,15 @@ const AddressPage = () => {
     } else {
       setAddresses([...addresses, { ...formData, id: Date.now(), isDefault: addresses.length === 0 }]);
     }
+    toast.success(editId ? 'Alamat berhasil diperbarui!' : 'Alamat baru berhasil ditambahkan!', {
+      style: {
+        borderRadius: '16px',
+        background: '#2D5A43',
+        color: '#fff',
+      }
+    });
     setIsModalOpen(false);
+    setEditId(null);
   };
 
   const setDefaultAddress = (id) => {
@@ -47,6 +72,12 @@ const AddressPage = () => {
       const updated = addresses.filter(item => item.id !== id);
       if (updated.length > 0 && !updated.some(a => a.isDefault)) updated[0].isDefault = true;
       setAddresses(updated);
+      toast.error('Alamat telah dihapus', { 
+        icon: '🗑️',
+        style: {
+          borderRadius: '16px',
+        }
+      });
     }
   };
 
@@ -92,7 +123,7 @@ const AddressPage = () => {
                 <button onClick={() => openModal(item)} className="flex items-center gap-2 text-[13px] font-bold text-gray-600 hover:text-[#2D5A43]">
                   <PencilLine size={16} /> UBAH
                 </button>
-                <Button variant="danger" className="text-[13px] px-4" onClick={() => deleteAddress(item.id)}>
+                <Button variant="danger" className="text-[13px] px-4" onClick={() => triggerDelete(item.id)}>
                    <Trash2 size={15} /> HAPUS
                 </Button>
               </div>
@@ -100,6 +131,13 @@ const AddressPage = () => {
           ))}
         </div>
       )}
+      <ConfirmModal 
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Hapus Alamat?"
+        message="Alamat ini akan dihapus permanen. Kamu harus menambahkannya lagi jika ingin menggunakannya kembali."
+      />
       <AddressModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

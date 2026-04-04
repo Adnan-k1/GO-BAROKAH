@@ -40,8 +40,6 @@ const ProductDetail = () => {
   );
 };
 
-
-
 const BackButton = ({ onClick }) => (
   <button onClick={onClick} className="flex items-center gap-2 text-gray-500 hover:text-black mb-8 text-sm font-medium transition-colors group">
     <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Kembali ke Toko
