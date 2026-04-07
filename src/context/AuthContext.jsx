@@ -18,10 +18,14 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = (userData) => setUser(userData);
+  const login = (userData) => {
+    setUser(userData);
+    localStorage.setItem('currentUser', JSON.stringify(userData)); 
+  };
   const logout = () => {
     setUser(null);
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('token'); 
   };
 
   return (

@@ -1,5 +1,3 @@
-import React from 'react';
-
 const CATEGORIES = [
   { id: 1, name: "Baking Needs", image: "src/assets/img/baking.svg" },
   { id: 2, name: "Cooking", image: "src/assets/img/cooking.png" },
