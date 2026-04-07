@@ -48,7 +48,7 @@ const Login = () => {
               icon={<Mail size={18} className="text-gray-400" />} 
               type="email" 
               name="email"
-              placeholder="adnangian12@gmail.com" 
+              placeholder="user@example.com" 
               value={formData.email} 
               onChange={handleChange} 
               className="bg-gray-50/50 border-gray-100 focus:bg-white transition-all"
