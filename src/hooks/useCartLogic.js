@@ -4,10 +4,10 @@ import { formatIDR } from '../utils/formatCurrency';
 export const useCartLogic = () => {
   const { cartItems, addToCart, removeFromCart, removeItem, clearCart } = useCart();
 
-  // Hanya menghitung subtotal barang
+
   const rawSubtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   
-  // Total sama dengan subtotal karena biaya kirim belum dihitung
+ 
   const rawTotal = rawSubtotal;
 
   const handleIncrement = (item) => addToCart(item);
@@ -21,7 +21,7 @@ export const useCartLogic = () => {
   return {
     cartItems,
     subtotal: formatIDR(rawSubtotal),
-    total: formatIDR(rawTotal), // Total sekarang hanya harga barang
+    total: formatIDR(rawTotal), 
     handleIncrement,
     handleDecrement,
     handleRemove,

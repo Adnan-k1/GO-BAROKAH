@@ -12,7 +12,6 @@ const Navbar = () => {
     <nav className="w-full bg-white border-b border-gray-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between gap-8">
         
-        {/* Logo */}
         <Link to="/" className="flex-shrink-0">
           <div className="flex flex-col items-start">
             <h1 className="text-[#2D5A43] text-2xl font-black tracking-tighter leading-none italic uppercase">
@@ -22,7 +21,6 @@ const Navbar = () => {
           </div>
         </Link>
 
-        {/* Search */}
         <div className="flex-1 max-w-2xl relative group">
           <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
             <Search className="h-5 w-5 text-gray-400 group-focus-within:text-[#2D5A43] transition-colors" />
@@ -34,7 +32,6 @@ const Navbar = () => {
           />
         </div>
 
-        {/* Nav Links & Actions */}
         <div className="flex items-center gap-8">
           <ul className="flex items-center gap-8">
             <li>
@@ -43,7 +40,6 @@ const Navbar = () => {
               </Link>
             </li>
             <li>
-              {/* DI SINI: Link diubah ke /store agar sinkron dengan App.jsx */}
               <Link to="/store" className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${location.pathname === '/store' ? 'text-[#2D5A43]' : 'text-gray-400 hover:text-black'}`}>
                 Shop
               </Link>
@@ -51,11 +47,9 @@ const Navbar = () => {
           </ul>
 
           <div className="flex items-center gap-5 border-l pl-8 border-gray-100">
-            {/* Keranjang */}
             <Link to="/cart" className="relative text-gray-800 hover:text-[#2D5A43] transition-colors group">
               <ShoppingCart className="w-6 h-6 stroke-[1.5] group-hover:scale-110 transition-transform" />
               
-              {/* Menampilkan total jenis produk unik */}
               {totalItems > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white animate-in zoom-in duration-300 shadow-sm">
                   {totalItems}
@@ -63,7 +57,7 @@ const Navbar = () => {
               )}
             </Link>
 
-            {/* Profile */}
+            
             <Link 
               to={isAuthenticated ? "/profile" : "/login"} 
               className="flex items-center gap-2 text-gray-800 hover:text-[#2D5A43] transition-colors"

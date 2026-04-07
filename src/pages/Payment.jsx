@@ -23,7 +23,7 @@ const Payment = () => {
     { id: 'debt', name: 'Hutang / Nota Buku', icon: <BookOpenCheck size={20}/>, public: false },
   ];
 
-  // Filter: Hanya tampilkan Hutang jika user.canDebt === true
+
   const availablePayments = paymentOptions.filter(opt => opt.public || user?.canDebt);
 
   if (!order) return <div className="p-20 text-center font-bold">Data pesanan tidak ditemukan.</div>;
@@ -64,7 +64,7 @@ const Payment = () => {
           </div>
         </div>
 
-        {/* RINGKASAN FINAL */}
+       
         <div className="bg-[#f8faf9] rounded-[3rem] p-10 border border-[#2D5A43]/10 h-fit">
           <div className="mb-8 pb-8 border-b border-gray-200">
              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Penerima</p>

@@ -19,16 +19,14 @@ import ProductDetail from './pages/ProductDetail';
 import Login from './pages/Login'; 
 import SignUp from './pages/SignUp'; 
 import Cart from './pages/Cart';
-import Checkout from './pages/Checkout'; // Dari branch teman
-import Payment from './pages/Payment';   // Dari branch teman
+import Checkout from './pages/Checkout';
+import Payment from './pages/Payment';   
 import ProfileInfoPage from './pages/Profile'; 
 import AddressPage from './pages/AddressPage'; 
 import OrdersPage from './pages/OrdersPage';
 
-// Wrapper untuk mengatur Layout (Navbar & Footer)
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
-  // Halaman yang tidak pakai Navbar/Footer
   const noLayoutPages = ['/login', '/signup']; 
   const showLayout = !noLayoutPages.includes(location.pathname);
 
@@ -55,7 +53,6 @@ function App() {
       <CartProvider>
         <Router>
           <ScrollToTop />
-          {/* Konfigurasi Toaster tetap dipertahankan */}
           <Toaster 
             position="top-center" 
             reverseOrder={false} 
@@ -73,7 +70,7 @@ function App() {
           
           <LayoutWrapper>
             <Routes>
-              {/* Public Routes */}
+             
               <Route path="/" element={<Home />} />
               <Route path="/store" element={<Store />} />
               <Route path="/product/:id" element={<ProductDetail />} />
@@ -81,11 +78,11 @@ function App() {
               <Route path="/signup" element={<SignUp />} />
               <Route path="/cart" element={<Cart />} />
               
-              {/* Checkout & Payment (Fitur Baru) */}
+              
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/payment" element={<Payment />} />
 
-              {/* Profile Routes dengan ProtectedRoute */}
+              
               <Route 
                 path="/profile" 
                 element={
@@ -99,10 +96,10 @@ function App() {
                 <Route path="orders" element={<OrdersPage />} />
               </Route> 
 
-              {/* Fallback Route */}
+            
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
-          </MainLayout>
+          </LayoutWrapper>
         </Router>
       </CartProvider>
     </AuthProvider>
