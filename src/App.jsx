@@ -102,7 +102,7 @@ function App() {
               {/* Fallback Route */}
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
-          </LayoutWrapper>
+          </MainLayout>
         </Router>
       </CartProvider>
     </AuthProvider>
