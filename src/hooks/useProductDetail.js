@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { ALL_PRODUCTS } from '../data/products';
 import toast from 'react-hot-toast';
+
 export const useProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -11,31 +12,47 @@ export const useProductDetail = () => {
 
   const product = ALL_PRODUCTS.find((p) => p.id === parseInt(id));
 
- 
   useEffect(() => {
     if (product) {
-      document.title = `${product.name} | Toko Organik`;
+      document.title = `${product.name} | UD Barokah`;
     }
   }, [product]);
 
-  const increase = () => setQuantity(prev => prev + 1);
-  const decrease = () => setQuantity(prev => Math.max(1, prev - 1));
+  const increase = () => setQuantity(prev => (prev === '' ? 1 : prev + 1));
+  const decrease = () => setQuantity(prev => Math.max(1, (prev === '' ? 1 : prev - 1)));
+
+  // Logika Input Manual
+  const handleQuantityChange = (e) => {
+    const val = e.target.value;
+    if (val === '') {
+      setQuantity('');
+      return;
+    }
+    const num = parseInt(val);
+    if (!isNaN(num)) {
+      setQuantity(Math.max(1, num));
+    }
+  };
+
+  // Reset ke 1 jika ditinggalkan dalam keadaan kosong
+  const handleBlur = () => {
+    if (quantity === '' || quantity < 1) {
+      setQuantity(1);
+    }
+  };
 
   const onAddToCart = () => {
-    if (!product) return;
-    for (let i = 0; i < quantity; i++) addToCart(product);
-    toast.success(`${quantity} ${product.name} berhasil ditambahkan!`, {
-      icon: '🛒',
-      duration: 3000,
+    if (!product || quantity === '') return;
+    
+    for (let i = 0; i < quantity; i++) {
+      addToCart(product);
+    }
+
+    toast.success(`${quantity} ${product.name} masuk keranjang!`, {
       style: {
-        borderRadius: '16px',
-        background: '#2D5A43', 
+        borderRadius: '12px',
+        background: '#2D5A43',
         color: '#fff',
-        fontWeight: 'bold',
-      },
-      iconTheme: {
-        primary: '#fff',
-        secondary: '#2D5A43',
       },
     });
   };
@@ -45,6 +62,8 @@ export const useProductDetail = () => {
     quantity,
     increase,
     decrease,
+    handleQuantityChange,
+    handleBlur,
     onAddToCart,
     goBack: () => navigate(-1)
   };

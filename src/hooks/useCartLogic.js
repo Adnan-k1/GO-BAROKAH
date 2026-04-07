@@ -2,30 +2,29 @@ import { useCart } from '../context/CartContext';
 import { formatIDR } from '../utils/formatCurrency';
 
 export const useCartLogic = () => {
-  const { cartItems, addToCart, removeFromCart, clearCart } = useCart();
+  const { cartItems, addToCart, removeFromCart, removeItem, clearCart } = useCart();
 
+  // Hanya menghitung subtotal barang
+  const rawSubtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   
-  const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  
-  
-  const shipping = cartItems.length > 0 ? 15000 : 0;
-  
-
-  const total = subtotal + shipping;
+  // Total sama dengan subtotal karena biaya kirim belum dihitung
+  const rawTotal = rawSubtotal;
 
   const handleIncrement = (item) => addToCart(item);
   const handleDecrement = (item) => removeFromCart(item.id);
-  const handleRemoveAll = (itemId) => {
-  
+  const handleRemove = (itemId) => {
+    if (window.confirm("Hapus produk ini dari keranjang?")) {
+      removeItem(itemId);
+    }
   };
 
   return {
     cartItems,
-    subtotal: formatIDR(subtotal),
-    shipping: formatIDR(shipping),
-    total: formatIDR(total),
+    subtotal: formatIDR(rawSubtotal),
+    total: formatIDR(rawTotal), // Total sekarang hanya harga barang
     handleIncrement,
     handleDecrement,
+    handleRemove,
     clearCart,
     isEmpty: cartItems.length === 0
   };

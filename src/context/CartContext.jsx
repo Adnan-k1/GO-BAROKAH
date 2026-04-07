@@ -3,35 +3,37 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    // Gunakan inisialisasi langsung agar angka tidak kedip saat refresh
+    const savedCart = localStorage.getItem("cart");
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
 
-  const addToCart = (product) => {
+  const addToCart = (product, quantity = 1) => {
+    const qtyToAdd = parseInt(quantity);
     setCartItems((prevItems) => {
       const isExist = prevItems.find((item) => item.id === product.id);
       if (isExist) {
         return prevItems.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item,
+          item.id === product.id 
+            ? { ...item, quantity: item.quantity + qtyToAdd } 
+            : item
         );
       }
-      return [...prevItems, { ...product, quantity: 1 }];
+      return [...prevItems, { ...product, quantity: qtyToAdd }];
     });
   };
 
-  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-  // Tambahkan ini di CartContext.jsx
-  useEffect(() => {
-    const savedCart = localStorage.getItem("cart");
-    if (savedCart) setCartItems(JSON.parse(savedCart));
-  }, []);
+  // --- KUNCI UTAMA ---
+  // Kita hanya menghitung jumlah jenis produk unik dalam array
+  const totalItems = cartItems.length;
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, totalItems }}>
+    <CartContext.Provider value={{ cartItems, addToCart, totalItems, setCartItems }}>
       {children}
     </CartContext.Provider>
   );
