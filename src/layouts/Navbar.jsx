@@ -1,7 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Search, ShoppingCart, User } from 'lucide-react';
+import { ShoppingCart, User } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext'; 
+import SearchBar from '../components/common/SearchBar';
 
 const Navbar = () => {
   const { totalItems } = useCart(); 
@@ -20,18 +21,7 @@ const Navbar = () => {
             <div className="w-full h-1 bg-gradient-to-r from-yellow-400 to-transparent mt-0.5 opacity-70"></div>
           </div>
         </Link>
-
-        <div className="flex-1 max-w-2xl relative group">
-          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-gray-400 group-focus-within:text-[#2D5A43] transition-colors" />
-          </div>
-          <input
-            type="text"
-            placeholder="Cari produk organik..."
-            className="w-full bg-[#F3F5F7] border-none rounded-xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-[#2D5A43]/20 transition-all outline-none font-medium"
-          />
-        </div>
-
+        <SearchBar />
         <div className="flex items-center gap-8">
           <ul className="flex items-center gap-8">
             <li>
@@ -49,20 +39,18 @@ const Navbar = () => {
           <div className="flex items-center gap-5 border-l pl-8 border-gray-100">
             <Link to="/cart" className="relative text-gray-800 hover:text-[#2D5A43] transition-colors group">
               <ShoppingCart className="w-6 h-6 stroke-[1.5] group-hover:scale-110 transition-transform" />
-              
               {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white animate-in zoom-in duration-300 shadow-sm">
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
                   {totalItems}
                 </span>
               )}
             </Link>
 
-            
             <Link 
               to={isAuthenticated ? "/profile" : "/login"} 
               className="flex items-center gap-2 text-gray-800 hover:text-[#2D5A43] transition-colors"
             >
-              <div className="w-9 h-9 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100 hover:border-[#2D5A43]/30 transition-colors">
+              <div className="w-9 h-9 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100">
                 <User className="w-5 h-5 stroke-[1.5]" />
               </div>
               {isAuthenticated && (
