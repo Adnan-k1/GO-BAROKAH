@@ -13,11 +13,11 @@ export const useCheckoutLogic = () => {
   const zones = [
     { name: 'Pangkalan Bun (Kota)', dist: 5, rate: 0 },
     { name: 'Kumai', dist: 15, rate: 0 },
-    { name: 'Pangkalan Lada', dist: 45, rate: 0.015 },  // Tarif 1.5%
-    { name: 'Pangkalan Banteng', dist: 65, rate: 0.015 }, // Tarif 1.5%
-    { name: 'Sukamandang', dist: 110, rate: 0.025 },    // Tarif 2.5%
-    { name: 'Sukamara', dist: 90, rate: 0.025 },        // Tarif 2.5%
-    { name: 'Lamandau', dist: 120, rate: 0.025 },       // Tarif 2.5%
+    { name: 'Pangkalan Lada', dist: 45, rate: 0.015 }, 
+    { name: 'Pangkalan Banteng', dist: 65, rate: 0.015 }, 
+    { name: 'Sukamandang', dist: 110, rate: 0.025 },   
+    { name: 'Sukamara', dist: 90, rate: 0.025 },        
+    { name: 'Lamandau', dist: 120, rate: 0.025 },       
   ];
 
   const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);

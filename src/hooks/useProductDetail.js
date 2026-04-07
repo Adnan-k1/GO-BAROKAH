@@ -34,7 +34,7 @@ export const useProductDetail = () => {
     }
   };
 
-  // Reset ke 1 jika ditinggalkan dalam keadaan kosong
+  
   const handleBlur = () => {
     if (quantity === '' || quantity < 1) {
       setQuantity(1);

@@ -21,9 +21,8 @@ const Checkout = () => {
       address: isPickup ? 'Ambil di Toko (Pangkalan Bun)' : `${alamatDetail} (${selectedLocation})`,
       subtotal,
       shippingFee: isPickup ? 'Gratis' : shippingFee,
-      total // Nilai total sementara
+      total 
     };
-    // Pindah ke halaman pembayaran
     navigate('/payment', { state: { orderData } });
   };
 
@@ -37,13 +36,11 @@ const Checkout = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2 space-y-8">
-          {/* TAB PENGIRIMAN */}
           <div className="flex gap-4 p-2 bg-gray-50 rounded-3xl border border-gray-100">
             <button onClick={() => setIsPickup(false)} className={`flex-1 py-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition-all ${!isPickup ? 'bg-white text-[#2D5A43] shadow-sm' : 'text-gray-400'}`}><Truck size={18}/> DIKIRIM</button>
             <button onClick={() => setIsPickup(true)} className={`flex-1 py-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition-all ${isPickup ? 'bg-white text-[#2D5A43] shadow-sm' : 'text-gray-400'}`}><Store size={18}/> AMBIL SENDIRI</button>
           </div>
 
-          {/* FORM ALAMAT */}
           <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-6">
             <label className="flex items-center gap-2 text-[11px] font-black text-gray-400 uppercase tracking-widest"><User size={14}/> Informasi Penerima</label>
             <input type="text" placeholder="Nama Lengkap" className="w-full p-5 rounded-2xl bg-gray-50 outline-none font-bold text-gray-800 focus:bg-white border-2 border-transparent focus:border-[#2D5A43]/10 transition-all" value={namaPenerima} onChange={(e) => setNamaPenerima(e.target.value)} />
@@ -61,7 +58,6 @@ const Checkout = () => {
           </div>
         </div>
 
-        {/* SUMMARY */}
         <div className="lg:col-span-1">
           <div className="bg-[#f8faf9] rounded-[2.5rem] p-8 sticky top-24 border border-[#2D5A43]/10 shadow-sm text-left">
             <h3 className="text-xl font-black mb-8 text-gray-900">Ringkasan</h3>
