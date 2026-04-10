@@ -1,28 +1,32 @@
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingCart, User } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext'; 
+import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
-  const { totalItems } = useCart(); 
-  const { user, isAuthenticated } = useAuth(); 
+  const { totalItems } = useCart();
+  const { user } = useAuth();
   const location = useLocation();
+
+ 
+  const isActive = (path) => location.pathname === path;
 
   return (
     <nav className="w-full bg-white border-b border-gray-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between gap-8">
         
-        {/* Logo */}
-        <Link to="/" className="flex-shrink-0">
+        
+        <Link to="/" className="flex-shrink-0 group">
           <div className="flex flex-col items-start">
-            <h1 className="text-[#2D5A43] text-2xl font-black tracking-tighter leading-none italic uppercase">
+            <h1 className="text-[#2D5A43] text-2xl font-black tracking-tighter leading-none italic uppercase transition-transform group-hover:scale-95">
               UD. Barokah
             </h1>
             <div className="w-full h-1 bg-gradient-to-r from-yellow-400 to-transparent mt-0.5 opacity-70"></div>
           </div>
         </Link>
 
-        {/* Search */}
+        
         <div className="flex-1 max-w-2xl relative group">
           <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
             <Search className="h-5 w-5 text-gray-400 group-focus-within:text-[#2D5A43] transition-colors" />
@@ -34,48 +38,60 @@ const Navbar = () => {
           />
         </div>
 
-        {/* Nav Links & Actions */}
+        
         <div className="flex items-center gap-8">
           <ul className="flex items-center gap-8">
             <li>
-              <Link to="/" className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${location.pathname === '/' ? 'text-[#2D5A43]' : 'text-gray-400 hover:text-black'}`}>
+              <Link 
+                to="/" 
+                className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
+                  isActive('/') ? 'text-[#2D5A43]' : 'text-gray-400 hover:text-black'
+                }`}
+              >
                 Home
               </Link>
             </li>
             <li>
-              {/* DI SINI: Link diubah ke /store agar sinkron dengan App.jsx */}
-              <Link to="/store" className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${location.pathname === '/store' ? 'text-[#2D5A43]' : 'text-gray-400 hover:text-black'}`}>
+              <Link 
+                to="/store" 
+                className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
+                  isActive('/store') ? 'text-[#2D5A43]' : 'text-gray-400 hover:text-black'
+                }`}
+              >
                 Shop
               </Link>
             </li>
           </ul>
 
+          
           <div className="flex items-center gap-5 border-l pl-8 border-gray-100">
-            {/* Keranjang */}
+           
             <Link to="/cart" className="relative text-gray-800 hover:text-[#2D5A43] transition-colors group">
               <ShoppingCart className="w-6 h-6 stroke-[1.5] group-hover:scale-110 transition-transform" />
-              
-              {/* Menampilkan total jenis produk unik */}
               {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white animate-in zoom-in duration-300 shadow-sm">
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white animate-in zoom-in shadow-sm">
                   {totalItems}
                 </span>
               )}
             </Link>
 
-            {/* Profile */}
+            
             <Link 
-              to={isAuthenticated ? "/profile" : "/login"} 
-              className="flex items-center gap-2 text-gray-800 hover:text-[#2D5A43] transition-colors"
+              to="/profile" 
+              className="flex items-center gap-3 text-gray-800 hover:text-[#2D5A43] transition-colors group"
             >
-              <div className="w-9 h-9 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100 hover:border-[#2D5A43]/30 transition-colors">
+              <div className="w-9 h-9 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100 group-hover:border-[#2D5A43]/30 group-hover:bg-[#2D5A43]/5 transition-all">
                 <User className="w-5 h-5 stroke-[1.5]" />
               </div>
-              {isAuthenticated && (
+
+              
+              {user && (
                 <div className="flex flex-col">
-                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-0.5">Akun</span>
+                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-0.5">
+                    Akun
+                  </span>
                   <span className="text-[11px] font-black text-gray-900 uppercase tracking-tighter leading-none">
-                    {user?.name?.split(' ')[0]}
+                    {user?.username?.split(' ')[0] || user?.name?.split(' ')[0] || "User"}
                   </span>
                 </div>
               )}

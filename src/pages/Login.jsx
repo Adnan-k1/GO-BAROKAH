@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Mail, Lock, ArrowLeft } from 'lucide-react';
 import { useLoginLogic } from '../hooks/useLoginLogic';
 import InputField from '../components/common/FormInput';
-import Button from '../components/common/Button'; // Pastikan import mengarah ke Button yang di atas
+import Button from '../components/common/Button'; 
 
 const Login = () => {
   const { formData, handleChange, handleLogin, isLoading, error } = useLoginLogic();

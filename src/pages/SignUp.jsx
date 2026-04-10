@@ -6,7 +6,7 @@ import InputField from "../components/common/FormInput";
 import SubmitButton from "../components/common/Button";
 
 const SignUp = () => {
-  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const [formData, setFormData] = useState({ username: "", email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -37,9 +37,30 @@ const SignUp = () => {
         </div>
 
         <form onSubmit={handleSignUp} className="space-y-6">
-          <InputField icon={<User />} type="text" name="name" placeholder="Nama Lengkap" onChange={handleChange} />
-          <InputField icon={<Mail />} type="email" name="email" placeholder="Email Anda" onChange={handleChange} />
-          <InputField icon={<Lock />} type="password" name="password" placeholder="Buat Password" onChange={handleChange} />
+          <InputField 
+            icon={<User />} 
+            type="text" 
+            name="username" 
+            placeholder="Username" 
+            onChange={handleChange} 
+            required
+          />
+          <InputField 
+            icon={<Mail />} 
+            type="email" 
+            name="email" 
+            placeholder="Email Anda" 
+            onChange={handleChange} 
+            required
+          />
+          <InputField 
+            icon={<Lock />} 
+            type="password" 
+            name="password" 
+            placeholder="Buat Password" 
+            onChange={handleChange} 
+            required
+          />
           
           <SubmitButton isLoading={isLoading} text="Daftar Sekarang" />
         </form>
@@ -52,4 +73,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;             
+export default SignUp;

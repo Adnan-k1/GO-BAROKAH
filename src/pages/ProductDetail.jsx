@@ -18,7 +18,6 @@ const ProductDetail = () => {
         <BackButton onClick={goBack} />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-          {/* Gallery Section */}
           <div className="bg-white border border-gray-100 rounded-[2.5rem] p-12 flex items-center justify-center relative shadow-2xl shadow-gray-200/50">
             {product.sale && (
               <span className="absolute top-8 left-8 bg-red-500 text-white text-[10px] font-black px-4 py-1.5 rounded-full z-10 uppercase tracking-widest">
@@ -28,7 +27,6 @@ const ProductDetail = () => {
             <img src={product.img} alt={product.name} className="max-h-[480px] object-contain" />
           </div>
 
-          {/* Info Section */}
           <div className="flex flex-col pt-4">
             <span className="text-[#2D5A43] font-black text-[10px] uppercase tracking-[0.3em] mb-4">{product.category}</span>
             <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-6 tracking-tighter leading-tight">{product.name}</h1>
@@ -50,7 +48,6 @@ const ProductDetail = () => {
               Produk segar berkualitas tinggi yang dipilih langsung dari mitra petani lokal UD Barokah.
             </p>
 
-            {/* Action Controls */}
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <QuantityControl 
                 qty={quantity} 
@@ -73,7 +70,6 @@ const ProductDetail = () => {
   );
 };
 
-// --- Komponen Pendukung ---
 
 const BackButton = ({ onClick }) => (
   <button onClick={onClick} className="flex items-center gap-2 text-gray-400 hover:text-[#2D5A43] mb-10 text-[10px] font-black uppercase tracking-[0.2em] transition-all">
