@@ -1,147 +1,111 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, MapPin, Check, PencilLine, Star } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { Plus, Trash2, PencilLine, Loader2 } from 'lucide-react';
 import Button from '../components/common/Button';
-import AddressModal from '../components/forms/AddressModal'; 
-import ConfirmModal from '../components/forms/ConfirmModal';
+import AddressModal from '../components/forms/AddressModal';
+import { useAddressLogic } from '../hooks/useAddressLogic';
 
 const AddressPage = () => {
-  const [addresses, setAddresses] = useState([]);
+  const { addresses, isLoading, handleSaveAddress, handleDeleteAddress } = useAddressLogic();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
   const [editId, setEditId] = useState(null);
-  const [formData, setFormData] = useState({ label: '', name: '', phone: '', address: '', city: '' });
 
-  const triggerDelete = (id) => {
-    setSelectedId(id);
-    setIsConfirmOpen(true);
-  }
-
-  const handleConfirmDelete = () => {
-    const updated = addresses.filter(item => item.id !== selectedId);
-    if (updated.length > 0 && !updated.some(a => a.isDefault)) updated[0].isDefault = true;
-    
-    setAddresses(updated);
-    setIsConfirmOpen(false);
-    toast.error('Alamat telah dihapus', { icon: '🗑️' });
-  };
+  const [formData, setFormData] = useState({
+    label: '',
+    recipient_name: '',
+    recipient_phone: '',
+    address_detail: ''
+  });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const openModal = (item = null) => {
     if (item) {
       setEditId(item.id);
-      setFormData({ ...item });
+      setFormData({
+        label: item.label || '',
+        recipient_name: item.recipientName || '',
+        recipient_phone: item.recipientPhone || '',
+        address_detail: item.addressDetail || ''
+      });
     } else {
       setEditId(null);
-      setFormData({ label: '', name: '', phone: '', address: '', city: '' });
+      setFormData({
+        label: '',
+        recipient_name: '',
+        recipient_phone: '',
+        address_detail: ''
+      });
     }
     setIsModalOpen(true);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (editId) {
-      setAddresses(addresses.map(addr => 
-        addr.id === editId ? { ...formData, id: editId, isDefault: addr.isDefault } : addr
-      ));
-    } else {
-      setAddresses([...addresses, { ...formData, id: Date.now(), isDefault: addresses.length === 0 }]);
-    }
-    toast.success(editId ? 'Alamat berhasil diperbarui!' : 'Alamat baru berhasil ditambahkan!', {
-      style: {
-        borderRadius: '16px',
-        background: '#2D5A43',
-        color: '#fff',
-      }
-    });
-    setIsModalOpen(false);
-    setEditId(null);
-  };
-
-  const setDefaultAddress = (id) => {
-    setAddresses(addresses.map(addr => ({ ...addr, isDefault: addr.id === id })));
-  };
-
-  const deleteAddress = (id) => {
-    if (window.confirm('Hapus alamat ini?')) {
-      const updated = addresses.filter(item => item.id !== id);
-      if (updated.length > 0 && !updated.some(a => a.isDefault)) updated[0].isDefault = true;
-      setAddresses(updated);
-      toast.error('Alamat telah dihapus', { 
-        icon: '🗑️',
-        style: {
-          borderRadius: '16px',
-        }
-      });
-    }
-  };
-
   return (
-    <div className="bg-white rounded-[32px] p-8 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] min-h-[600px]">
+    <div className="bg-white rounded-[32px] p-8 border border-gray-100 min-h-[500px]">
       <div className="flex justify-between items-center mb-10">
-        <div>
-          <h3 className="text-2xl font-bold text-gray-900 tracking-tight">Alamat Saya</h3>
-          <p className="text-sm text-gray-400 mt-1">Kelola alamat pengiriman pesanan Anda</p>
-        </div>
-        <Button onClick={() => openModal()} className="px-6 py-3 text-[14px]">
-          <Plus size={18} /> Tambah Alamat
+        <h3 className="text-2xl font-bold text-gray-900">Alamat Saya</h3>
+        <Button onClick={() => openModal()} className="px-6 py-3">
+          <Plus size={18} /> TAMBAH ALAMAT
         </Button>
       </div>
 
-      {addresses.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-32 text-gray-400">
-          <MapPin size={32} className="text-gray-200 mb-4" />
-          <p>Belum ada alamat pengiriman.</p>
+      {isLoading ? (
+        <div className="flex justify-center py-20">
+          <Loader2 className="animate-spin text-[#2D5A43]" />
+        </div>
+      ) : addresses.length === 0 ? (
+        <div className="text-center py-20 text-gray-400">
+          <p className="text-sm">Belum ada alamat tersimpan</p>
         </div>
       ) : (
         <div className="grid gap-6">
           {addresses.map((item) => (
-            <div key={item.id} className={`p-6 rounded-[24px] border-2 transition-all ${item.isDefault ? 'border-[#2D5A43] bg-[#fdfdfd]' : 'border-gray-50 bg-white'}`}>
-              <div className="flex justify-between items-start mb-4">
-                <span className="font-bold text-gray-900">{item.label}</span>
-                {item.isDefault ? (
-                  <span className="bg-[#2D5A43] text-white text-[10px] px-2.5 py-1 rounded-lg uppercase font-bold flex items-center gap-1">
-                    <Check size={10} /> Utama
+            <div key={item.id} className="p-6 rounded-[24px] border border-gray-100 bg-gray-50/40">
+              <div className="flex items-center gap-2">
+                {item.label && (
+                  <span className="text-[10px] font-black text-[#2D5A43] uppercase bg-green-50 px-2 py-1 rounded">
+                    {item.label}
                   </span>
-                ) : (
-                  <button onClick={() => setDefaultAddress(item.id)} className="text-[11px] font-bold text-[#2D5A43] hover:underline flex items-center gap-1">
-                    <Star size={12} /> Jadikan Utama
-                  </button>
+                )}
+                {item.isDefault && (
+                  <span className="text-[10px] font-black text-blue-600 uppercase bg-blue-50 px-2 py-1 rounded">
+                    Utama
+                  </span>
                 )}
               </div>
-              <div className="text-[14px] text-gray-500 space-y-1">
-                <p className="font-bold text-gray-800">{item.name}</p>
-                <p>{item.phone}</p>
-                <p>{item.address}, {item.city}</p>
+              <div className="mt-3 text-[14px]">
+                <p className="font-bold text-gray-900">{item.recipientName}</p>
+                <p className="text-gray-500">{item.recipientPhone}</p>
+                <p className="text-gray-600 mt-1">{item.addressDetail}</p>
               </div>
-              <div className="mt-6 pt-6 border-t border-gray-50 flex gap-4">
-                <button onClick={() => openModal(item)} className="flex items-center gap-2 text-[13px] font-bold text-gray-600 hover:text-[#2D5A43]">
-                  <PencilLine size={16} /> UBAH
+              <div className="mt-5 flex gap-5 pt-4 border-t border-gray-100">
+                <button
+                  onClick={() => openModal(item)}
+                  className="text-xs font-bold text-gray-400 hover:text-[#2D5A43] flex items-center gap-1"
+                >
+                  <PencilLine size={14} /> UBAH
                 </button>
-                <Button variant="danger" className="text-[13px] px-4" onClick={() => triggerDelete(item.id)}>
-                   <Trash2 size={15} /> HAPUS
-                </Button>
+                <button
+                  onClick={() => handleDeleteAddress(item.id)}
+                  className="text-xs font-bold text-red-300 hover:text-red-500 flex items-center gap-1"
+                >
+                  <Trash2 size={14} /> HAPUS
+                </button>
               </div>
             </div>
           ))}
         </div>
       )}
-      <ConfirmModal 
-        isOpen={isConfirmOpen}
-        onClose={() => setIsConfirmOpen(false)}
-        onConfirm={handleConfirmDelete}
-        title="Hapus Alamat?"
-        message="Alamat ini akan dihapus permanen. Kamu harus menambahkannya lagi jika ingin menggunakannya kembali."
-      />
-      <AddressModal 
+
+      <AddressModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={handleSubmit}
+        onSubmit={async (e) => {
+          e.preventDefault();
+          if (await handleSaveAddress(formData, editId)) setIsModalOpen(false);
+        }}
         formData={formData}
         onChange={handleInputChange}
         isEdit={!!editId}

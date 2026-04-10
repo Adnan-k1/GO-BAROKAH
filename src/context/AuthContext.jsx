@@ -7,30 +7,33 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-      try {
+    const loadStoredData = () => {
+      // Samakan nama key-nya: 'user' dan 'token'
+      const savedUser = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+
+      if (savedUser && token && token !== 'undefined') {
         setUser(JSON.parse(savedUser));
-      } catch (e) {
-        localStorage.removeItem('currentUser');
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+    loadStoredData();
   }, []);
 
+  // Kita buat fungsinya lebih simpel, data sudah disimpan oleh authService
   const login = (userData) => {
     setUser(userData);
-    localStorage.setItem('currentUser', JSON.stringify(userData)); 
   };
+
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('token'); 
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user, loading }}>
-      {!loading ? children : <div className="h-screen flex items-center justify-center italic">Loading...</div>}
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
+      {children}
     </AuthContext.Provider>
   );
 };

@@ -1,68 +1,41 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import toast from 'react-hot-toast'; 
+import toast from 'react-hot-toast';
 
 export const useProfileLogic = () => {
-  const { user, logout } = useAuth();
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    birthDate: ''
-  });
-
+  
   useEffect(() => {
-    if (user) {
-      const parts = user.name ? user.name.split(' ') : ['', ''];
-      setFormData({
-        firstName: parts[0] || '',
-        lastName: parts[1] || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        birthDate: user.birthDate || ''
-      });
+    const storedUser = localStorage.getItem('user'); 
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
     }
-  }, [user]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const saveProfile = async () => {
-    try {
-      const loadingToast = toast.loading('Menyimpan perubahan...');
-      setTimeout(() => {
-        toast.dismiss(loadingToast);
-        toast.success('Profil berhasil diperbarui!', {
-          style: {
-            borderRadius: '16px',
-            background: '#2D5A43', 
-            color: '#fff',
-          },
-        });
-      }, 800);
-
-    } catch (error) {
-      toast.error('Gagal memperbarui profil. Coba lagi nanti.');
-    }
-  };
+  }, []);
 
   const handleLogout = () => {
-    logout();
-    navigate('/login');
-    toast.success('Berhasil keluar!');
+   
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+
+   
+    toast.success('Berhasil keluar. Sampai jumpa kembali!', {
+      icon: '👋',
+      style: {
+        borderRadius: '16px',
+        background: '#2D5A43',
+        color: '#fff',
+      },
+      duration: 3000
+    });
+
+    
+    navigate('/login', { replace: true });
   };
 
-  return { 
+  return {
     user,
-    formData,
-    handleChange,
-    saveProfile,
     handleLogout
   };
 };

@@ -1,11 +1,18 @@
-const FormInput = ({ label, ...props }) => (
-  <div className="space-y-2">
-    {label && <label className="text-[14px] font-semibold text-gray-700 ml-1">{label}</label>}
-    <input 
-      {...props}
-      className="w-full bg-gray-50/50 border border-gray-200 p-4 rounded-2xl outline-none focus:border-[#2D5A43] focus:ring-1 focus:ring-[#2D5A43] text-[14px] transition-all placeholder:text-gray-300" 
+const FormInput = ({ label, name, value, onChange, required, type = "text" }) => (
+  <div className="flex flex-col gap-1">
+    <label className="text-[10px] font-black uppercase text-gray-400 tracking-wider">
+      {label}
+    </label>
+    <input
+      type={type}
+      name={name}
+      value={value ?? ''}      
+      onChange={onChange}      
+      required={required}
+      className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D5A43]/20"
     />
   </div>
 );
+
 
 export default FormInput;
