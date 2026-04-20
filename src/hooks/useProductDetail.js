@@ -1,64 +1,78 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { ALL_PRODUCTS } from '../data/products';
-import toast from 'react-hot-toast';
+import { productService } from '../services/productService';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const useProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
 
-  const product = ALL_PRODUCTS.find((p) => p.id === parseInt(id));
+  const fetchProductDetail = useCallback(async () => {
+    if (!id) return;
+    setLoading(true);
+    try {
+      const response = await productService.getProductById(id);
+      const p = response.data || response;
+      const imagePath = p.image_url || p.image || p.img || '';
+      const cleanBaseUrl = API_URL?.replace(/\/$/, '') || ''; 
+      const cleanImagePath = imagePath.replace(/^\//, ''); 
+
+      const sanitizedProduct = {
+        ...p,
+        id: p._id || p.id,
+        img: imagePath.startsWith('http') 
+             ? imagePath 
+             : imagePath === '' 
+               ? '' 
+               : `${cleanBaseUrl}/${cleanImagePath}`
+      };
+
+      setProduct(sanitizedProduct);
+      if (sanitizedProduct.name) {
+        document.title = `${sanitizedProduct.name} | UD Barokah`;
+      }
+    } catch (err) {
+      console.error("❌ Gagal ambil detail produk:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
 
   useEffect(() => {
-    if (product) {
-      document.title = `${product.name} | UD Barokah`;
-    }
-  }, [product]);
+    fetchProductDetail();
+  }, [fetchProductDetail]);
 
   const increase = () => setQuantity(prev => (prev === '' ? 1 : prev + 1));
   const decrease = () => setQuantity(prev => Math.max(1, (prev === '' ? 1 : prev - 1)));
-
-  // Logika Input Manual
+  
   const handleQuantityChange = (e) => {
     const val = e.target.value;
-    if (val === '') {
-      setQuantity('');
-      return;
-    }
+    if (val === '') { setQuantity(''); return; }
     const num = parseInt(val);
-    if (!isNaN(num)) {
-      setQuantity(Math.max(1, num));
-    }
+    if (!isNaN(num)) setQuantity(Math.max(1, num));
   };
 
-  
   const handleBlur = () => {
-    if (quantity === '' || quantity < 1) {
-      setQuantity(1);
-    }
+    if (quantity === '' || quantity < 1) setQuantity(1);
   };
 
   const onAddToCart = () => {
     if (!product || quantity === '') return;
-    
     for (let i = 0; i < quantity; i++) {
       addToCart(product);
     }
-
-    toast.success(`${quantity} ${product.name} masuk keranjang!`, {
-      style: {
-        borderRadius: '12px',
-        background: '#2D5A43',
-        color: '#fff',
-      },
-    });
   };
 
   return {
     product,
+    loading,
     quantity,
     increase,
     decrease,

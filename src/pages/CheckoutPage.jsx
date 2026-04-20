@@ -3,15 +3,13 @@ import { useCheckoutLogic } from '../hooks/useCheckoutLogic';
 import { MapPin, Truck, Store, User, ChevronLeft, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const Checkout = () => {
+const CheckoutPage = () => {
   const navigate = useNavigate();
   const { 
     cartItems, zones, selectedLocation, setSelectedLocation, 
-    subtotal, shippingFee, total, isPickup, setIsPickup 
+    subtotal, shippingFee, total, isPickup, setIsPickup,
+    namaPenerima, setNamaPenerima,alamatDetail, setAlamatDetail
   } = useCheckoutLogic();
-
-  const [namaPenerima, setNamaPenerima] = useState('');
-  const [alamatDetail, setAlamatDetail] = useState('');
 
   const handleNextStep = () => {
     const orderData = {
@@ -79,4 +77,4 @@ const Checkout = () => {
   );
 };
 
-export default Checkout;
+export default CheckoutPage;

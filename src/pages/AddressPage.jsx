@@ -1,103 +1,204 @@
-import React, { useState } from 'react';
-import { Plus, Trash2, PencilLine, Loader2 } from 'lucide-react';
-import Button from '../components/common/Button';
-import AddressModal from '../components/forms/AddressModal';
-import { useAddressLogic } from '../hooks/useAddressLogic';
+import React, { useState } from "react";
+import {
+  MapPin,
+  Plus,
+  Trash2,
+  PencilLine,
+  Loader2,
+  Home,
+  Briefcase,
+  Map,
+  Phone,
+  User,
+} from "lucide-react";
+import Button from "../components/common/Button";
+import AddressModal from "../components/forms/AddressModal";
+import { useAddressLogic } from "../hooks/useAddressLogic";
 
 const AddressPage = () => {
-  const { addresses, isLoading, handleSaveAddress, handleDeleteAddress } = useAddressLogic();
+  const {
+    addresses,
+    isLoading,
+    handleSaveAddress,
+    handleDeleteAddress,
+    handleSetDefault,
+  } = useAddressLogic();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editId, setEditId] = useState(null);
-
   const [formData, setFormData] = useState({
-    label: '',
-    recipient_name: '',
-    recipient_phone: '',
-    address_detail: ''
+    label: "",
+    recipient_name: "",
+    recipient_phone: "",
+    address_detail: "",
+    is_default: false,
   });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const getLabelIcon = (label) => {
+    const l = label?.toLowerCase() || "";
+    if (l.includes("rumah")) return <Home size={16} />;
+    if (l.includes("kantor")) return <Briefcase size={16} />;
+    return <Map size={16} />;
   };
 
   const openModal = (item = null) => {
     if (item) {
-      setEditId(item.id);
+      setEditId(item.id || item._id);
       setFormData({
-        label: item.label || '',
-        recipient_name: item.recipientName || '',
-        recipient_phone: item.recipientPhone || '',
-        address_detail: item.addressDetail || ''
+        label: item.label || "",
+        recipient_name: item.recipientName || "",
+        recipient_phone: item.recipientPhone || "",
+        address_detail: item.addressDetail || "",
+        is_default: item.isDefault || false,
       });
     } else {
       setEditId(null);
       setFormData({
-        label: '',
-        recipient_name: '',
-        recipient_phone: '',
-        address_detail: ''
+        label: "",
+        recipient_name: "",
+        recipient_phone: "",
+        address_detail: "",
+        is_default: false,
       });
     }
     setIsModalOpen(true);
   };
 
   return (
-    <div className="bg-white rounded-[32px] p-8 border border-gray-100 min-h-[500px]">
-      <div className="flex justify-between items-center mb-10">
-        <h3 className="text-2xl font-bold text-gray-900">Alamat Saya</h3>
-        <Button onClick={() => openModal()} className="px-6 py-3">
+    <div className="bg-white rounded-[32px] p-8 border border-gray-100 shadow-sm min-h-[600px]">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
+        <div>
+          <h3 className="text-2xl font-black text-gray-900 tracking-tight">
+            Alamat <span className="text-[#3A5A4D]">Pengiriman.</span>
+          </h3>
+          <p className="text-sm text-gray-400 mt-1 font-medium">
+            Atur ke mana pesanan Barokah Anda akan dikirim.
+          </p>
+        </div>
+        <button
+          onClick={() => openModal()}
+          className="flex items-center gap-2 bg-[#3A5A4D] hover:bg-[#2D463C] text-white px-6 py-3 rounded-2xl text-[12px] font-bold tracking-widest transition-all active:scale-95 shadow-lg shadow-green-900/10"
+        >
           <Plus size={18} /> TAMBAH ALAMAT
-        </Button>
-      </div>
+        </button>
+      </header>
 
-      {isLoading ? (
-        <div className="flex justify-center py-20">
-          <Loader2 className="animate-spin text-[#2D5A43]" />
-        </div>
-      ) : addresses.length === 0 ? (
-        <div className="text-center py-20 text-gray-400">
-          <p className="text-sm">Belum ada alamat tersimpan</p>
-        </div>
-      ) : (
-        <div className="grid gap-6">
-          {addresses.map((item) => (
-            <div key={item.id} className="p-6 rounded-[24px] border border-gray-100 bg-gray-50/40">
-              <div className="flex items-center gap-2">
-                {item.label && (
-                  <span className="text-[10px] font-black text-[#2D5A43] uppercase bg-green-50 px-2 py-1 rounded">
-                    {item.label}
-                  </span>
-                )}
-                {item.isDefault && (
-                  <span className="text-[10px] font-black text-blue-600 uppercase bg-blue-50 px-2 py-1 rounded">
-                    Utama
-                  </span>
-                )}
+      <div className="grid grid-cols-1 gap-6">
+        {isLoading ? (
+          <div className="flex justify-center py-40">
+            <Loader2 className="animate-spin text-[#3A5A4D]" size={32} />
+          </div>
+        ) : addresses.length > 0 ? (
+          addresses.map((item) => {
+            const itemId = item.id || item._id;
+            const isDefault = item.isDefault || item.is_default || false;
+
+            return (
+              <div
+                key={itemId}
+                className={`group relative border rounded-[24px] p-6 transition-all duration-300 ${
+                  isDefault
+                    ? "border-[#3A5A4D] bg-[#FDFDFD] shadow-md shadow-green-900/5"
+                    : "border-gray-100 hover:border-gray-300 bg-white"
+                }`}
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`p-2 rounded-xl ${isDefault ? "bg-[#3A5A4D] text-white" : "bg-gray-100 text-gray-500"}`}
+                    >
+                      {getLabelIcon(item.label)}
+                    </div>
+                    <span className="font-black text-[10px] uppercase tracking-[0.2em] text-gray-400">
+                      {item.label || "Alamat"}
+                    </span>
+                    {isDefault && (
+                      <span className="bg-[#E8F5EE] text-[#3A5A4D] text-[9px] px-3 py-1 rounded-lg font-black uppercase tracking-tighter">
+                        Utama
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="px-1 py-2 space-y-3">
+                  <div className="flex items-center gap-4">
+                    <User
+                      size={16}
+                      className="text-[#3A5A4D] opacity-40 shrink-0"
+                    />
+                    <span className="text-[15px] font-bold text-gray-900">
+                      {item.recipientName || "-"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Phone
+                      size={16}
+                      className="text-[#3A5A4D] opacity-40 shrink-0"
+                    />
+                    <span className="text-[14px] text-gray-600 font-medium">
+                      {item.recipientPhone || "-"}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <MapPin
+                      size={16}
+                      className="text-[#3A5A4D] opacity-40 shrink-0 mt-0.5"
+                    />
+                    <span className="text-[14px] text-gray-500 leading-relaxed font-medium">
+                      {item.addressDetail || "-"}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row justify-between items-center pt-5 border-t border-gray-50 gap-4">
+                  {!isDefault ? (
+                    <button
+                      onClick={() => handleSetDefault(itemId)}
+                      className="text-[11px] text-gray-400 hover:text-[#3A5A4D] font-bold uppercase tracking-widest transition-colors"
+                    >
+                      Jadikan Utama
+                    </button>
+                  ) : (
+                    <div />
+                  )}
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => openModal(item)}
+                      className="p-2.5 text-gray-400 hover:text-[#3A5A4D] hover:bg-gray-50 rounded-xl transition-all"
+                      title="Edit Alamat"
+                    >
+                      <PencilLine size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteAddress(itemId)}
+                      className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                      title="Hapus Alamat"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div className="mt-3 text-[14px]">
-                <p className="font-bold text-gray-900">{item.recipientName}</p>
-                <p className="text-gray-500">{item.recipientPhone}</p>
-                <p className="text-gray-600 mt-1">{item.addressDetail}</p>
-              </div>
-              <div className="mt-5 flex gap-5 pt-4 border-t border-gray-100">
-                <button
-                  onClick={() => openModal(item)}
-                  className="text-xs font-bold text-gray-400 hover:text-[#2D5A43] flex items-center gap-1"
-                >
-                  <PencilLine size={14} /> UBAH
-                </button>
-                <button
-                  onClick={() => handleDeleteAddress(item.id)}
-                  className="text-xs font-bold text-red-300 hover:text-red-500 flex items-center gap-1"
-                >
-                  <Trash2 size={14} /> HAPUS
-                </button>
-              </div>
+            );
+          })
+        ) : (
+          <div className="flex flex-col items-center justify-center text-center py-24 border-2 border-dashed border-gray-100 rounded-[32px]">
+            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+              <MapPin size={32} className="text-gray-200" />
             </div>
-          ))}
-        </div>
-      )}
+            <h4 className="text-lg font-bold text-gray-900">
+              Belum ada alamat tersimpan
+            </h4>
+            <p className="text-sm text-gray-400 mt-2 max-w-[250px]">
+              Tambahkan lokasi pengiriman untuk memudahkan checkout.
+            </p>
+          </div>
+        )}
+      </div>
 
       <AddressModal
         isOpen={isModalOpen}

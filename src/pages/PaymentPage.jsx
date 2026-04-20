@@ -7,7 +7,7 @@ import {
   CreditCard, Banknote, BookOpenCheck, ChevronLeft 
 } from 'lucide-react';
 
-const Payment = () => {
+const PaymentPage = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -91,4 +91,4 @@ const Payment = () => {
   );
 };
 
-export default Payment;
+export default PaymentPage;

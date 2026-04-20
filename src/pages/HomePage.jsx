@@ -1,7 +1,7 @@
 import Hero from '../components/features/Hero';
 import ProductSection from '../components/features/ProductSection';
 
-const Home = () => {
+const HomePage = () => {
   return (
     <div className="animate-in fade-in duration-700">
       <Hero />
@@ -10,4 +10,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default HomePage;

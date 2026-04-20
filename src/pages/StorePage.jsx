@@ -3,7 +3,7 @@ import ProductCard from '../components/common/ProductCard';
 import FilterSidebar from '../components/features/FilterSidebar'; 
 import { ShoppingBasket } from 'lucide-react'; 
 
-const Store = () => {
+const StorePage = () => {
   const { 
     filter, categories, filteredData, totalCount, 
     currentLimit, handleFilterChange, loadMore, clearFilter 
@@ -83,4 +83,4 @@ const Store = () => {
   );
 };
 
-export default Store;
+export default StorePage;
