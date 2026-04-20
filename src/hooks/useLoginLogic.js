@@ -20,27 +20,31 @@ export const useLoginLogic = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
-      const result = await authService.login(formData.email, formData.password);
-      
-     
+      const result = await authService.login(formData);
+      const user = result?.data?.account; 
       const token = result?.data?.token;
-      const account = result?.data?.account;
 
-      if (token) {
-        
-        setGlobalUser(account); 
-        toast.success('Login Berhasil!');
-
+      if (token) { 
+        localStorage.setItem('token', token);
+        setGlobalUser(user);
+        toast.success('Selamat Datang di UD Barokah!', {
+          style: {
+            borderRadius: '16px',
+            background: '#2D5A43',
+            color: '#fff',
+            fontWeight: 'bold'
+          },
+        });
         setTimeout(() => {
           navigate('/profile', { replace: true });
-        }, 500);
+        }, 1000);
       }
     } catch (err) {
-      setError(err.message); 
-      toast.error(err.message);
-      
+      const errMsg = err.message || "Email atau password salah, silahkan coba lagi.";
+      setError(errMsg); 
+      toast.error(errMsg);
     } finally {
       setIsLoading(false);
     }

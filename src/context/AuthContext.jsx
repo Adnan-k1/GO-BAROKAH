@@ -1,39 +1,42 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
-    const loadStoredData = () => {
-      // Samakan nama key-nya: 'user' dan 'token'
-      const savedUser = localStorage.getItem('user');
-      const token = localStorage.getItem('token');
-
-      if (savedUser && token && token !== 'undefined') {
-        setUser(JSON.parse(savedUser));
-      }
-      setLoading(false);
-    };
-    loadStoredData();
+    const savedUser = localStorage.getItem("user_session");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+    setLoading(false); 
   }, []);
 
-  // Kita buat fungsinya lebih simpel, data sudah disimpan oleh authService
-  const login = (userData) => {
+  const login = (userData, token) => {
     setUser(userData);
+    localStorage.setItem("user_session", JSON.stringify(userData));
+    if (token) {
+      localStorage.setItem('token', token);
+    } 
+  };
+
+  const updateUser = (newUserData) => {
+    setUser(newUserData);
+    localStorage.setItem("user_session", JSON.stringify(newUserData));
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    localStorage.removeItem("user_session");
+    localStorage.removeItem("token");
+    localStorage.removeItem("cart"); 
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
-      {children}
+   <AuthContext.Provider value={{ user, login, logout, updateUser, loading }}>
+      {!loading && children} 
     </AuthContext.Provider>
   );
 };

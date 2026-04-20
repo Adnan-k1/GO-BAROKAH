@@ -1,58 +1,24 @@
 import axios from "axios";
 
-const API_URL = 'https://joziah-unqualifiable-undesirably.ngrok-free.dev';
-
-const getAuthHeader = () => {
-  const token = localStorage.getItem('token');
-  if (!token || token === 'undefined' || token === 'null') {
-    return { 'ngrok-skip-browser-warning': 'true' };
-  }
-  return {
-    Authorization: `Bearer ${token.trim()}`,
-    'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true',
-    Accept: 'application/json'
-  };
-};
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const authService = {
-  login: async (email, password) => {
-    const response = await axios.post(`${API_URL}/auth/login`, { email, password });
-    const token = response.data?.data?.token;
-    const user = response.data?.data?.account;
-    if (token) {
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      return response.data;
-    }
-    throw new Error("Token tidak ditemukan");
-  },
-
-  getAddresses: async () => {
-    const response = await axios.get(`${API_URL}/address`, {
-      headers: getAuthHeader()
+  login: async (credentials) => {
+    const response = await axios.post(`${API_URL}/api/auth/login`, credentials, {
+      headers: { 'ngrok-skip-browser-warning': 'true' }
     });
     return response.data;
   },
 
-  createAddress: async (payload) => {
-    const response = await axios.post(`${API_URL}/address`, payload, {
-      headers: getAuthHeader()
+  register: async (userData) => {
+    const response = await axios.post(`${API_URL}/api/auth/register`, userData, {
+      headers: { 'ngrok-skip-browser-warning': 'true' }
     });
     return response.data;
   },
 
-  updateAddress: async (id, payload) => {
-    const response = await axios.put(`${API_URL}/address/${id}`, payload, {
-      headers: getAuthHeader()
-    });
-    return response.data;
-  },
-
-  deleteAddress: async (id) => {
-    const response = await axios.delete(`${API_URL}/address/${id}`, {
-      headers: getAuthHeader()
-    });
-    return response.data;
+  logout: () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
   }
 };

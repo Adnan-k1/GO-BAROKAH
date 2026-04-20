@@ -1,73 +1,76 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingBag, Star, Heart, Eye } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { formatIDR } from '../../utils/formatCurrency';
+import { useAuth } from '../../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { cartItems, addToCart } = useCart();
+  const { user } = useAuth();
+  
+  const isInCart = user && cartItems.some(item => item.id === product.id);
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation(); 
+    if (isInCart) return;
+
+    if (!user) {
+      toast.error('Login terlebih dahulu!');
+      return;
+    }
+
+    addToCart(product);
+    toast.success(`${product.name} masuk keranjang!`);
+  };
 
   return (
-    <div className="p-5 border-r border-b border-gray-100 relative group transition-all hover:shadow-xl hover:z-10 bg-white">
-      <div onClick={() => navigate(`/product/${product.id}`)} className="cursor-pointer">
-      
-        {product.sale && (
-          <div className="absolute top-4 left-4 bg-red-500 text-white text-[9px] px-2 py-0.5 rounded font-bold z-20">
-            SALE {product.sale}
-          </div>
-        )}
-
-       
-        <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20">
-          <ActionButton icon={<Heart className="w-3.5 h-3.5" />} />
-          <ActionButton icon={<Eye className="w-3.5 h-3.5" />} />
-        </div>
-
-       
-        <div className="aspect-square flex items-center justify-center p-4 mb-4 overflow-hidden">
+    <div className="p-5 border-r border-b border-gray-100 relative group transition-all hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:z-10 bg-white flex flex-col min-h-[480px] text-left">
+      <div onClick={() => navigate(`/product/${product.id}`)} className="cursor-pointer flex-1 mb-16">
+        <div className="aspect-square w-full flex items-center justify-center mb-6 overflow-hidden rounded-2xl border border-gray-50 bg-[#FBFBFB]">
           <img 
             src={product.img} 
             alt={product.name} 
-            className="max-h-full object-contain group-hover:scale-110 transition-transform duration-500" 
+            className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-700 ease-out" 
+            onError={(e) => { 
+              e.target.onerror = null; 
+              e.target.src = 'https://placehold.co/400x400/FBFBFB/3A5A4D?text=No+Image'; 
+            }} 
           />
         </div>
 
-      
-        <div className="space-y-1">
-          <p className="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">{product.category}</p>
-          <h4 className="text-sm font-semibold text-gray-800 line-clamp-1">{product.name}</h4>
+        <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-[#2D5A43]">{formatIDR(product.price)}</span>
-            {product.oldPrice && (
-              <span className="text-[10px] text-gray-300 line-through">{formatIDR(product.oldPrice)}</span>
-            )}
+            <span className="text-[#3A5A4D] font-black text-[9px] uppercase tracking-[0.25em] opacity-80">
+              {product.category || 'Organik'}
+            </span>
+            <div className="h-[1px] w-3 bg-gray-200"></div>
           </div>
-          <div className="flex text-orange-400 gap-0.5">
-            {[...Array(5)].map((_, i) => <Star key={i} className="w-2.5 h-2.5 fill-current" />)}
-          </div>
+
+          <h4 className="text-sm font-bold text-gray-800 line-clamp-2 group-hover:text-[#3A5A4D] transition-colors leading-snug">
+            {product.name}
+          </h4>
+          <span className="font-black text-[#3A5A4D] text-lg tracking-tighter block mt-2">
+            {formatIDR(product.price)}
+          </span>
         </div>
       </div>
-
-      
       <button 
-        onClick={(e) => {
-          e.stopPropagation();
-          addToCart(product);
-        }}
-        className="absolute bottom-5 right-5 p-3 bg-gray-50 text-gray-400 rounded-full hover:bg-[#2D5A43] hover:text-white transition-all shadow-sm active:scale-90 z-30"
+        onClick={handleAddToCart}
+        disabled={isInCart}
+        className={`absolute bottom-6 right-6 h-11 flex items-center justify-center transition-all duration-500 z-30 rounded-2xl shadow-lg border
+          ${isInCart
+            ? 'bg-[#3A5A4D] text-white px-5 border-[#3A5A4D] w-auto cursor-default opacity-90' 
+            : 'bg-white text-gray-700 border-gray-100 w-11 hover:border-[#3A5A4D] hover:text-[#3A5A4D] cursor-pointer'
+          }`}
       >
-        <ShoppingBag className="w-5 h-5" />
+        <ShoppingBag size={18} className={`${isInCart ? 'mr-2' : ''}`} />
+        {isInCart && <span className="text-[10px] font-black uppercase tracking-widest">In Cart</span>}
       </button>
     </div>
   );
 };
-
-
-const ActionButton = ({ icon }) => (
-  <button className="p-2 bg-white shadow-md rounded-full hover:bg-[#2D5A43] hover:text-white transition-colors">
-    {icon}
-  </button>
-);
 
 export default ProductCard;

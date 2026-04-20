@@ -19,26 +19,15 @@ const ProfileInfoPage = () => {
       </div>
       
       <form className="space-y-6" onSubmit={handleSaveProfile}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormInput 
-            label="Nama Depan"
-            name="firstName"
+        <FormInput 
+          label="Nama Depan"
+            name="username"
             type="text"
-            value={formData?.firstName || ''}
+            value={formData?.username || ''}
             onChange={handleChange}
             placeholder="Masukkan nama depan Anda"
             required
-          />
-          <FormInput 
-            label="Nama Belakang"
-            name="lastName"
-            type="text"
-            value={formData?.lastName || ''}
-            onChange={handleChange}
-            placeholder="Masukkan nama belakang Anda"
-            required
-          />
-        </div>
+        />
 
         <FormInput 
           label="Email"
@@ -46,8 +35,8 @@ const ProfileInfoPage = () => {
           type="email"
           value={formData?.email || ''}
           placeholder="Masukkan email Anda"
+          onChange={handleChange}
           required
-          className="bg-gray-50 opacity-70 cursor-not-allowed"
         />
 
         <FormInput 
@@ -58,15 +47,6 @@ const ProfileInfoPage = () => {
           onChange={handleChange}
           placeholder="Contoh: 08123456789"
           required
-        />
-
-        <FormInput 
-          label="Tanggal Lahir"
-          name="birthDate"
-          type="text"
-          placeholder="dd/mm/yyyy"
-          value={formData?.birthDate || ''}
-          onChange={handleChange}
         />
 
         <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-50">

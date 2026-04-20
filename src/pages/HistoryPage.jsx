@@ -1,8 +1,8 @@
 import { ClipboardList, Eye, ShoppingBag } from 'lucide-react';
-import { useOrderLogic } from '../hooks/useOrderLogic';
+import { useHistoryLogic } from '../hooks/useHistoryLogic';
 import Button from '../components/common/Button';
 
-const OrdersPage = () => {
+const HistoryPage = () => {
   const { 
     orders, 
     activeTab, 
@@ -11,7 +11,7 @@ const OrdersPage = () => {
     formatCurrency, 
     handleStartShopping, 
     handleViewDetail 
-  } = useOrderLogic();
+  } = useHistoryLogic();
 
   return (
     <div className="bg-white rounded-[32px] p-10 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] min-h-[600px]">
@@ -116,4 +116,4 @@ const OrdersPage = () => {
   );
 };
 
-export default OrdersPage;
+export default HistoryPage;

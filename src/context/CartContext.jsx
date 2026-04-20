@@ -1,15 +1,25 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
+  const { user } = useAuth();
   const [cartItems, setCartItems] = useState(() => {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
-  // Tambah / Update Quantity
+  useEffect(() => {
+    if (!user) {
+      setCartItems([]);
+      localStorage.removeItem("cart");
+    }
+  }, [user]);
+
   const addToCart = (product, quantity = 1) => {
+    if (!user) return; 
+    
     const qtyToAdd = parseInt(quantity);
     setCartItems((prevItems) => {
       const isExist = prevItems.find((item) => item.id === product.id);
@@ -24,7 +34,6 @@ export const CartProvider = ({ children }) => {
     });
   };
 
-  // Kurangi 1 Quantity (untuk tombol minus di Cart)
   const removeFromCart = (productId) => {
     setCartItems((prevItems) => {
       const item = prevItems.find((i) => i.id === productId);
@@ -33,25 +42,26 @@ export const CartProvider = ({ children }) => {
           i.id === productId ? { ...i, quantity: i.quantity - 1 } : i
         );
       }
-      // Jika quantity 1, biarkan saja atau hapus (sesuai selera)
       return prevItems;
     });
   };
 
-  // Hapus total 1 baris produk
   const removeItem = (productId) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
   };
 
-  // Kosongkan Keranjang
-  const clearCart = () => setCartItems([]);
+  const clearCart = () => {
+    setCartItems([]);
+    localStorage.removeItem("cart");
+  };
 
-  // Logika: Hanya hitung jumlah jenis barang (Unique)
   const totalItems = cartItems.length;
 
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cartItems));
-  }, [cartItems]);
+    if (user) {
+      localStorage.setItem("cart", JSON.stringify(cartItems));
+    }
+  }, [cartItems, user]);
 
   return (
     <CartContext.Provider value={{ 
