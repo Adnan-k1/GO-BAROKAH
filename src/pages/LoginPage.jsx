@@ -4,6 +4,7 @@ import { Mail, Lock, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useLoginLogic } from '../hooks/useLoginLogic';
 import InputField from '../components/common/FormInput';
 import Button from '../components/common/Button'; 
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
   const { formData, handleChange, handleLogin, isLoading, error } = useLoginLogic();
