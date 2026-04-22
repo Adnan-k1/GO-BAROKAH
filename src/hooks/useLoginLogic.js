@@ -30,21 +30,21 @@ export const useLoginLogic = () => {
         localStorage.setItem('token', token);
         setGlobalUser(user);
         toast.success('Selamat Datang di UD Barokah!', {
-          style: {
-            borderRadius: '16px',
-            background: '#2D5A43',
-            color: '#fff',
-            fontWeight: 'bold'
-          },
+          style: { borderRadius: '16px', background: '#2D5A43', color: '#fff', fontWeight: 'bold' },
         });
-        setTimeout(() => {
-          navigate('/profile', { replace: true });
-        }, 1000);
+        setTimeout(() => { navigate('/profile', { replace: true }); }, 1000);
       }
     } catch (err) {
-      const errMsg = err.message || "Email atau password salah, silahkan coba lagi.";
+      const errMsg = err.response?.data?.message || "Email atau password salah.";
       setError(errMsg); 
       toast.error(errMsg);
+
+      // REDIRECT JIKA BELUM VERIFIKASI
+      if (errMsg.toLowerCase().includes("verifikasi") || errMsg.toLowerCase().includes("otp")) {
+        setTimeout(() => {
+          navigate('/verify-otp', { state: { email: formData.email } });
+        }, 1500);
+      }
     } finally {
       setIsLoading(false);
     }

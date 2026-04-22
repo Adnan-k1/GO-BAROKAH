@@ -12,7 +12,7 @@ import {
   Cart, Checkout, Payment, ProfileInfoPage, 
   AddressPage, OrdersPage 
 } from "./pages";
-
+import VerifyOTP from "./pages/VerifyOTP";
 function App() {
   return (
     <AuthProvider>
@@ -64,6 +64,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="*" element={<Navigate to="/" />} />
+            <Route path="/verify-otp" element={<VerifyOTP />} />
           </Routes>
         </Router>
       </CartProvider>
