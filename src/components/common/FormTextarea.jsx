@@ -1,27 +1,44 @@
-const FormInput = ({ label, icon, name, value, onChange, ...props }) => (
-  <div className="space-y-2">
-    {label && (
-      <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">
-        {label}
-      </label>
-    )}
+import React from 'react';
 
-    <div className="relative flex items-center">
-      {icon && <div className="absolute left-4 z-10">{icon}</div>}
+const Button = ({
+  children,
+  variant = 'primary',
+  className = '',
+  isLoading = false,
+  ...props
+}) => {
 
-      <input
-        name={name}           
-        value={value}         
-        onChange={onChange}   
-        {...props}           
-        className={`w-full bg-gray-50/50 border border-gray-200 p-4 ${
-          icon ? 'pl-12' : 'pl-4'
-        } rounded-2xl outline-none focus:border-[#2D5A43] focus:ring-1 focus:ring-[#2D5A43] text-[14px] transition-all placeholder:text-gray-300 ${
-          props.className || ''
-        }`}
-      />
-    </div>
-  </div>
-);
+  const variants = {
+    primary: 'bg-[#2D5A43] text-white hover:bg-[#234735]',
+    outline: 'border border-[#2D5A43] text-[#2D5A43] hover:bg-[#2D5A43] hover:text-white',
+    danger: 'bg-red-500 text-white hover:bg-red-600',
 
-export default FormInput;
+    // 🔥 TAMBAHAN (buat admin)
+    admin: 'bg-emerald-600 text-white hover:bg-emerald-700'
+  };
+
+  return (
+    <button
+      {...props}
+      disabled={isLoading || props.disabled}
+      className={`
+        flex items-center justify-center gap-2 rounded-lg font-semibold
+        transition-all duration-200 active:scale-95
+        disabled:opacity-70 disabled:cursor-not-allowed
+        ${variants[variant]}
+        ${className}
+      `}
+    >
+      {isLoading ? (
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          <span>Loading...</span>
+        </div>
+      ) : (
+        children
+      )}
+    </button>
+  );
+};
+
+export default Button;
