@@ -1,8 +1,8 @@
 import React from 'react';
-import { Navigate, useLocation, Outlet } from 'react-router-dom'; 
+import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
@@ -17,6 +17,14 @@ const ProtectedRoute = ({ children }) => {
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
+
+  // Cek role dari berbagai kemungkinan struktur response backend
+  const userRole = user.role ?? user.Role ?? user?.data?.role;
+
+  if (allowedRoles && !allowedRoles.includes(userRole)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
   return children ? children : <Outlet />;
 };
 
