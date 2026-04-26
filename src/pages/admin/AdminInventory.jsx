@@ -1,242 +1,117 @@
-import React, { useState } from "react";
-import { Plus, ChevronLeft, ChevronRight, Pencil, Trash2, Package, Database } from "lucide-react";
-
-import AdminSidebar        from "../../components/admin/AdminSidebar";
-import InventoryStatCard   from "../../components/admin/inventory/InventoryStatCard";
-import ProductFilterBar    from "../../components/admin/inventory/ProductFilterBar";
-import ProductModal        from "../../components/admin/inventory/ProductModal";
-import DeleteModal         from "../../components/admin/inventory/DeleteModal";
+import React, { useState, useMemo, useRef, useEffect } from "react";
+import { Plus, ChevronLeft, ChevronRight, Pencil, Trash2, Package, Database, Loader2, Banknote, AlertCircle, Image as ImageIcon } from "lucide-react";
+import AdminSidebar from "../../components/admin/AdminSidebar";
+import InventoryStatCard from "../../components/admin/inventory/InventoryStatCard";
+import ProductFilterBar from "../../components/admin/inventory/ProductFilterBar";
+import ProductModal from "../../components/admin/inventory/ProductModal";
+import DeleteModal from "../../components/admin/inventory/DeleteModal";
 import { useAdminProducts } from "../../hooks/admin/useAdminProducts";
+import { formatRupiah } from "../../utils/formatters";
 
-// ─── Helper ──────────────────────────────────────────────────────
-const formatRp  = (v) => `Rp ${Number(v || 0).toLocaleString("id-ID")}`;
-const PER_PAGE  = 5;
-
-// ─── Loading skeleton ─────────────────────────────────────────────
-const LoadingState = () => (
-  <div className="flex h-screen bg-[#F8FAFC] items-center justify-center">
-    <div className="flex flex-col items-center gap-3">
-      <div className="w-10 h-10 border-4 border-emerald-100 border-t-emerald-500 rounded-full animate-spin" />
-      <p className="text-sm text-slate-400 font-medium animate-pulse">Memuat produk...</p>
-    </div>
-  </div>
-);
-
-// ─── Main Page ────────────────────────────────────────────────────
 const AdminInventory = () => {
-  const {
-    products, isLoading, error,
-    handleCreate, handleUpdate, handleDelete,
-  } = useAdminProducts();
-
-  // ── UI state ────────────────────────────────────────────────────
-  const [search,    setSearch]    = useState("");
+  const { products, isLoading, handleCreate, handleUpdate, handleDelete } = useAdminProducts();
+  const [search, setSearch] = useState("");
   const [activecat, setActivecat] = useState("Semua");
-  const [page,      setPage]      = useState(1);
-  const [modalMode, setModalMode] = useState(null); // "create" | "edit" | "delete"
-  const [selected,  setSelected]  = useState(null);
+  const [page, setPage] = useState(1);
+  const [modalMode, setModalMode] = useState(null);
+  const [selected, setSelected] = useState(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const tableScrollRef = useRef(null);
+  const PER_PAGE = 10;
 
-  const currentUser = { name: "Adnan Gian", role: "Administrator" };
+  useEffect(() => { setPage(1); }, [search, activecat]);
 
-  // ── Handlers ────────────────────────────────────────────────────
-  const openCreate = ()      => { setSelected(null); setModalMode("create"); };
-  const openEdit   = (prod)  => { setSelected(prod); setModalMode("edit");   };
-  const openDelete = (prod)  => { setSelected(prod); setModalMode("delete"); };
-  const closeModal = ()      => setModalMode(null);
+  useEffect(() => {
+    const el = tableScrollRef.current;
+    if (!el) return;
+    const onScroll = () => setIsScrolled(el.scrollTop > 40);
+    el.addEventListener("scroll", onScroll);
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
 
-  const onSubmitCreate = async (payload) => {
-    const res = await handleCreate(payload);
-    if (res.success) closeModal();
-    return res;
-  };
+  const filteredProducts = useMemo(() => {
+    return products.filter((p) => {
+      const matchCat = activecat === "Semua" || p.category === activecat;
+      const matchSearch = p.name?.toLowerCase().includes(search.toLowerCase());
+      return matchCat && matchSearch;
+    });
+  }, [products, activecat, search]);
 
-  const onSubmitEdit = async (payload) => {
-    const res = await handleUpdate(selected?._id ?? selected?.id, payload);
-    if (res.success) closeModal();
-    return res;
-  };
-
-  const onConfirmDelete = async () => {
-    const res = await handleDelete(selected?._id ?? selected?.id);
-    if (res.success) closeModal();
-  };
-
-  // ── Filter & pagination ─────────────────────────────────────────
-  const filtered = products.filter((p) => {
-    const matchCat    = activecat === "Semua" || p.category === activecat;
-    const matchSearch = p.name?.toLowerCase().includes(search.toLowerCase());
-    return matchCat && matchSearch;
-  });
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
-  const paginated  = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
-
-  const totalStock = products.reduce((s, p) => s + Number(p.stock ?? 0), 0);
-
-  // ── Render ──────────────────────────────────────────────────────
-  if (isLoading) return <LoadingState />;
-  if (error)     return (
-    <div className="flex h-screen items-center justify-center">
-      <p className="text-sm text-red-500 font-medium">{error}</p>
-    </div>
-  );
+  const totalPages = Math.ceil(filteredProducts.length / PER_PAGE) || 1;
+  const paginatedItems = filteredProducts.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC] font-sans text-slate-900 overflow-hidden">
-      <AdminSidebar user={currentUser} />
-
-      <main className="flex-1 flex flex-col overflow-hidden px-8 py-8 gap-6">
-
-        {/* Title + CTA */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Inventory Barang</h1>
-            <p className="text-sm text-slate-400 mt-0.5">Kelola semua produk UD BAROKAH</p>
-          </div>
-          <button
-            onClick={openCreate}
-            className="flex items-center gap-2 bg-[#1a4d2e] hover:bg-[#14532D] text-white px-5 py-3 rounded-xl text-sm font-semibold shadow-md shadow-emerald-900/20 transition-colors"
-          >
-            <Plus size={16} /> Tambah Produk
-          </button>
-        </div>
-
-        {/* Stat Cards */}
-        <div className="grid grid-cols-2 gap-5">
-          <InventoryStatCard
-            label="Total Jenis Produk"
-            value={products.length}
-            icon={<Package size={22} />}
-            iconBg="bg-emerald-50 text-emerald-600"
-          />
-          <InventoryStatCard
-            label="Total Stok"
-            value={totalStock.toLocaleString("id-ID")}
-            icon={<Database size={22} />}
-            iconBg="bg-blue-50 text-blue-600"
-          />
-        </div>
-
-        {/* Filter */}
-        <ProductFilterBar
-          search={search}
-          onSearchChange={(v) => { setSearch(v); setPage(1); }}
-          activecat={activecat}
-          onCatChange={(v) => { setActivecat(v); setPage(1); }}
-        />
-
-        {/* Table */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm flex-1 overflow-hidden flex flex-col">
-          <div className="flex-1 overflow-y-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-slate-50 sticky top-0 border-b border-slate-100">
-                <tr>
-                  {["Nama Produk", "Kategori", "Stok", "Harga", "Aksi"].map((h) => (
-                    <th key={h} className={`px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider ${h === "Aksi" ? "text-right" : "text-left"}`}>
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {paginated.map((p) => (
-                  <tr key={p._id ?? p.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="px-6 py-4">
-                      <p className="font-semibold text-slate-800">{p.name}</p>
-                      {p.description && (
-                        <p className="text-[11px] text-slate-400 mt-0.5 max-w-xs truncate">{p.description}</p>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-lg">
-                        {p.category}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-slate-700 font-medium">{p.stock} {p.unit}</td>
-                    <td className="px-6 py-4 font-bold text-emerald-700">{formatRp(p.price)}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => openEdit(p)}
-                          className="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-500 hover:text-white flex items-center justify-center transition-all"
-                          aria-label="Edit produk"
-                        >
-                          <Pencil size={14} />
-                        </button>
-                        <button
-                          onClick={() => openDelete(p)}
-                          className="w-8 h-8 rounded-lg bg-red-50 text-red-400 hover:bg-red-500 hover:text-white flex items-center justify-center transition-all"
-                          aria-label="Hapus produk"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-
-                {paginated.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-16 text-center text-slate-400 text-sm">
-                      Tidak ada produk ditemukan.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 flex-shrink-0">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-            >
-              <ChevronLeft size={15} /> Previous
+    <div className="flex h-screen bg-[#F8FAFC] overflow-hidden font-sans">
+      <AdminSidebar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-shrink-0 bg-[#F8FAFC] transition-all duration-500 ease-in-out overflow-hidden" style={{ maxHeight: isScrolled ? "90px" : "450px" }}>
+          <div className="flex items-center justify-between px-8 pt-8">
+            <div className={`transition-all duration-500 ${isScrolled ? "opacity-0 -translate-y-10" : "opacity-100 translate-y-0"}`}>
+              <h1 className="text-xl font-black text-slate-900 tracking-tight uppercase">Katalog Produk</h1>
+              <p className="text-[10px] font-bold text-slate-400 mt-0.5 uppercase tracking-[0.2em]">Sistem Inventaris UD BAROKAH</p>
+            </div>
+            <button onClick={() => { setSelected(null); setModalMode("create"); }} className="flex items-center gap-2 bg-[#1a4d2e] text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase shadow-lg active:scale-95 transition-all">
+              <Plus size={14} strokeWidth={3} />
+              <span className={isScrolled ? "hidden" : "block"}>Produk Baru</span>
             </button>
+          </div>
 
-            <div className="flex items-center gap-1.5">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
-                <button
-                  key={n}
-                  onClick={() => setPage(n)}
-                  className={`w-9 h-9 rounded-xl text-sm font-semibold transition-all
-                    ${page === n ? "bg-[#1a4d2e] text-white shadow-sm" : "text-slate-500 hover:bg-slate-100"}`}
-                >
-                  {n}
-                </button>
-              ))}
+          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 px-8 py-6 transition-all duration-500 ${isScrolled ? "opacity-0 scale-95 pointer-events-none -mb-[140px]" : "opacity-100 scale-100 mb-0"}`}>
+            <InventoryStatCard label="Varian" value={products.length} icon={<Package size={16} />} iconBg="bg-emerald-50 text-emerald-600" />
+            <InventoryStatCard label="Total Stok" value={products.reduce((acc, p) => acc + (Number(p.stock) || 0), 0).toLocaleString("id-ID")} icon={<Database size={16} />} iconBg="bg-blue-50 text-blue-600" />
+            <InventoryStatCard label="Total harga produk" value={formatRupiah(products.reduce((acc, p) => acc + (Number(p.price) * Number(p.stock) || 0), 0))} icon={<Banknote size={16} />} iconBg="bg-amber-50 text-amber-600" />
+            <InventoryStatCard label="Kosong" value={products.filter(p => (Number(p.stock) || 0) <= 0).length} icon={<AlertCircle size={16} />} iconBg="bg-red-50 text-red-600" />
+          </div>
+
+          <div className={`px-8 py-2 transition-all duration-500 ${isScrolled ? "-translate-y-10" : "translate-y-0"}`}>
+            <ProductFilterBar search={search} onSearchChange={(v) => setSearch(v)} activecat={activecat} onCatChange={(v) => setActivecat(v)} />
+          </div>
+        </div>
+
+        <div className="flex-1 px-8 pb-8 flex flex-col min-h-0 mt-2">
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 overflow-auto custom-scrollbar" ref={tableScrollRef}>
+              <table className="w-full border-collapse min-h-full">
+                <thead className="bg-slate-50/50 sticky top-0 backdrop-blur-md z-10 border-b border-slate-100">
+                  <tr>{["Produk", "Kategori", "Stok", "Harga", "Aksi"].map((h) => (<th key={h} className="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] text-left">{h}</th>))}</tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {isLoading ? (
+                    <tr><td colSpan={5} className="py-24 text-center"><Loader2 className="w-8 h-8 animate-spin text-emerald-600 mx-auto mb-2" /><p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Loading...</p></td></tr>
+                  ) : paginatedItems.length > 0 ? (
+                    <>
+                      {paginatedItems.map((p) => (
+                        <tr key={p.id} className="hover:bg-slate-50/50 h-[73px]">
+                          <td className="px-8 py-4"><div className="flex items-center gap-4"><div className="w-11 h-11 rounded-xl bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center">{p.image_url || p.image ? <img src={p.image_url || p.image} alt={p.name} className="w-full h-full object-cover" /> : <ImageIcon size={18} className="text-slate-300" />}</div><div className="flex flex-col min-w-0"><p className="font-bold text-slate-900 text-xs uppercase truncate">{p.name}</p><p className="text-[9px] text-slate-400 font-bold uppercase">ID: {String(p.id).slice(-6)}</p></div></div></td>
+                          <td className="px-8 py-4"><span className="text-[9px] font-black text-blue-600 bg-blue-50/50 px-2.5 py-1.5 rounded-lg border border-blue-100/50 uppercase">{p.category || "General"}</span></td>
+                          <td className="px-8 py-4"><div className="flex flex-col"><span className={`font-black text-xs ${Number(p.stock) <= 5 ? 'text-red-500' : 'text-slate-700'}`}>{p.stock}</span><span className="text-[9px] text-slate-400 font-bold uppercase">{p.unit || 'Unit'}</span></div></td>
+                          <td className="px-8 py-4 font-black text-slate-900 text-xs">{formatRupiah(p.price)}</td>
+                          <td className="px-8 py-4"><div className="flex gap-2"><button onClick={() => { setSelected(p); setModalMode("edit"); }} className="p-2.5 bg-slate-50 text-slate-400 hover:text-emerald-600 rounded-xl active:scale-90 transition-all"><Pencil size={14} /></button><button onClick={() => { setSelected(p); setModalMode("delete"); }} className="p-2.5 bg-slate-50 text-slate-400 hover:text-red-500 rounded-xl active:scale-90 transition-all"><Trash2 size={14} /></button></div></td>
+                        </tr>
+                      ))}
+                      {paginatedItems.length < PER_PAGE && (
+                        <tr style={{ height: `${(PER_PAGE - paginatedItems.length) * 73}px` }}><td colSpan={5}></td></tr>
+                      )}
+                    </>
+                  ) : (
+                    <tr><td colSpan={5} className="py-24 text-center uppercase tracking-widest text-slate-300 font-black text-[10px]">Kosong</td></tr>
+                  )}
+                </tbody>
+              </table>
             </div>
 
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-            >
-              Next <ChevronRight size={15} />
-            </button>
+            <footer className="px-8 py-4 border-t border-slate-50 flex items-center justify-between bg-white flex-shrink-0">
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Page {page} of {totalPages}</p>
+              <div className="flex gap-1.5">
+                <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="p-2.5 rounded-xl border border-slate-100 hover:bg-slate-50 disabled:opacity-20 active:scale-95 transition-all"><ChevronLeft size={16} /></button>
+                <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="p-2.5 rounded-xl border border-slate-100 hover:bg-slate-50 disabled:opacity-20 active:scale-95 transition-all"><ChevronRight size={16} /></button>
+              </div>
+            </footer>
           </div>
         </div>
-      </main>
-
-      {/* Modals */}
-      {(modalMode === "create" || modalMode === "edit") && (
-        <ProductModal
-          mode={modalMode}
-          initial={selected}
-          onClose={closeModal}
-          onSubmit={modalMode === "create" ? onSubmitCreate : onSubmitEdit}
-        />
-      )}
-
-      {modalMode === "delete" && (
-        <DeleteModal
-          product={selected}
-          onClose={closeModal}
-          onConfirm={onConfirmDelete}
-        />
-      )}
+      </div>
+      {(modalMode === "create" || modalMode === "edit") && <ProductModal mode={modalMode} initial={selected} onClose={() => setModalMode(null)} onSubmit={modalMode === "create" ? handleCreate : (data) => handleUpdate(selected.id, data)} />}
+      {modalMode === "delete" && <DeleteModal product={selected} onClose={() => setModalMode(null)} onConfirm={() => { handleDelete(selected.id); setModalMode(null); }} />}
     </div>
   );
 };

@@ -1,112 +1,92 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Package, ClipboardList, History, AlertTriangle, LogOut } from "lucide-react";
+import { LogOut, ChevronRight } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import ProfileModal from "./ProfileModal";
+import { NAV_ITEMS } from "../../constants/adminConstants";
+import LogoutModal from "./LogoutModal"; // Import komponen baru
 
-const NAV = [
-  { id: "Dashboard",         icon: LayoutDashboard, path: "/admin/dashboard" },
-  { id: "Produk",            icon: Package,         path: "/admin/inventory" },
-  { id: "Kelola Pesanan",    icon: ClipboardList,   path: "/admin/orders"    },
-  { id: "Riwayat Transaksi", icon: History,         path: "/admin/reports"   },
-];
-
-/**
- * AdminSidebar
- * Sidebar navigasi admin — klik avatar di bawah untuk buka ProfileModal.
- *
- * @param {number} alertCount - jumlah stok alert
- */
 const AdminSidebar = ({ alertCount = 0 }) => {
   const { user, logout } = useAuth();
-  const [showProfile, setShowProfile] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  const initials = (user?.name ?? user?.username ?? "A")
-    .split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
+  const initials = useMemo(() => {
+    const displayName = user?.username || user?.name || "Admin";
+    return displayName.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
+  }, [user]);
 
   return (
     <>
-      <aside className="w-64 flex-shrink-0 flex flex-col bg-[#1a4d2e] px-5 py-7 gap-6">
+      <aside className="w-64 h-screen sticky top-0 flex-shrink-0 flex flex-col bg-[#1a4d2e] px-5 py-8 font-sans border-r border-white/5">
+        <header className="px-2 mb-10 flex-shrink-0">
+          <h1 className="text-2xl font-black italic tracking-tighter text-white uppercase leading-none">
+            UD. BAROKAH
+          </h1>
+          <div className="h-[4px] w-12 bg-[#f5c518] rounded-full mt-2" />
+          <p className="text-[9px] text-emerald-400/60 font-black mt-3 uppercase tracking-[0.3em]">
+            Admin Management
+          </p>
+        </header>
 
-        {/* Logo */}
-        <div className="px-2 mb-2">
-          <p className="text-xl font-black italic tracking-tight text-white">UD. BAROKAH</p>
-          <div className="h-[3px] w-full bg-[#f5c518] rounded-full mt-1" />
-          <p className="text-[10px] text-white/50 font-medium mt-2 uppercase tracking-widest">Admin Dashboard</p>
-        </div>
-
-        {/* Nav */}
-        <nav className="flex-1 flex flex-col gap-1">
-          {NAV.map(({ id, icon: Icon, path }) => (
+        <nav className="flex flex-col gap-1.5 mb-auto">
+          <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2 mb-2">Menu Utama</p>
+          {NAV_ITEMS.map(({ id, label, icon: Icon, path }) => (
             <NavLink
               key={id}
               to={path}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200
-                 ${isActive
-                   ? "bg-white text-[#1a4d2e] font-semibold shadow-md"
-                   : "text-white/60 hover:bg-white/10 hover:text-white"}`
+                `flex items-center justify-between px-4 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 group
+                 ${isActive ? "bg-white text-[#1a4d2e] shadow-lg shadow-black/20" : "text-white/50 hover:bg-white/10 hover:text-white"}`
               }
             >
               {({ isActive }) => (
                 <>
-                  <Icon size={17} className={isActive ? "text-[#1a4d2e]" : "text-white/60"} />
-                  <span>{id}</span>
+                  <div className="flex items-center gap-3.5">
+                    <Icon size={16} strokeWidth={isActive ? 3 : 2} className={isActive ? "text-[#1a4d2e]" : "text-white/30 group-hover:text-white"} />
+                    <span>{label || id}</span>
+                  </div>
+                  {isActive && <ChevronRight size={14} strokeWidth={3} className="opacity-40" />}
                 </>
               )}
             </NavLink>
           ))}
         </nav>
 
-        {/* Alert badge */}
-        {alertCount > 0 && (
-          <div className="mx-1 p-4 bg-amber-500/20 rounded-2xl border border-amber-400/30">
-            <div className="flex items-center gap-2 mb-1">
-              <AlertTriangle size={13} className="text-amber-300" />
-              <span className="text-xs font-bold text-amber-300">{alertCount} Stok Menipis</span>
-            </div>
-            <p className="text-[11px] text-amber-300/70">Segera lakukan restock produk.</p>
-          </div>
-        )}
-
-        {/* Profile card — klik untuk buka modal */}
-        <div className="border-t border-white/10 pt-4 space-y-2">
-          <button
-            onClick={() => setShowProfile(true)}
-            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/10 transition-colors group text-left"
-          >
-            {user?.photo_url || user?.avatar ? (
-              <img
-                src={user.photo_url ?? user.avatar}
-                alt="avatar"
-                className="w-9 h-9 rounded-xl object-cover flex-shrink-0 shadow"
-              />
-            ) : (
-              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 group-hover:bg-white/30 transition-colors">
-                {initials}
+        <footer className="mt-auto pt-6 space-y-3">
+          {alertCount > 0 && (
+            <div className="p-3 bg-white/5 rounded-xl border border-white/10 mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">Stok Menipis ({alertCount})</span>
               </div>
-            )}
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-white truncate leading-tight">
-                {user?.name ?? user?.username ?? "Admin"}
-              </p>
-              <p className="text-[10px] text-white/50 capitalize">{user?.role ?? "administrator"}</p>
             </div>
-          </button>
+          )}
 
-          {/* Logout */}
+          <NavLink to="/admin/profile" className={({ isActive }) => `w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all group border ${isActive ? "bg-white/10 border-white/20" : "hover:bg-white/5 border-transparent"}`}>
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-white font-black text-xs shadow-md">
+              {initials}
+            </div>
+            <div className="flex-1 min-w-0 text-left">
+              <p className="text-[11px] font-black text-white truncate uppercase tracking-wider">{user?.username || "Admin"}</p>
+              <p className="text-[9px] text-white/30 font-bold uppercase tracking-widest">{user?.role || "Administrator"}</p>
+            </div>
+          </NavLink>
+
           <button
-            onClick={logout}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/40 hover:text-white hover:bg-white/10 transition-all"
+            onClick={() => setShowLogoutModal(true)}
+            className="w-full flex items-center gap-3 px-5 py-3 rounded-xl text-[10px] font-black text-white/20 hover:text-red-400 hover:bg-red-500/10 transition-all uppercase tracking-[0.2em] group"
           >
-            <LogOut size={15} />
+            <LogOut size={14} strokeWidth={3} />
             <span>Keluar</span>
           </button>
-        </div>
+        </footer>
       </aside>
 
-      {/* Profile Modal */}
-      {showProfile && <ProfileModal onClose={() => setShowProfile(false)} />}
+      {/* Gunakan Komponen Modal */}
+      <LogoutModal 
+        isOpen={showLogoutModal} 
+        onClose={() => setShowLogoutModal(false)} 
+        onConfirm={logout} 
+      />
     </>
   );
 };
