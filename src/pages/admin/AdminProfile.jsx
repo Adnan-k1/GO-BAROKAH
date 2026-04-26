@@ -1,173 +1,115 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Camera, Check, AlertCircle, Loader, User, Mail, AtSign, Shield } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Check, Mail, AtSign, Loader, Shield } from "lucide-react";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import { useAdminProfile } from "../../hooks/admin/useAdminProfile";
 
-/**
- * AdminProfile
- * Halaman profil penuh di /admin/profile
- */
 const AdminProfile = () => {
-  const { user, isLoading, error, success, handleUpdateProfile } = useAdminProfile();
-  const fileRef = useRef(null);
-
-  const [form, setForm]       = useState({ name: "", username: "", email: "", photo_url: "" });
-  const [preview, setPreview] = useState(null);
+  const { user, isLoading, handleUpdateProfile } = useAdminProfile();
+  const [form, setForm] = useState({ username: "", email: "" });
 
   useEffect(() => {
     if (user) {
       setForm({
-        name:      user.name      ?? user.username ?? "",
-        username:  user.username  ?? "",
-        email:     user.email     ?? "",
-        photo_url: user.photo_url ?? user.avatar ?? "",
+        username: user.username || "",
+        email: user.email || "",
       });
-      setPreview(user.photo_url ?? user.avatar ?? null);
     }
   }, [user]);
-
-  const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
-
-  const handlePhotoChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setPreview(URL.createObjectURL(file));
-    const reader = new FileReader();
-    reader.onload = () => set("photo_url", reader.result);
-    reader.readAsDataURL(file);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await handleUpdateProfile(form);
-  };
-
-  const initials = (form.name || form.username || "A")
-    .split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
+  
+  const isChanged = form.username !== user?.username;
+  const labelStyle = "text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2";
+  const inputStyle = "w-full px-5 py-3.5 text-sm font-medium bg-white border border-slate-200 rounded-xl focus:border-emerald-600 outline-none transition-all shadow-sm";
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC] font-sans text-slate-900 overflow-hidden">
+    <div className="flex h-screen bg-[#F8FAFC] overflow-hidden font-sans text-slate-900">
       <AdminSidebar />
+      
+      <main className="flex-1 overflow-y-auto px-10 py-12 custom-scrollbar">
+        <header className="mb-10 pb-6 border-b border-slate-200/60 max-w-4xl">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-800">Profil Administrator</h1>
+          <p className="text-sm text-slate-500 mt-1">Kelola informasi akses akun UD. BAROKAH.</p>
+        </header>
 
-      <main className="flex-1 overflow-y-auto px-8 py-8">
-        {/* Title */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Profil Saya</h1>
-          <p className="text-sm text-slate-400 mt-0.5">Kelola informasi akun admin kamu</p>
-        </div>
+        <div className="max-w-4xl">
+          <form 
+            onSubmit={(e) => { 
+              e.preventDefault(); 
+              if (isChanged) handleUpdateProfile(form); 
+            }} 
+            className="grid grid-cols-1 lg:grid-cols-12 gap-12"
+          >
+            <div className="lg:col-span-7 space-y-8">
+              <div className="space-y-6">
+                <div className="space-y-2.5">
+                  <label className={labelStyle}>
+                    <AtSign size={13} className="text-slate-400" /> Username
+                  </label>
+                  <input 
+                    type="text" 
+                    value={form.username} 
+                    onChange={(e) => setForm({...form, username: e.target.value})} 
+                    className={inputStyle} 
+                    placeholder="Masukkan username baru" 
+                  />
+                </div>
+                <div className="space-y-2.5">
+                  <label className={labelStyle}>
+                    <Mail size={13} className="text-slate-400" /> Email Terdaftar
+                  </label>
+                  <input 
+                    type="email" 
+                    value={form.email} 
+                    disabled 
+                    className={`${inputStyle} bg-slate-50 text-slate-400 cursor-not-allowed`} 
+                  />
+                </div>
+              </div>
 
-        <div className="grid grid-cols-3 gap-6 max-w-4xl">
-
-          {/* Left — Avatar card */}
-          <div className="col-span-1">
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-7 flex flex-col items-center text-center gap-4">
-              {/* Avatar */}
-              <div className="relative">
-                {preview ? (
-                  <img src={preview} alt="avatar" className="w-24 h-24 rounded-2xl object-cover shadow-md" />
-                ) : (
-                  <div className="w-24 h-24 rounded-2xl bg-[#1a4d2e] flex items-center justify-center text-white font-bold text-3xl shadow-md">
-                    {initials}
-                  </div>
-                )}
-                <button
-                  type="button"
-                  onClick={() => fileRef.current?.click()}
-                  className="absolute -bottom-2 -right-2 w-8 h-8 bg-white border-2 border-slate-100 rounded-xl flex items-center justify-center text-slate-500 hover:text-[#1a4d2e] shadow-sm transition-colors"
+              <div className="pt-4">
+                <button 
+                  type="submit" 
+                  disabled={isLoading || !isChanged} 
+                  className="flex items-center gap-2.5 px-10 py-3 bg-[#1a4d2e] hover:bg-[#143d24] text-white text-sm font-semibold rounded-xl transition-all active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed shadow-md shadow-emerald-900/10"
                 >
-                  <Camera size={14} />
+                  {isLoading ? <Loader size={16} className="animate-spin" /> : <Check size={17} />}
+                  Simpan Perubahan
                 </button>
               </div>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
-
-              <div>
-                <p className="font-bold text-slate-900">{form.name || form.username}</p>
-                <p className="text-xs text-slate-400 mt-0.5">@{form.username}</p>
-              </div>
-
-              {/* Role badge */}
-              <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-emerald-100">
-                <Shield size={11} />
-                <span className="capitalize">{user?.role ?? "admin"}</span>
-              </div>
-
-              <p className="text-[11px] text-slate-400 leading-snug">
-                Klik ikon kamera untuk mengganti foto profil
-              </p>
             </div>
-          </div>
 
-          {/* Right — Form */}
-          <div className="col-span-2">
-            <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-7 space-y-5">
-              <h3 className="font-bold text-slate-900 text-base mb-2">Informasi Akun</h3>
-
-              {/* Nama */}
-              <div>
-                <label className="text-xs font-semibold text-slate-500 mb-1.5 flex items-center gap-1.5">
-                  <User size={12} /> Nama Lengkap
-                </label>
-                <input
-                  type="text"
-                  value={form.name}
-                  onChange={(e) => set("name", e.target.value)}
-                  className="w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-300/60 focus:bg-white transition-all"
-                />
-              </div>
-
-              {/* Username */}
-              <div>
-                <label className="text-xs font-semibold text-slate-500 mb-1.5 flex items-center gap-1.5">
-                  <AtSign size={12} /> Username
-                </label>
-                <input
-                  type="text"
-                  value={form.username}
-                  onChange={(e) => set("username", e.target.value)}
-                  className="w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-300/60 focus:bg-white transition-all"
-                />
-              </div>
-
-              {/* Email (disabled) */}
-              <div>
-                <label className="text-xs font-semibold text-slate-500 mb-1.5 flex items-center gap-1.5">
-                  <Mail size={12} /> Email
-                </label>
-                <input
-                  type="email"
-                  value={form.email}
-                  disabled
-                  className="w-full px-4 py-3 text-sm bg-slate-100 border border-slate-200 rounded-xl text-slate-400 cursor-not-allowed"
-                />
-                <p className="text-[10px] text-slate-400 mt-1.5">Email tidak dapat diubah.</p>
-              </div>
-
-              {/* Feedback */}
-              {error && (
-                <div className="flex items-center gap-2 text-xs text-red-600 bg-red-50 border border-red-100 px-4 py-3 rounded-xl">
-                  <AlertCircle size={14} /> {error}
+            {/* Right Side: Info Akun */}
+            <div className="lg:col-span-5">
+              <div className="bg-white border border-slate-200 rounded-2xl p-8 space-y-6 shadow-sm">
+                <div className="flex items-center gap-3 text-slate-800 border-b border-slate-50 pb-4">
+                  <Shield size={20} className="text-emerald-600" />
+                  <h3 className="font-bold text-sm uppercase tracking-wider">Status Akun</h3>
                 </div>
-              )}
-              {success && (
-                <div className="flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50 border border-emerald-100 px-4 py-3 rounded-xl">
-                  <Check size={14} /> Profil berhasil diperbarui!
-                </div>
-              )}
+                
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[11px] font-medium text-slate-400 uppercase tracking-tighter">Level Akses</span>
+                    <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100 uppercase">
+                      {user?.role || "Admin"}
+                    </span>
+                  </div>
 
-              {/* Submit */}
-              <div className="flex justify-end pt-2">
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="flex items-center gap-2 px-6 py-3 bg-[#1a4d2e] hover:bg-[#14532D] text-white text-sm font-semibold rounded-xl disabled:opacity-50 transition-colors shadow-sm shadow-emerald-900/20"
-                >
-                  {isLoading
-                    ? <><Loader size={14} className="animate-spin" /> Menyimpan...</>
-                    : <><Check size={14} /> Simpan Perubahan</>}
-                </button>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[11px] font-medium text-slate-400 uppercase tracking-tighter">Status Akun</span>
+                    <span className="flex items-center gap-1.5 text-[10px] font-black text-blue-600 uppercase">
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                      Aktif
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-6 p-4 bg-slate-50 rounded-xl">
+                  <p className="text-[10px] text-slate-400 font-medium leading-relaxed text-center">
+                    "Kredensial login dikelola oleh sistem developer. Hubungi administrator teknis untuk perubahan data sensitif."
+                  </p>
+                </div>
               </div>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       </main>
     </div>

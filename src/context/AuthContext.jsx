@@ -25,6 +25,11 @@ export const AuthProvider = ({ children }) => {
     if (token) localStorage.setItem("token", token);
   };
 
+  const updateUser = (newUserData) => {
+  setUser(newUserData); 
+  localStorage.setItem("user_session", JSON.stringify(newUserData)); 
+};
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user_session");
@@ -32,7 +37,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, updateUser }}>
       {!loading && children}
     </AuthContext.Provider>
   );

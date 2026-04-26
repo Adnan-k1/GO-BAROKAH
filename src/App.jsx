@@ -7,17 +7,19 @@ import MainLayout from "./layouts/MainLayout";
 import ProfileLayout from "./layouts/ProfileSideBarLayout";
 import ScrollToTop from "./components/ScrollToTop";
 import ProtectedRoute from "./components/ProtectedRoute";
-
 import {
   Home, Store, ProductDetail, Login, SignUp,
   Cart, Checkout, Payment, ProfileInfoPage,
   AddressPage, OrdersPage
-} from "./pages";
-import VerifyOTP from "./pages/VerifyOTP";
+} from "./pages/user/index";
+import VerifyOTP from "./pages/auth/VerifyOtpPage";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminInventory from "./pages/admin/AdminInventory";
+import AdminProfile from "./pages/admin/AdminProfile";
+import AdminOrders from "./pages/admin/AdminOrders"; 
+import AdminTransactionHistory from "./pages/admin/AdminTransactionHistroy"; 
 
 function App() {
   return (
@@ -76,7 +78,9 @@ function App() {
               <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/inventory" element={<AdminInventory />} />
-              {/* Tambahkan AdminOrders atau AdminReports di sini nanti */}
+              <Route path="/admin/profile" element={<AdminProfile />} />
+              <Route path="/admin/orders" element={<AdminOrders />} />
+              <Route path="/admin/transactions" element={<AdminTransactionHistory />} />
             </Route>
 
             {/* ── ERROR PAGES ── */}
@@ -95,8 +99,6 @@ function App() {
                 </button>
               </div>
             } />
-
-            {/* Catch All - Redirect to Home */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>

@@ -1,6 +1,6 @@
 import { Outlet, NavLink } from 'react-router-dom';
 import { User, MapPin, ShoppingBag, LogOut } from 'lucide-react';
-import { useProfileLogic } from '../hooks/useProfileLogic';
+import { useProfileLogic } from '../hooks/user/useProfileLogic';
 import toast from 'react-hot-toast'; 
 
 const ProfileSideBarLayout = () => {
