@@ -50,6 +50,15 @@ export const CartProvider = ({ children }) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
   };
 
+  const updateQuantity = (productId, newQty) => {
+    if (!user) return;
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === productId ? { ...item, quantity: Math.max(1, newQty) } : item
+      )
+    );
+  };
+
   const clearCart = () => {
     setCartItems([]);
     localStorage.removeItem("cart");
@@ -69,6 +78,7 @@ export const CartProvider = ({ children }) => {
       addToCart, 
       removeFromCart, 
       removeItem, 
+      updateQuantity,
       clearCart, 
       totalItems 
     }}>

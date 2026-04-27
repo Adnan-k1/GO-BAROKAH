@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { LogOut, ChevronRight } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { NAV_ITEMS } from "../../constants/adminConstants";
-import LogoutModal from "./LogoutModal"; // Import komponen baru
+import LogoutModal from "./LogoutModal"; 
 
 const AdminSidebar = ({ alertCount = 0 }) => {
   const { user, logout } = useAuth();
@@ -18,7 +18,7 @@ const AdminSidebar = ({ alertCount = 0 }) => {
     <>
       <aside className="w-64 h-screen sticky top-0 flex-shrink-0 flex flex-col bg-[#1a4d2e] px-5 py-8 font-sans border-r border-white/5">
         <header className="px-2 mb-10 flex-shrink-0">
-          <h1 className="text-2xl font-black italic tracking-tighter text-white uppercase leading-none">
+          <h1 className="text-2xl font-black tracking-tighter text-white uppercase leading-none">
             UD. BAROKAH
           </h1>
           <div className="h-[4px] w-12 bg-[#f5c518] rounded-full mt-2" />
@@ -80,8 +80,6 @@ const AdminSidebar = ({ alertCount = 0 }) => {
           </button>
         </footer>
       </aside>
-
-      {/* Gunakan Komponen Modal */}
       <LogoutModal 
         isOpen={showLogoutModal} 
         onClose={() => setShowLogoutModal(false)} 

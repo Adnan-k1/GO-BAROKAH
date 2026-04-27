@@ -16,7 +16,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between gap-8">
         <Link to="/" className="flex-shrink-0 group">
           <div className="flex flex-col items-start">
-            <h1 className="text-[#2D5A43] text-2xl font-black tracking-tighter leading-none italic uppercase transition-transform group-hover:scale-95">
+            <h1 className="text-[#2D5A43] text-2xl font-black tracking-tighter leading-none uppercase transition-transform group-hover:scale-95">
               UD. Barokah
             </h1>
             <div className="w-full h-1 bg-gradient-to-r from-yellow-400 to-transparent mt-0.5 opacity-70"></div>

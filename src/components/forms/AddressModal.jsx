@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, Search } from "lucide-react";
+import { X, Search, MapPin } from "lucide-react";
 import {
   MapContainer,
   TileLayer,
@@ -31,14 +31,29 @@ const AddressModal = ({
   formData,
   onChange,
   isEdit,
+  isLoading, 
 }) => {
   const [position, setPosition] = useState([-2.689, 111.621]);
+  const [animate, setAnimate] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      const timer = setTimeout(() => setAnimate(true), 10);
+      return () => clearTimeout(timer);
+    } else {
+      setAnimate(false);
+      const timer = setTimeout(() => setShouldRender(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen && isEdit && formData.address_detail) {
       handleSearchLocation(formData.address_detail);
     }
-  }, [isOpen]);
+  }, [isOpen, isEdit]);
 
   const fetchAddressName = async (lat, lng) => {
     try {
@@ -52,7 +67,7 @@ const AddressModal = ({
         });
       }
     } catch (error) {
-      console.error(error);
+      console.error("Geocoding Error:", error);
     }
   };
 
@@ -77,7 +92,7 @@ const AddressModal = ({
         setPosition([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
       }
     } catch (error) {
-      console.error(error);
+      console.error("Search Error:", error);
     }
   };
 
@@ -89,28 +104,42 @@ const AddressModal = ({
     return null;
   };
 
-  if (!isOpen) return null;
+  if (!shouldRender) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white w-full max-w-xl rounded-[32px] overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-        <div className="p-6 border-b border-gray-50 flex justify-between items-center bg-white shrink-0">
-          <h3 className="text-xl font-bold text-gray-900">
-            {isEdit ? "Ubah Alamat" : "Tambah Alamat Baru"}
-          </h3>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div
+        className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
+          animate ? "opacity-100" : "opacity-0"
+        }`}
+        onClick={onClose}
+      />
+      <div
+        className={`relative bg-white w-full max-w-xl rounded-[40px] overflow-hidden shadow-2xl flex flex-col max-h-[90vh] transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform ${
+          animate ? "scale-100 translate-y-0 opacity-100" : "scale-90 translate-y-10 opacity-0"
+        }`}
+      >
+        <div className="p-6 px-10 border-b border-gray-50 flex justify-between items-center bg-white shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-green-50 text-[#2D5A43] rounded-xl">
+              <MapPin size={20} />
+            </div>
+            <h3 className="text-xl font-black text-gray-900 tracking-tighter uppercase">
+              {isEdit ? "Ubah Alamat" : "Tambah Alamat Baru"}
+            </h3>
+          </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors group"
           >
-            <X size={20} />
+            <X size={20} className="text-gray-400 group-hover:rotate-90 transition-transform duration-300" />
           </button>
         </div>
-
         <form
           onSubmit={onSubmit}
-          className="p-8 space-y-6 overflow-y-auto flex-grow text-left"
+          className="p-10 space-y-6 overflow-y-auto flex-grow text-left"
         >
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormInput
               label="Label Alamat"
               name="label"
@@ -124,27 +153,26 @@ const AddressModal = ({
               name="recipient_name"
               value={formData.recipient_name ?? ""}
               onChange={onChange}
-              placeholder={"Masukkan nama penerima"}
+              placeholder="Nama Lengkap"
               required
             />
           </div>
-
           <FormInput
             label="No. Telepon"
             name="recipient_phone"
             value={formData.recipient_phone ?? ""}
             onChange={onChange}
-            placeholder={"Masukkan nomor telepon anda"}
+            placeholder="0812xxxx"
             required
           />
-          <div className="space-y-2">
-            <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest flex justify-between">
-              Titik Lokasi
-              <span className="text-[10px] lowercase font-medium text-[#2D5A43]">
-                Klik peta untuk geser pin
+          <div className="space-y-3">
+            <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest flex justify-between items-center">
+              Titik Lokasi Pengiriman
+              <span className="text-[10px] lowercase font-medium text-[#2D5A43] bg-green-50 px-3 py-1 rounded-full">
+                Klik peta untuk menggeser PIN
               </span>
             </label>
-            <div className="h-48 w-full rounded-2xl overflow-hidden border border-gray-100 z-0">
+            <div className="h-52 w-full rounded-[2rem] overflow-hidden border border-gray-100 z-0">
               <MapContainer
                 center={position}
                 zoom={13}
@@ -160,9 +188,9 @@ const AddressModal = ({
               </MapContainer>
             </div>
           </div>
-          <div className="space-y-1">
-            <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest text-left block">
-              Detail Alamat
+          <div className="space-y-2">
+            <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest block">
+              Detail Alamat (Jalan, No Rumah, RT/RW)
             </label>
             <div className="relative group">
               <FormTextarea
@@ -170,34 +198,36 @@ const AddressModal = ({
                 value={formData.address_detail ?? ""}
                 onChange={onChange}
                 onBlur={(e) => handleSearchLocation(e.target.value)}
-                placeholder="Jl. Nama Jalan, No. Rumah..."
-                className="pr-12"
+                placeholder="Jl. G.M. Arsyad No. 10..."
+                className="pr-14 min-h-[100px]"
                 required
               />
               <button
                 type="button"
                 onClick={() => handleSearchLocation(formData.address_detail)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-[#2D5A43] transition-colors bg-gray-50 rounded-xl"
-                title="Cari lokasi di peta"
+                className="absolute right-4 top-4 p-2 text-gray-400 hover:text-[#2D5A43] transition-colors bg-gray-50 rounded-xl"
               >
                 <Search size={18} />
               </button>
             </div>
           </div>
-
-          <div className="flex gap-3 pt-4 sticky bottom-0 bg-white">
+          <div className="flex gap-4 pt-6 sticky bottom-0 bg-white border-t border-gray-50">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-4 font-bold text-gray-400 uppercase text-xs tracking-widest"
+              disabled={isLoading}
+              className="flex-1 py-4 font-black text-gray-400 uppercase text-[10px] tracking-widest disabled:opacity-50"
             >
               Batal
             </button>
+            
             <Button
               type="submit"
-              className="flex-[2] py-4 shadow-lg uppercase text-xs tracking-widest"
+              variant="primary"
+              isLoading={isLoading} 
+              className="flex-[2] py-4 rounded-2xl shadow-xl shadow-green-900/10"
             >
-              {isEdit ? "Simpan Perubahan" : "Tambah Alamat"}
+              {isEdit ? "Simpan Perubahan" : "Tambah Alamat Baru"}
             </Button>
           </div>
         </form>
