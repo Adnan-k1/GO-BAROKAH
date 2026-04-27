@@ -31,6 +31,7 @@ export const useAddressLogic = () => {
   }, [fetchAddresses, user]); 
 
   const handleSaveAddress = async (formData, editId) => {
+    setIsLoading(true);
     const payload = {
       label: formData.label,
       recipient_name: formData.recipient_name,
@@ -55,6 +56,8 @@ export const useAddressLogic = () => {
     } catch (err) {
       toast.error(err.response?.data?.message || "Gagal menyimpan!");
       return false;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -83,13 +86,15 @@ export const useAddressLogic = () => {
 };
 
   const handleDeleteAddress = async (id) => {
-    if (!window.confirm("Hapus alamat ini?")) return;
+    setIsLoading(true);
     try {
       await addressService.deleteAddress(id);
       toast.success("Alamat dihapus");
       await fetchAddresses();
     } catch (err) {
       toast.error("Gagal menghapus alamat");
+    } finally {
+      setIsLoading(false);
     }
   };
 

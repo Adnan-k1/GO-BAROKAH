@@ -11,8 +11,8 @@ import {
   Phone,
   User,
 } from "lucide-react";
-import Button from "../../components/common/Button";
 import AddressModal from "../../components/forms/AddressModal";
+import ConfirmModal from "../../components/forms/ConfirmModal"; 
 import { useAddressLogic } from "../../hooks/user/useAddressLogic";
 
 const AddressPage = () => {
@@ -26,6 +26,11 @@ const AddressPage = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    addressId: null,
+  });
+
   const [formData, setFormData] = useState({
     label: "",
     recipient_name: "",
@@ -67,6 +72,17 @@ const AddressPage = () => {
       });
     }
     setIsModalOpen(true);
+  };
+
+  const openDeleteConfirm = (id) => {
+    setDeleteModal({ isOpen: true, addressId: id });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteModal.addressId) {
+      await handleDeleteAddress(deleteModal.addressId);
+      setDeleteModal({ isOpen: false, addressId: null });
+    }
   };
 
   return (
@@ -124,35 +140,22 @@ const AddressPage = () => {
                     )}
                   </div>
                 </div>
+                
                 <div className="px-1 py-2 space-y-3">
                   <div className="flex items-center gap-4">
-                    <User
-                      size={16}
-                      className="text-[#3A5A4D] opacity-40 shrink-0"
-                    />
-                    <span className="text-[15px] font-bold text-gray-900">
-                      {item.recipientName || "-"}
-                    </span>
+                    <User size={16} className="text-[#3A5A4D] opacity-40 shrink-0" />
+                    <span className="text-[15px] font-bold text-gray-900">{item.recipientName || "-"}</span>
                   </div>
                   <div className="flex items-center gap-4">
-                    <Phone
-                      size={16}
-                      className="text-[#3A5A4D] opacity-40 shrink-0"
-                    />
-                    <span className="text-[14px] text-gray-600 font-medium">
-                      {item.recipientPhone || "-"}
-                    </span>
+                    <Phone size={16} className="text-[#3A5A4D] opacity-40 shrink-0" />
+                    <span className="text-[14px] text-gray-600 font-medium">{item.recipientPhone || "-"}</span>
                   </div>
                   <div className="flex items-start gap-4">
-                    <MapPin
-                      size={16}
-                      className="text-[#3A5A4D] opacity-40 shrink-0 mt-0.5"
-                    />
-                    <span className="text-[14px] text-gray-500 leading-relaxed font-medium">
-                      {item.addressDetail || "-"}
-                    </span>
+                    <MapPin size={16} className="text-[#3A5A4D] opacity-40 shrink-0 mt-0.5" />
+                    <span className="text-[14px] text-gray-500 leading-relaxed font-medium">{item.addressDetail || "-"}</span>
                   </div>
                 </div>
+
                 <div className="flex flex-col sm:flex-row justify-between items-center pt-5 border-t border-gray-50 gap-4">
                   {!isDefault ? (
                     <button
@@ -161,9 +164,7 @@ const AddressPage = () => {
                     >
                       Jadikan Utama
                     </button>
-                  ) : (
-                    <div />
-                  )}
+                  ) : <div />}
 
                   <div className="flex gap-2">
                     <button
@@ -174,7 +175,7 @@ const AddressPage = () => {
                       <PencilLine size={18} />
                     </button>
                     <button
-                      onClick={() => handleDeleteAddress(itemId)}
+                      onClick={() => openDeleteConfirm(itemId)}
                       className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                       title="Hapus Alamat"
                     >
@@ -187,15 +188,9 @@ const AddressPage = () => {
           })
         ) : (
           <div className="flex flex-col items-center justify-center text-center py-24 border-2 border-dashed border-gray-100 rounded-[32px]">
-            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
-              <MapPin size={32} className="text-gray-200" />
-            </div>
-            <h4 className="text-lg font-bold text-gray-900">
-              Belum ada alamat tersimpan
-            </h4>
-            <p className="text-sm text-gray-400 mt-2 max-w-[250px]">
-              Tambahkan lokasi pengiriman untuk memudahkan checkout.
-            </p>
+            <MapPin size={32} className="text-gray-200 mb-6" />
+            <h4 className="text-lg font-bold text-gray-900">Belum ada alamat tersimpan</h4>
+            <p className="text-sm text-gray-400 mt-2 max-w-[250px]">Tambahkan lokasi pengiriman untuk memudahkan checkout.</p>
           </div>
         )}
       </div>
@@ -210,6 +205,16 @@ const AddressPage = () => {
         formData={formData}
         onChange={handleInputChange}
         isEdit={!!editId}
+        isLoading={isLoading}
+      />
+
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, addressId: null })}
+        onConfirm={handleConfirmDelete}
+        isLoading={isLoading}
+        title="Hapus Alamat?"
+        message="Apakah Anda yakin ingin menghapus alamat ini? Data yang sudah dihapus tidak dapat dikembalikan."
       />
     </div>
   );

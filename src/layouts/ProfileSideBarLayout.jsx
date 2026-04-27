@@ -1,50 +1,12 @@
+import React, { useState } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { User, MapPin, ShoppingBag, LogOut } from 'lucide-react';
 import { useProfileLogic } from '../hooks/user/useProfileLogic';
-import toast from 'react-hot-toast'; 
+import ConfirmModal from '../components/forms/ConfirmModal'; 
 
 const ProfileSideBarLayout = () => {
   const { user, handleLogout } = useProfileLogic();
-  const confirmLogout = () => {
-    toast((t) => (
-      <div className="flex flex-col gap-3 p-1">
-        <div className="flex items-center gap-3">
-          <div className="bg-red-50 p-2 rounded-full">
-            <LogOut size={20} className="text-red-500" />
-          </div>
-          <p className="font-bold text-gray-800 text-sm">
-            Yakin ingin logout?
-          </p>
-        </div>
-        <div className="flex gap-2 justify-end">
-          <button
-            onClick={() => toast.dismiss(t.id)}
-            className="px-4 py-2 text-xs font-bold text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            Batal
-          </button>
-          <button
-            onClick={() => {
-              toast.dismiss(t.id);
-              handleLogout();
-            }}
-            className="px-5 py-2 text-xs font-black bg-red-500 text-white rounded-xl shadow-lg shadow-red-200 active:scale-95 transition-all uppercase tracking-wider"
-          >
-            Ya, Keluar
-          </button>
-        </div>
-      </div>
-    ), {
-      duration: 5000,
-      position: 'top-center',
-      style: {
-        borderRadius: '24px',
-        padding: '16px',
-        border: '1px solid #FEE2E2',
-        minWidth: '280px'
-      },
-    });
-  };
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const navLinkStyle = ({ isActive }) => 
     `flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 ${
@@ -96,9 +58,8 @@ const ProfileSideBarLayout = () => {
                   <span className="text-[12px] text-gray-400 font-normal">Cek status pesanan</span>
                 </div>
               </NavLink>
-
               <button 
-                onClick={confirmLogout} 
+                onClick={() => setIsLogoutModalOpen(true)} 
                 className="w-full flex items-center gap-4 p-4 rounded-2xl text-red-500 hover:bg-red-50 transition-all mt-4 group border border-transparent hover:border-red-100"
               >
                 <div className="bg-red-50 p-2 rounded-xl group-hover:bg-red-100 transition-colors">
@@ -120,8 +81,15 @@ const ProfileSideBarLayout = () => {
             <Outlet />
           </div>
         </main>
-
       </div>
+      <ConfirmModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleLogout}
+        title="Yakin ingin Keluar?"
+        message="Anda akan keluar dari akun Barokah. Anda perlu login kembali untuk mengakses profil dan riwayat pesanan."
+        confirmText="Ya, Logout"
+      />
     </div>
   );
 };
