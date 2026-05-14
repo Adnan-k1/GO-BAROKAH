@@ -1,93 +1,165 @@
-import React, { useState } from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
-import { User, MapPin, ShoppingBag, LogOut } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import { User, MapPin, ShoppingBag, LogOut, ChevronRight, Menu, X, LayoutGrid } from 'lucide-react';
 import { useProfileLogic } from '../hooks/user/useProfileLogic';
 import ConfirmModal from '../components/forms/ConfirmModal'; 
 
 const ProfileSideBarLayout = () => {
   const { user, handleLogout } = useProfileLogic();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State untuk toggle sidebar di mobile
+  const location = useLocation();
+
+  // Tutup sidebar otomatis setiap kali pindah halaman di mobile
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [location.pathname]);
 
   const navLinkStyle = ({ isActive }) => 
-    `flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 ${
-      isActive 
-        ? 'bg-[#E8F5EE] text-[#2D5A43] font-bold shadow-sm' 
-        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-    }`;
+    `flex items-center gap-4 p-3 rounded-xl transition-all duration-200 group border
+    ${isActive 
+      ? 'bg-emerald-50 border-emerald-100 shadow-sm' 
+      : 'hover:bg-slate-50 border-transparent text-slate-500'}`;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 pt-10 pb-20 bg-[#FAFAFA] min-h-screen">
-      <div className="flex flex-col lg:flex-row items-start gap-8">
+    <div className="max-w-7xl mx-auto px-4 md:px-12 pt-6 md:pt-16 pb-20 bg-[#FAFAFA] min-h-screen">
+      
+      {/* Floating Toggle Button Mobile */}
+      <button 
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="lg:hidden fixed bottom-6 right-6 z-[60] bg-[#2D5A43] text-white p-4 rounded-full shadow-xl flex items-center justify-center transition-transform active:scale-95"
+      >
+        {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      <div className="flex flex-col lg:flex-row items-start gap-12 relative">
         
-        <aside className="w-full lg:w-[360px] lg:sticky lg:top-10">
-          <div className="bg-white rounded-[32px] p-8 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+        {/* Overlay Mobile (Klik area gelap untuk tutup sidebar) */}
+        {isSidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[40] lg:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
 
-            <div className="flex flex-col items-center text-center pb-8 border-b border-gray-100 mb-8">
-              <div className="w-20 h-20 bg-[#E8F5EE] rounded-full flex items-center justify-center mb-4 border-4 border-white shadow-sm">
-                <User size={32} className="text-[#2D5A43]" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 tracking-tight capitalize">
-                {user?.name || user?.username || 'Memuat Nama...'}
-              </h2>
-              <p className="text-gray-400 text-sm font-normal">
-                {user?.email || 'Memuat Email...'}
-              </p>
+        {/* ASIDE (SIDEBAR) */}
+        <aside className={`
+          fixed inset-y-0 left-0 z-[50] w-[280px] bg-white p-6 shadow-2xl transition-transform duration-300 transform 
+          lg:relative lg:translate-x-0 lg:z-0 lg:w-[300px] lg:bg-transparent lg:shadow-none lg:p-0
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:block'}
+        `}>
+          
+          <div className="mb-10 lg:pl-2">
+            <div className="flex items-center gap-3 mb-6">
+              <LayoutGrid size={18} className="text-[#2D5A43]" strokeWidth={2.5} />
+              <h3 className="font-black text-[11px] lg:text-[13px] uppercase tracking-[0.15em] text-[#2D5A43]">
+                Pengaturan Akun
+              </h3>
             </div>
-
-            <nav className="space-y-2">
-              <NavLink to="/profile" end className={navLinkStyle}>
-                <User size={22} strokeWidth={2} />
-                <div className="flex flex-col">
-                  <span className="text-[15px] leading-tight">Informasi Profil</span>
-                  <span className="text-[12px] text-gray-400 font-normal">Kelola data diri Anda</span>
-                </div>
-              </NavLink>
-
-              <NavLink to="/profile/address" className={navLinkStyle}>
-                <MapPin size={22} strokeWidth={2} />
-                <div className="flex flex-col">
-                  <span className="text-[15px] leading-tight">Alamat</span>
-                  <span className="text-[12px] text-gray-400 font-normal">Kelola alamat pengiriman</span>
-                </div>
-              </NavLink>
-
-              <NavLink to="/profile/orders" className={navLinkStyle}>
-                <ShoppingBag size={22} strokeWidth={2} />
-                <div className="flex flex-col">
-                  <span className="text-[15px] leading-tight">Riwayat Pesanan</span>
-                  <span className="text-[12px] text-gray-400 font-normal">Cek status pesanan</span>
-                </div>
-              </NavLink>
-              <button 
-                onClick={() => setIsLogoutModalOpen(true)} 
-                className="w-full flex items-center gap-4 p-4 rounded-2xl text-red-500 hover:bg-red-50 transition-all mt-4 group border border-transparent hover:border-red-100"
-              >
-                <div className="bg-red-50 p-2 rounded-xl group-hover:bg-red-100 transition-colors">
-                  <LogOut size={20} strokeWidth={2} />
-                </div>
-                <div className="flex flex-col text-left">
-                  <span className="text-[15px] font-bold leading-tight">Logout</span>
-                  <span className="text-[12px] text-gray-400 font-normal group-hover:text-red-400">
-                    Keluar dari aplikasi
-                  </span>
-                </div>
-              </button>
-            </nav>
+            
+            <div className="flex items-center gap-4 p-2 bg-slate-50 lg:bg-transparent rounded-2xl">
+              <div className="w-12 h-12 bg-[#2D5A43] rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-emerald-900/10">
+                <User size={20} className="text-white" strokeWidth={2.5} />
+              </div>
+              <div className="flex flex-col overflow-hidden">
+                <span className="font-black text-[13px] uppercase tracking-tight text-slate-900 truncate italic">
+                  {user?.name || user?.username || 'Pelanggan'}
+                </span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate">
+                  {user?.email || 'Member'}
+                </span>
+              </div>
+            </div>
           </div>
+
+          <nav className="flex flex-col gap-2">
+            <NavLink to="/profile" end className={navLinkStyle}>
+              {({ isActive }) => (
+                <>
+                  <div className={`w-5 h-5 flex items-center justify-center rounded-lg border-2 transition-all 
+                    ${isActive ? 'border-[#2D5A43] bg-[#2D5A43] text-white' : 'border-slate-200 text-slate-400'}`}>
+                    <User size={12} strokeWidth={3} />
+                  </div>
+                  <span className={`text-[12px] lg:text-[11px] font-black uppercase tracking-tight ${isActive ? 'text-[#2D5A43]' : ''}`}>
+                    Informasi Profil
+                  </span>
+                  <ChevronRight size={14} className={`ml-auto ${isActive ? 'opacity-100' : 'opacity-0'}`} />
+                </>
+              )}
+            </NavLink>
+
+            <NavLink to="/profile/address" className={navLinkStyle}>
+              {({ isActive }) => (
+                <>
+                  <div className={`w-5 h-5 flex items-center justify-center rounded-lg border-2 transition-all 
+                    ${isActive ? 'border-[#2D5A43] bg-[#2D5A43] text-white' : 'border-slate-200 text-slate-400'}`}>
+                    <MapPin size={12} strokeWidth={3} />
+                  </div>
+                  <span className={`text-[12px] lg:text-[11px] font-black uppercase tracking-tight ${isActive ? 'text-[#2D5A43]' : ''}`}>
+                    Daftar Alamat
+                  </span>
+                  <ChevronRight size={14} className={`ml-auto ${isActive ? 'opacity-100' : 'opacity-0'}`} />
+                </>
+              )}
+            </NavLink>
+
+            <NavLink to="/profile/orders" className={navLinkStyle}>
+              {({ isActive }) => (
+                <>
+                  <div className={`w-5 h-5 flex items-center justify-center rounded-lg border-2 transition-all 
+                    ${isActive ? 'border-[#2D5A43] bg-[#2D5A43] text-white' : 'border-slate-200 text-slate-400'}`}>
+                    <ShoppingBag size={12} strokeWidth={3} />
+                  </div>
+                  <span className={`text-[12px] lg:text-[11px] font-black uppercase tracking-tight ${isActive ? 'text-[#2D5A43]' : ''}`}>
+                    Riwayat Belanja
+                  </span>
+                  <ChevronRight size={14} className={`ml-auto ${isActive ? 'opacity-100' : 'opacity-0'}`} />
+                </>
+              )}
+            </NavLink>
+
+            <div className="h-[1px] bg-slate-100 my-4 mx-2" />
+
+            <button 
+              onClick={() => setIsLogoutModalOpen(true)} 
+              className="flex items-center gap-4 p-3 rounded-xl hover:bg-red-50 text-red-500"
+            >
+              <div className="w-5 h-5 flex items-center justify-center rounded-lg border-2 border-red-100 text-red-400">
+                <LogOut size={12} strokeWidth={3} />
+              </div>
+              <span className="text-[12px] lg:text-[11px] font-black uppercase tracking-tight">
+                Keluar Sesi
+              </span>
+            </button>
+          </nav>
         </aside>
 
-        <main className="flex-1 w-full">
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+        {/* MAIN CONTENT AREA */}
+        <main className="flex-1 w-full min-w-0">
+          {/* Header Mobile untuk buka sidebar (Alternatif tombol floating) */}
+          <div className="lg:hidden flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+             <h2 className="font-black text-[14px] uppercase tracking-widest text-slate-800 italic">Menu Profil</h2>
+             <button 
+                onClick={() => setIsSidebarOpen(true)}
+                className="flex items-center gap-2 text-[#2D5A43] font-black text-[10px] uppercase tracking-wider"
+             >
+                Pilih Menu <Menu size={16} />
+             </button>
+          </div>
+
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <Outlet />
           </div>
         </main>
+
       </div>
+
       <ConfirmModal
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}
         onConfirm={handleLogout}
-        title="Yakin ingin Keluar?"
-        message="Anda akan keluar dari akun Barokah. Anda perlu login kembali untuk mengakses profil dan riwayat pesanan."
+        title="Konfirmasi Keluar"
+        message="Sesi belanja Anda akan diakhiri. Yakin ingin melanjutkan?"
         confirmText="Ya, Logout"
       />
     </div>

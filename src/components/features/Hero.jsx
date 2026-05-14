@@ -6,23 +6,28 @@ const Hero = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative w-full h-[85vh] bg-[#FBFBFB] overflow-hidden">
-      <div className="max-w-7xl mx-auto h-full px-6 lg:px-12 flex flex-col md:flex-row items-center gap-12">
-        <div className="flex-1 space-y-8 z-10">
-          <div className="space-y-4">
-            <h1 className="text-5xl lg:text-6xl font-black text-gray-900 leading-[0.9] tracking-tighter uppercase">
+    <section className="relative w-full min-h-[85vh] bg-[#FBFBFB] overflow-hidden">
+      <div className="max-w-7xl mx-auto min-h-[85vh] px-6 lg:px-12 flex flex-col md:flex-row items-center gap-8 md:gap-12 py-16 md:py-0">
+        
+        {/* Text Content */}
+        <div className="flex-1 space-y-6 md:space-y-8 z-10 w-full text-center md:text-left">
+          <div className="space-y-3 md:space-y-4">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 leading-[0.9] tracking-tighter uppercase">
               KUALITAS <br />
               <span className="text-[#2D5A43]">UTAMA,</span> <br />
-              HARGA <br /><span className="text-[#2D5A43]">BAROKAH.</span>
+              HARGA <br />
+              <span className="text-[#2D5A43]">BAROKAH.</span>
             </h1>
-            <p className="text-gray-500 text-[13px] font-medium max-w-sm leading-relaxed">
-              Penyedia bahan pangan segar kualitas unggulan untuk kebutuhan bisnis dan keluarga Anda. Segar setiap hari, jujur dalam harga, dan terpercaya dalam pelayanan.
+            <p className="text-gray-500 text-[13px] font-medium max-w-sm leading-relaxed mx-auto md:mx-0">
+              Penyedia bahan pangan segar kualitas unggulan untuk kebutuhan bisnis
+              dan keluarga Anda. Segar setiap hari, jujur dalam harga, dan
+              terpercaya dalam pelayanan.
             </p>
           </div>
 
           <button
             onClick={() => navigate("/store")}
-            className="flex items-center gap-4 group"
+            className="flex items-center gap-4 group mx-auto md:mx-0 w-fit"
           >
             <div className="bg-gray-900 text-white px-8 py-4 rounded-full font-black text-xs uppercase tracking-widest group-hover:bg-[#2D5A43] transition-all duration-300">
               Belanja Sekarang
@@ -32,7 +37,9 @@ const Hero = () => {
             </div>
           </button>
         </div>
-        <div className="flex-1 h-[50%] md:h-[70%] w-full relative flex items-center justify-center">
+
+        {/* Image */}
+        <div className="flex-1 w-full h-64 sm:h-80 md:h-[70%] relative flex items-center justify-center">
           <div className="w-full h-full max-w-lg md:max-w-none rounded-[3rem] overflow-hidden border-8 border-[#FBFBFB]">
             <img
               src={petaniImg}
@@ -42,7 +49,9 @@ const Hero = () => {
           </div>
         </div>
       </div>
-      <div className="absolute top-0 right-0 w-1/3 h-full bg-[#F6F8F7] -z-10 hidden md:block"></div>
+
+      {/* Background accent — desktop only */}
+      <div className="absolute top-0 right-0 w-1/3 h-full bg-[#F6F8F7] -z-10 hidden md:block" />
     </section>
   );
 };
