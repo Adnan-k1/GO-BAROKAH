@@ -6,6 +6,7 @@ import {
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import InventoryStatCard from "../../components/admin/inventory/InventoryStatCard";
 import OrderDetailModal from "../../components/admin/order/OrderDetailModal";
+import ConfirmModal from "../../components/forms/ConfirmModal"; 
 import { useAdminOrders } from "../../hooks/admin/useAdminOrders";
 import { formatRupiah } from "../../utils/formatters";
 
@@ -29,6 +30,8 @@ const AdminOrders = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [orderToCancel, setOrderToCancel] = useState(null);
+  
   const tableScrollRef = useRef(null);
 
   useEffect(() => {
@@ -62,6 +65,7 @@ const AdminOrders = () => {
     setSelectedOrder(order);
     setIsModalOpen(true);
   };
+
   const ActionButtons = ({ order }) => {
     const btnClass = "p-2.5 rounded-xl transition-all shadow-sm border active:scale-95";
     
@@ -76,7 +80,7 @@ const AdminOrders = () => {
             <button onClick={() => handleUpdateStatus(order.id, "Disiapkan")} className={`${btnClass} bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-[#1a4d2e] hover:text-white`}>
               <Briefcase size={14} strokeWidth={2.5} />
             </button>
-            <button onClick={() => handleUpdateStatus(order.id, "Dibatalkan")} className={`${btnClass} bg-red-50 text-red-500 border-red-100 hover:bg-red-500 hover:text-white`}>
+            <button onClick={() => setOrderToCancel(order)} className={`${btnClass} bg-red-50 text-red-500 border-red-100 hover:bg-red-500 hover:text-white`}>
               <Ban size={14} />
             </button>
           </>
@@ -190,7 +194,20 @@ const AdminOrders = () => {
           </div>
         </main>
       </div>
+
       {isModalOpen && <OrderDetailModal order={selectedOrder} onClose={() => setIsModalOpen(false)} />}
+      <ConfirmModal
+        isOpen={!!orderToCancel}
+        onClose={() => setOrderToCancel(null)}
+        onConfirm={() => {
+          handleUpdateStatus(orderToCancel.id, "Dibatalkan");
+          setOrderToCancel(null);
+        }}
+        title="Batalkan Pesanan?"
+        message={orderToCancel ? `Kamu yakin mau membatalkan pesanan #${orderToCancel.id} dari ${orderToCancel.customer_name}?` : ""}
+        confirmText="Ya, Batalkan"
+        variant="danger"
+      />
     </div>
   );
 };
