@@ -2,12 +2,12 @@ import api from '../../utils/api';
 
 export const cartService = {
   getCart: async () => {
-    const response = await api.get('/api/cart');
+    const response = await api.get('/api/carts');
     return response.data;
   },
 
   addItem: async (productId, quantity = 1) => {
-    const response = await api.post('/api/cart/items', {
+    const response = await api.post('/api/carts/items', {
       product_id: productId,
       quantity,
     });
@@ -15,17 +15,17 @@ export const cartService = {
   },
 
   updateItem: async (productId, quantity) => {
-    const response = await api.patch(`/api/cart/items/${productId}`, { quantity });
+    const response = await api.patch(`/api/carts/items/${productId}`, { quantity });
     return response.data;
   },
 
   deleteItem: async (productId) => {
-    const response = await api.delete(`/api/cart/items/${productId}`);
+    const response = await api.delete(`/api/carts/items/${productId}`);
     return response.data;
   },
 
   clearCart: async () => {
-    const response = await api.delete('/api/cart');
+    const response = await api.delete('/api/carts');
     return response.data;
   },
 };

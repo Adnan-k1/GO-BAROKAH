@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react"; 
 import { useCheckoutLogic } from "../../hooks/user/useCheckoutLogic";
 import {
   MapPin,
@@ -10,14 +10,12 @@ import {
   Info,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { addressService } from "../../services/user/addressService"; 
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const {
     cartItems,
-    zones,
-    selectedLocation,
-    setSelectedLocation,
     subtotal,
     shippingFee,
     total,
@@ -29,27 +27,63 @@ const CheckoutPage = () => {
     setAlamatDetail,
   } = useCheckoutLogic();
 
-  const isFormValid =
-    namaPenerima && (isPickup || (selectedLocation && alamatDetail));
+  const [userAddresses, setUserAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState("");
+
+  useEffect(() => {
+    const fetchUserAddresses = async () => {
+      try {
+        const response = await addressService.getAddresses();
+        const data = response.data?.data || response.data || response;
+        const addressList = Array.isArray(data) ? data : [];
+
+        setUserAddresses(addressList);
+
+        if (addressList.length > 0) {
+          const firstAddressId = addressList[0].id?.toString() || "";
+          setSelectedAddressId(firstAddressId);
+
+          const initialAddress = addressList[0];
+          setAlamatDetail(initialAddress.addressDetail || "");
+          
+          if (!namaPenerima && initialAddress.recipientName) {
+            setNamaPenerima(initialAddress.recipientName);
+          }
+        }
+      } catch (error) {
+        console.error("Gagal load alamat asli user:", error);
+      }
+    };
+
+    if (!isPickup) {
+      fetchUserAddresses();
+    }
+  }, [isPickup, setAlamatDetail, namaPenerima, setNamaPenerima]);
+
+  const isFormValid = namaPenerima && (isPickup || selectedAddressId);
 
   const handleNextStep = () => {
     const orderData = {
       customerName: namaPenerima,
-      items: cartItems,
+      items: cartItems.map((item) => ({
+        product_id: parseInt(item.product_id || item.id || item._id, 10),
+        quantity: parseInt(item.quantity || item.qty, 10),
+      })),
       method: isPickup ? "AMBIL SENDIRI" : "DIKIRIM",
-      address: isPickup
-        ? "Ambil di Toko (Pangkalan Bun)"
-        : `${alamatDetail} (${selectedLocation})`,
+      address: isPickup ? "Ambil di Toko (Pangkalan Bun)" : alamatDetail,
+      addressId: isPickup ? 0 : Number(selectedAddressId),
+      notes: "Tolong kirim secepatnya",
       subtotal,
       shippingFee: isPickup ? "Gratis" : shippingFee,
       total,
     };
+
     navigate("/payment", { state: { orderData } });
   };
 
   const displayTotal = isPickup
     ? subtotal
-    : selectedLocation
+    : selectedAddressId
       ? total
       : subtotal;
 
@@ -90,6 +124,7 @@ const CheckoutPage = () => {
                 <Store size={13} /> Ambil Sendiri
               </button>
             </div>
+            
             <div className="bg-white p-5 sm:p-6 lg:p-8 rounded-[2rem] lg:rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/30 space-y-5">
               <div className="space-y-2.5">
                 <label className="flex items-center gap-1.5 text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">
@@ -103,26 +138,39 @@ const CheckoutPage = () => {
                   onChange={(e) => setNamaPenerima(e.target.value)}
                 />
               </div>
+              
               {!isPickup ? (
                 <div className="space-y-3">
                   <label className="flex items-center gap-1.5 text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">
-                    <MapPin size={11} className="text-[#2D5A43]" /> Lokasi &
-                    Alamat
+                    <MapPin size={11} className="text-[#2D5A43]" /> Pilih Alamat Terdaftar
                   </label>
+
                   <select
-                    value={selectedLocation}
-                    onChange={(e) => setSelectedLocation(e.target.value)}
+                    value={selectedAddressId}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      setSelectedAddressId(id);
+                      
+                      const found = userAddresses.find((a) => a.id?.toString() === id.toString());
+
+                      if (found) {
+                        setAlamatDetail(found.addressDetail || "");
+                      }
+                    }}
                     className="w-full px-4 py-3.5 rounded-2xl bg-gray-50 outline-none font-black text-gray-700 cursor-pointer text-sm border border-gray-100 focus:border-[#2D5A43]/30 focus:bg-white transition-all"
                   >
-                    <option value="">Pilih Kota/Kecamatan</option>
-                    {zones.map((z) => (
-                      <option key={z.name} value={z.name}>
-                        {z.name}
+                    <option value="" disabled>
+                      Pilih alamat pengiriman
+                    </option>
+                    {userAddresses.map((addr) => (
+                      <option key={addr.id} value={addr.id}>
+                        {addr.label || "Alamat"} - {addr.recipientName || namaPenerima} ({addr.recipientPhone || "No HP"})
                       </option>
                     ))}
                   </select>
+
                   <textarea
-                    placeholder="Detail Alamat (Jl, No Rumah, RT/RW)"
+                    placeholder="Detail Alamat (Akan terisi otomatis dari pilihan diatas)"
                     rows="3"
                     className="w-full px-4 py-3.5 rounded-2xl bg-gray-50 outline-none font-bold text-gray-800 text-sm border border-gray-100 focus:border-[#2D5A43]/30 focus:bg-white transition-all resize-none"
                     value={alamatDetail}
@@ -146,6 +194,7 @@ const CheckoutPage = () => {
               )}
             </div>
           </div>
+          
           <aside className="hidden lg:block lg:col-span-2">
             <div className="bg-white rounded-[2rem] p-6 lg:p-8 sticky top-8 border border-gray-100 shadow-xl shadow-gray-200/40">
               <h3 className="text-sm font-black mb-5 text-gray-900 uppercase tracking-widest">
@@ -160,7 +209,11 @@ const CheckoutPage = () => {
                 <div className="flex justify-between text-gray-400">
                   <span>Ongkir</span>
                   <span className="text-[#2D5A43]">
-                    {isPickup ? "Gratis" : selectedLocation ? shippingFee : "—"}
+                    {isPickup
+                      ? "Gratis"
+                      : selectedAddressId
+                        ? shippingFee
+                        : "—"}
                   </span>
                 </div>
                 <div className="pt-3 border-t border-gray-100 flex justify-between items-center">
@@ -186,6 +239,7 @@ const CheckoutPage = () => {
           </aside>
         </div>
       </div>
+      
       <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 px-4 pt-2.5 pb-5 z-50 shadow-[0_-6px_20px_rgba(0,0,0,0.06)]">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">
@@ -196,7 +250,7 @@ const CheckoutPage = () => {
             <span>
               Ongkir{" "}
               <span className="text-[#2D5A43]">
-                {isPickup ? "Gratis" : selectedLocation ? shippingFee : "—"}
+                {isPickup ? "Gratis" : selectedAddressId ? shippingFee : "—"}
               </span>
             </span>
           </div>
