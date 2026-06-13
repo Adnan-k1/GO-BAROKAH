@@ -12,7 +12,7 @@ import ProfileLayout from "./layouts/ProfileSideBarLayout";
 
 import {
   Home, Store, ProductDetail, Login, SignUp,
-  Cart, Checkout, Payment, ProfileInfoPage,
+  Cart, Checkout, ProfileInfoPage,
   AddressPage, OrdersPage, OrderSuccessPage
 } from "./pages/user/index";
 import VerifyOTP from "./pages/auth/VerifyOtpPage";
@@ -20,7 +20,6 @@ import Unauthorized from "./pages/error/Unauthorized";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminInventory from "./pages/admin/AdminInventory";
-import AdminProfile from "./pages/admin/AdminProfile";
 import AdminOrders from "./pages/admin/AdminOrders"; 
 import AdminTransactionHistory from "./pages/admin/AdminTransactionHistroy"; 
 
@@ -50,7 +49,6 @@ function App() {
               {/* Rute Campuran Terproteksi (User, Admin, Owner) */}
               <Route element={<ProtectedRoute allowedRoles={["user", "admin", "owner"]} />}> 
                 <Route path="/checkout" element={<Checkout />} />
-                <Route path="/payment" element={<Payment />} />
                 <Route path="/order-success" element={<OrderSuccessPage />} /> 
                 <Route path="/profile" element={<ProfileLayout />}>
                   <Route index element={<ProfileInfoPage />} />
@@ -70,7 +68,6 @@ function App() {
               <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/inventory" element={<AdminInventory />} />
-              <Route path="/admin/profile" element={<AdminProfile />} />
               <Route path="/admin/orders" element={<AdminOrders />} />
               <Route path="/admin/transactions" element={<AdminTransactionHistory />} />
             </Route>

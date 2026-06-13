@@ -5,7 +5,6 @@ export { default as Login } from '../auth/LoginPage';
 export { default as SignUp } from '../auth/SignUpPage';
 export { default as Cart } from './CartPage';
 export { default as Checkout } from './CheckoutPage';
-export { default as Payment } from './PaymentPage';
 export { default as ProfileInfoPage } from './ProfileInfoPage';
 export { default as AddressPage } from './AddressPage';
 export { default as OrdersPage } from './HistoryPage';
