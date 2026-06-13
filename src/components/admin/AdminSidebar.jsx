@@ -48,24 +48,6 @@ const AdminSidebar = ({ alertCount = 0 }) => {
         </nav>
 
         <footer className="mt-auto pt-6 space-y-3">
-          {alertCount > 0 && (
-            <div className="p-3 bg-white/5 rounded-xl border border-white/10 mb-4">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">Stok Menipis ({alertCount})</span>
-              </div>
-            </div>
-          )}
-
-          <NavLink to="/admin/profile" className={({ isActive }) => `w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all group border ${isActive ? "bg-white/10 border-white/20" : "hover:bg-white/5 border-transparent"}`}>
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-white font-black text-xs shadow-md uppercase">
-              {initials}
-            </div>
-            <div className="flex-1 min-w-0 text-left">
-              <p className="text-[11px] font-black text-white truncate uppercase tracking-wider">{user?.username || "Admin"}</p>
-              <p className="text-[9px] text-white/30 font-bold uppercase tracking-widest">{user?.role || "Administrator"}</p>
-            </div>
-          </NavLink>
 
           <button onClick={() => setShowLogoutModal(true)} className="w-full flex items-center gap-3 px-5 py-3 rounded-xl text-[10px] font-black text-white/20 hover:text-red-400 hover:bg-red-500/10 transition-all uppercase tracking-[0.2em]">
             <LogOut size={14} strokeWidth={3} />
