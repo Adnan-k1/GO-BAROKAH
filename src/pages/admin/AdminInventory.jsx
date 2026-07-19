@@ -13,7 +13,7 @@ const PER_PAGE = 10;
 const AdminInventory = () => {
   const { 
     products, categories, types, isLoading, actionLoading, 
-    handleCreate, handleUpdate, handleDelete, handleToggleActive,
+    handleCreate, handleUpdate, handleToggleActive,
     handleAddCategory, handleAddType, 
     handleEditCategory, handleEditType 
   } = useAdminProducts();
@@ -196,9 +196,6 @@ const AdminInventory = () => {
                                 <button onClick={() => openModal("edit", p)} className="p-2.5 bg-slate-50 text-slate-400 hover:text-emerald-600 rounded-xl active:scale-90 transition-all">
                                   <Pencil size={14} />
                                 </button>
-                                <button onClick={() => openModal("delete", p)} className="p-2.5 bg-slate-50 text-slate-400 hover:text-red-500 rounded-xl active:scale-90 transition-all">
-                                  <Trash2 size={14} />
-                                </button>
                               </div>
                             </td>
                           </tr>
@@ -247,17 +244,7 @@ const AdminInventory = () => {
           onSubmit={modalMode === "create" ? handleCreate : (data) => handleUpdate(selected.id, data)}
         />
       )}
-      {modalMode === "delete" && (
-        <ConfirmModal
-          isOpen={true}
-          onClose={() => setModalMode(null)}
-          onConfirm={async () => { const ok = await handleDelete(selected.id); if (ok) setModalMode(null); }}
-          isLoading={actionLoading}
-          title="Hapus Produk?"
-          confirmText="Ya, Hapus Produk"
-          message={`Apakah Anda yakin ingin menghapus "${selected?.name}"? Tindakan ini akan menghapus produk secara permanen dari stok UD BAROKAH.`}
-        />
-      )}
+
     </div>
   );
 };
