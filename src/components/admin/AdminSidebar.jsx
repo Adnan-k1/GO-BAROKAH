@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import { LogOut, ChevronRight, LayoutDashboard, ArrowRightLeft, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { LogOut, ChevronRight, ChevronLeft, LayoutDashboard, ArrowRightLeft } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { NAV_ITEMS } from "../../constants/adminConstants";
 import LogoutModal from "./LogoutModal"; 
@@ -26,42 +26,43 @@ const AdminSidebar = ({ alertCount = 0 }) => {
 
   return (
     <>
-      <aside className={`${isMinimized ? "w-[88px] px-3" : "w-64 px-5"} h-screen sticky top-0 flex-shrink-0 flex flex-col bg-[#1a4d2e] py-8 font-sans border-r border-white/5 transition-all duration-300 ease-in-out relative`}>
+      <aside className={`${isMinimized ? "w-20" : "w-64"} h-screen sticky top-0 flex-shrink-0 flex flex-col bg-white py-8 font-sans border-r border-slate-200 transition-all duration-300 ease-in-out relative z-[60]`}>
         
         <button 
           onClick={() => setIsMinimized(!isMinimized)}
-          className="absolute -right-3 top-8 bg-white text-[#1a4d2e] p-1.5 rounded-full shadow-lg border border-slate-100 hover:scale-110 transition-transform z-50"
+          className="absolute -right-3 top-8 bg-white text-slate-400 hover:text-[#1a4d2e] w-6 h-6 flex items-center justify-center rounded-full shadow-md border border-slate-200 transition-colors z-50"
           title={isMinimized ? "Perbesar Sidebar" : "Perkecil Sidebar"}
         >
-          {isMinimized ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+          {isMinimized ? <ChevronRight size={14} strokeWidth={3} /> : <ChevronLeft size={14} strokeWidth={3} />}
         </button>
 
-        <header className={`mb-10 flex-shrink-0 flex flex-col ${isMinimized ? "items-center px-0" : "px-2"}`}>
-          <h1 className={`font-black tracking-tighter text-white uppercase leading-none transition-all ${isMinimized ? "text-xl" : "text-2xl"}`}>
-            {isMinimized ? "UD" : "UD. BAROKAH"}
+        <header className={`flex-shrink-0 flex flex-col overflow-hidden transition-all duration-300 ${isMinimized ? "opacity-0 h-0 mb-0" : "px-6 mb-10 h-auto opacity-100"}`}>
+          <h1 className="text-2xl font-black tracking-tighter text-[#1a4d2e] uppercase leading-none">
+            UD. BAROKAH
           </h1>
-          <div className={`h-[4px] bg-[#f5c518] rounded-full mt-2 ${isMinimized ? "w-6" : "w-12"}`} />
-          {!isMinimized && (
-            <p className="text-[9px] text-emerald-400/60 font-black mt-3 uppercase tracking-[0.3em]">Admin Management</p>
-          )}
+          <div className="h-[4px] w-12 bg-[#f5c518] rounded-full mt-2" />
+          <p className="text-[9px] text-slate-400 font-black mt-3 uppercase tracking-[0.3em]">Admin Management</p>
         </header>
 
-        <nav className="flex flex-col gap-1.5 mb-auto overflow-x-hidden">
-          {!isMinimized && <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2 mb-2">Menu Utama</p>}
+        <nav className={`flex flex-col gap-2 mb-auto overflow-x-hidden ${isMinimized ? "mt-4" : ""}`}>
+          <p className={`text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-6 mb-1 transition-all duration-300 ${isMinimized ? "opacity-0 h-0 hidden" : "opacity-100"}`}>
+            Menu Utama
+          </p>
           {NAV_ITEMS.map(({ id, label, icon: Icon, path }) => (
             <NavLink
               key={id}
               to={path}
               className={({ isActive }) =>
-                `flex items-center ${isMinimized ? "justify-center px-0" : "justify-between px-4"} py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 group
-                 ${isActive ? "bg-white text-[#1a4d2e] shadow-lg shadow-black/20" : "text-white/50 hover:bg-white/10 hover:text-white"}`
+                `flex items-center w-full ${isMinimized ? "justify-center py-4" : "justify-between pl-8 pr-6 py-3"} text-[11px] font-black uppercase tracking-widest transition-all duration-300 group relative
+                 ${isActive ? "text-[#1a4d2e]" : "text-slate-500 hover:bg-slate-50 hover:text-[#1a4d2e]"}`
               }
               title={isMinimized ? (label || id) : ""}
             >
               {({ isActive }) => (
                 <>
+                  {isActive && <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1.5 bg-[#1a4d2e] rounded-r-full shadow-sm" />}
                   <div className={`flex items-center ${isMinimized ? "justify-center" : "gap-3.5"}`}>
-                    <Icon size={16} strokeWidth={isActive ? 3 : 2} className={isActive ? "text-[#1a4d2e]" : "text-white/30 group-hover:text-white"} />
+                    <Icon size={isMinimized ? 20 : 18} strokeWidth={isActive ? 2.5 : 2} className={isActive ? "text-[#1a4d2e]" : "text-slate-400 group-hover:text-[#1a4d2e] transition-colors"} />
                     {!isMinimized && <span>{label || id}</span>}
                   </div>
                   {!isMinimized && isActive && <ChevronRight size={14} strokeWidth={3} className="opacity-40" />}
@@ -71,25 +72,25 @@ const AdminSidebar = ({ alertCount = 0 }) => {
           ))}
         </nav>
 
-        <footer className="mt-auto pt-6 space-y-3 overflow-x-hidden">
+        <footer className="mt-auto pt-6 flex flex-col gap-2 overflow-x-hidden border-t border-slate-100 mx-4">
           {isOwner && (
             <NavLink 
               to="/owner/dashboard" 
-              className={`w-full flex items-center ${isMinimized ? "justify-center px-0" : "justify-between px-5"} py-3 rounded-xl text-[10px] font-black text-[#f5c518] border border-[#f5c518]/20 hover:border-[#f5c518]/40 hover:bg-[#f5c518]/10 transition-all uppercase tracking-[0.2em] group`}
+              className={`flex items-center ${isMinimized ? "justify-center w-12 h-12 mx-auto rounded-xl" : "justify-between px-4 py-3 rounded-xl"} text-[10px] font-black text-amber-600 border border-amber-200/50 hover:border-amber-300 hover:bg-amber-50 transition-all uppercase tracking-[0.2em] group mt-4`}
               title={isMinimized ? "Beralih ke Owner" : ""}
             >
               <div className={`flex items-center ${isMinimized ? "justify-center" : "gap-3"}`}>
-                <ArrowRightLeft size={14} strokeWidth={3} className="text-[#f5c518]/60 group-hover:text-[#f5c518] transition-colors" />
+                <ArrowRightLeft size={isMinimized ? 20 : 16} strokeWidth={2.5} className="text-amber-500 group-hover:text-amber-600 transition-colors" />
                 {!isMinimized && <span>Beralih ke Owner</span>}
               </div>
             </NavLink>
           )}
           <button 
             onClick={() => setShowLogoutModal(true)} 
-            className={`w-full flex items-center ${isMinimized ? "justify-center px-0" : "gap-3 px-5"} py-3 rounded-xl text-[10px] font-black text-white/20 hover:text-red-400 hover:bg-red-500/10 transition-all uppercase tracking-[0.2em]`}
+            className={`flex items-center ${isMinimized ? "justify-center w-12 h-12 mx-auto rounded-xl" : "gap-3 px-4 py-3 rounded-xl"} text-[10px] font-black text-slate-500 hover:text-red-500 hover:bg-red-50 transition-all uppercase tracking-[0.2em] ${!isOwner ? 'mt-4' : ''}`}
             title={isMinimized ? "Keluar" : ""}
           >
-            <LogOut size={14} strokeWidth={3} />
+            <LogOut size={isMinimized ? 20 : 16} strokeWidth={2.5} className="flex-shrink-0" />
             {!isMinimized && <span>Keluar</span>}
           </button>
         </footer>
