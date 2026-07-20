@@ -13,7 +13,7 @@ const PER_PAGE = 10;
 const AdminInventory = () => {
   const { 
     products, categories, types, isLoading, actionLoading, 
-    handleCreate, handleUpdate, handleToggleActive,
+    handleCreate, handleUpdate, handleDelete, handleToggleActive,
     handleAddCategory, handleAddType, 
     handleEditCategory, handleEditType 
   } = useAdminProducts();
@@ -47,6 +47,7 @@ const AdminInventory = () => {
   const [selected, setSelected] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const tableScrollRef = useRef(null);
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null });
 
   useEffect(() => { setPage(1); }, [search, activecat]);
 
@@ -196,6 +197,9 @@ const AdminInventory = () => {
                                 <button onClick={() => openModal("edit", p)} className="p-2.5 bg-slate-50 text-slate-400 hover:text-emerald-600 rounded-xl active:scale-90 transition-all">
                                   <Pencil size={14} />
                                 </button>
+                                <button onClick={() => setDeleteModal({ isOpen: true, id: p.id })} className="p-2.5 bg-slate-50 text-slate-400 hover:text-red-500 rounded-xl active:scale-90 transition-all">
+                                  <Trash2 size={14} />
+                                </button>
                               </div>
                             </td>
                           </tr>
@@ -244,6 +248,18 @@ const AdminInventory = () => {
           onSubmit={modalMode === "create" ? handleCreate : (data) => handleUpdate(selected.id, data)}
         />
       )}
+
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, id: null })}
+        onConfirm={() => {
+          handleDelete(deleteModal.id);
+          setDeleteModal({ isOpen: false, id: null });
+        }}
+        title="Hapus Produk"
+        message="Apakah kamu yakin ingin menghapus produk ini? Semua data terkait produk ini akan ikut terhapus secara permanen."
+        isLoading={actionLoading}
+      />
 
     </div>
   );
