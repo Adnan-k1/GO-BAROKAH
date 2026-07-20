@@ -75,7 +75,7 @@ const DashboardOwner = () => {
         {/* HEADER */}
         <header className="bg-white px-8 py-5 flex items-center justify-between z-10 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
           <div>
-            <h1 className="text-2xl font-black text-slate-800 tracking-tight mb-0.5">OVERVIEW ANALITIK</h1>
+            <h1 className="text-2xl font-black text-slate-800 tracking-tight mb-0.5">DASHBOARD OWNER</h1>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">
               Selamat Datang, {firstName}
             </p>
