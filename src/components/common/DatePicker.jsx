@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 
-const DatePicker = ({ value, onChange, placeholder = "Pilih Tanggal", className = "", align = "left", label }) => {
+const DatePicker = ({ value, onChange, placeholder = "Pilih Tanggal", className = "", align = "left", placement = "bottom", label }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const popoverRef = useRef(null);
@@ -53,6 +53,7 @@ const DatePicker = ({ value, onChange, placeholder = "Pilih Tanggal", className 
 
       days.push(
         <button
+          type="button"
           key={d}
           onClick={() => {
             onChange(dateString);
@@ -68,15 +69,15 @@ const DatePicker = ({ value, onChange, placeholder = "Pilih Tanggal", className 
     }
 
     return (
-      <div className={`absolute top-full mt-2 p-4 w-[280px] bg-white rounded-3xl shadow-2xl border border-slate-100 z-50 animate-in fade-in zoom-in-95 duration-200 ${align === 'right' ? 'right-0' : 'left-0'}`}>
+      <div className={`absolute ${placement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'} p-4 w-[280px] bg-white rounded-3xl shadow-2xl border border-slate-100 z-50 animate-in fade-in zoom-in-95 duration-200 ${align === 'right' ? 'right-0' : 'left-0'}`}>
         <div className="flex justify-between items-center mb-4">
-          <button onClick={handlePrevMonth} className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+          <button type="button" onClick={handlePrevMonth} className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
             <ChevronLeft size={16} />
           </button>
           <div className="text-[11px] font-black text-slate-800 uppercase tracking-wide">
             {currentMonth.toLocaleString('id-ID', { month: 'long', year: 'numeric' })}
           </div>
-          <button onClick={handleNextMonth} className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+          <button type="button" onClick={handleNextMonth} className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
             <ChevronRight size={16} />
           </button>
         </div>
@@ -102,6 +103,7 @@ const DatePicker = ({ value, onChange, placeholder = "Pilih Tanggal", className 
   return (
     <div className="relative flex-1 w-full" ref={popoverRef}>
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={`flex flex-col w-full text-left outline-none rounded-lg px-2 py-1.5 transition-colors ${isOpen ? 'bg-slate-200/70' : 'bg-transparent hover:bg-slate-200/50'} ${className}`}
       >

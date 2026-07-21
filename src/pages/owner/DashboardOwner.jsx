@@ -118,7 +118,7 @@ const DashboardOwner = () => {
             </div>
             <button 
               onClick={handleFilter}
-              className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 sm:py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all w-full sm:w-auto self-stretch sm:self-auto flex items-center justify-center"
+              className="bg-[#1a4d2e] hover:bg-[#123620] text-white px-6 py-3 sm:py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all w-full sm:w-auto self-stretch sm:self-auto flex items-center justify-center"
             >
               Filter
             </button>

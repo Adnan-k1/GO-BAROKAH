@@ -78,9 +78,9 @@ const ExpenseModal = ({
     <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${animate ? "opacity-100" : "opacity-0"}`}>
       <div className={`absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-all duration-300 ${animate ? "opacity-100" : "opacity-0"}`} onClick={handleClose} />
       
-      <div className={`relative bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] transition-all duration-300 ${animate ? "scale-100 translate-y-0" : "scale-95 translate-y-4"}`}>
+      <div className={`relative bg-white w-full max-w-lg rounded-3xl shadow-2xl flex flex-col max-h-[90vh] transition-all duration-300 ${animate ? "scale-100 translate-y-0" : "scale-95 translate-y-4"}`}>
         {/* Header */}
-        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md z-10">
+        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md z-10 rounded-t-3xl">
           <div>
             <h2 className="text-xl font-black text-slate-800 tracking-tight uppercase">
               {mode === "add" ? "Tambah Pengeluaran" : "Edit Pengeluaran"}
@@ -89,13 +89,13 @@ const ExpenseModal = ({
               Catat operasional toko
             </p>
           </div>
-          <button onClick={handleClose} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors">
+          <button type="button" onClick={handleClose} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors">
             <X size={20} />
           </button>
         </div>
 
         {/* Form Body */}
-        <div className="p-6 overflow-y-auto custom-scrollbar">
+        <div className="p-6 overflow-visible">
           <form id="expense-form" onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Kategori</label>
@@ -142,6 +142,8 @@ const ExpenseModal = ({
                     value={form.date}
                     onChange={(date) => handleChange({ target: { name: 'date', value: date } })}
                     className="text-slate-800 text-sm font-bold"
+                    placement="top"
+                    align="right"
                   />
                 </div>
               </div>
@@ -151,7 +153,7 @@ const ExpenseModal = ({
 
         {/* Footer */}
         <div className="px-6 py-5 border-t border-slate-100 bg-slate-50 flex justify-end gap-3 rounded-b-3xl mt-auto">
-          <Button variant="secondary" onClick={handleClose} disabled={isSaving} className="px-6 py-2.5 rounded-xl text-xs">
+          <Button type="button" variant="secondary" onClick={handleClose} disabled={isSaving} className="px-6 py-2.5 rounded-xl text-xs">
             Batal
           </Button>
           <Button
