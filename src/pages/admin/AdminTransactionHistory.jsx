@@ -6,6 +6,7 @@ import {
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import OrderDetailModal from "../../components/admin/order/OrderDetailModal";
 import { useAdminOrders } from "../../hooks/admin/useAdminOrders";
+import { formatDateID } from "../../utils/formatters";
 
 const formatRupiahUtuh = (angka) => {
   return new Intl.NumberFormat("id-ID", {
@@ -84,7 +85,7 @@ const AdminTransactionHistory = () => {
               </button>
               <div className="transition-all duration-500">
                 <h1 className="text-xl font-black tracking-tight uppercase">Riwayat Pesanan</h1>
-                <p className="text-[10px] font-bold text-slate-400 mt-0.5 uppercase tracking-[0.2em] hidden md:block">Semua Riwayat Pesanan UD BAROKAH</p>
+                <p className="text-[10px] font-bold text-slate-400 mt-0.5  tracking-[0.2em] hidden md:block">Semua Riwayat Pesanan UD BAROKAH</p>
               </div>
             </div>
           </div>
@@ -104,7 +105,7 @@ const AdminTransactionHistory = () => {
               <table className="w-full border-collapse min-w-[700px]">
                 <thead className="bg-slate-50 sticky top-0 z-10 border-b border-slate-100">
                   <tr>
-                    {["ID", "Pelanggan", "Tanggal", "Pengiriman", "Pembayaran", "Total", "Status", "Aksi"].map((h) => (
+                    {["Pelanggan", "Tanggal", "Pengiriman", "Pembayaran", "Total", "Status", "Aksi"].map((h) => (
                       <th key={h} className={`px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] ${h === 'Aksi' ? 'text-right' : 'text-left'}`}>{h}</th>
                     ))}
                   </tr>
@@ -157,7 +158,7 @@ const TabButton = ({ label, active, onClick }) => (
 
 const LoadingState = () => (
   <tr>
-    <td colSpan={8} className="py-24 text-center">
+    <td colSpan={7} className="py-24 text-center">
       <Loader2 className="w-8 h-8 animate-spin text-emerald-600 mx-auto mb-2" />
       <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Memuat...</p>
     </td>
@@ -181,7 +182,6 @@ const TableRow = ({ order, onOpenDetail }) => {
 
   return (
     <tr className="hover:bg-slate-50/50 transition-colors h-[68px]">
-      <td className="px-4 py-5"><span className="text-[10px] font-black text-slate-900 bg-slate-100 px-2.5 py-1 rounded-md">#{order.id}</span></td>
       <td className="px-4 py-5">
         <div className="flex flex-col">
           <span className="text-xs font-bold uppercase truncate tracking-tight text-slate-700">
@@ -192,7 +192,7 @@ const TableRow = ({ order, onOpenDetail }) => {
           </span>
         </div>
       </td>
-      <td className="px-4 py-5 text-[10px] font-bold text-slate-500 uppercase whitespace-nowrap">{order.created_at}</td>
+      <td className="px-4 py-5 text-[10px] font-bold text-slate-500 uppercase whitespace-nowrap">{formatDateID(order.created_at)}</td>
       <td className="px-4 py-5">
         <div className={`inline-flex items-center gap-1.5 text-[9px] font-black px-2 py-1 rounded-lg border uppercase whitespace-nowrap ${order.is_pickup ? "text-orange-600 bg-orange-50 border-orange-100" : "text-blue-600 bg-blue-50 border-blue-100"}`}>
           {order.is_pickup ? <><Store size={12} /> Ambil di Toko</> : <><Truck size={12} /> Kirim Kurir</>}

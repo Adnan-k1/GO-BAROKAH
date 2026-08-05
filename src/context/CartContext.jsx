@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { useAuth } from "./AuthContext";
 import { cartService } from "../services/user/cartService";
+import { productService } from "../services/user/productService";
 import { buildImageUrl } from "../utils/imageUrl";
 import toast from "react-hot-toast";
 
@@ -17,20 +18,51 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [cartSummary, setCartSummary] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [allProducts, setAllProducts] = useState([]);
+  
+  useEffect(() => {
+    productService.getAllProducts()
+      .then(res => {
+        const data = res?.data?.data || res?.data || res || [];
+        setAllProducts(data);
+      })
+      .catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    if (allProducts.length > 0 && cartItems.length > 0) {
+      setCartItems(prev => {
+        let hasChanges = false;
+        const next = prev.map(item => {
+          const p = allProducts.find(prod => String(prod.id || prod._id) === String(item.id));
+          if (p && p.min_order_quantity !== item.min_order_quantity) {
+            hasChanges = true;
+            return { ...item, min_order_quantity: p.min_order_quantity };
+          }
+          return item;
+        });
+        return hasChanges ? next : prev;
+      });
+    }
+  }, [allProducts, cartItems.length]);
 
   const mapItems = (items = []) =>
-    items.map((item) => ({
-      id: item.product_id,
-      cartItemId: item.id,
-      name: item.name,
-      image_url: buildImageUrl(item.image_url),
-      price: Number(item.final_price ?? item.price) || 0,
-      original_price: Number(item.price) || 0,
-      discount_amount: Number(item.discount_amount) || 0,
-      quantity: Number(item.quantity) || 0,
-      stock: item.stock,
-      category: item.category ?? "",
-    }));
+    items.map((item) => {
+      const p = allProducts.find(prod => String(prod.id || prod._id) === String(item.product_id));
+      return {
+        id: item.product_id,
+        cartItemId: item.id,
+        name: item.name,
+        image_url: buildImageUrl(item.image_url),
+        price: Number(item.final_price ?? item.price) || 0,
+        original_price: Number(item.price) || 0,
+        discount_amount: Number(item.discount_amount) || 0,
+        quantity: Number(item.quantity) || 0,
+        stock: item.stock,
+        category: item.category ?? "",
+        min_order_quantity: item.min_order_quantity || item.product?.min_order_quantity || p?.min_order_quantity || 1,
+      };
+    });
 
   const syncCart = (data) => {
     if (data?.items) setCartItems(mapItems(data.items));

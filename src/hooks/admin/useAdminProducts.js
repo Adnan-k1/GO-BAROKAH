@@ -103,7 +103,7 @@ export const useAdminProducts = () => {
     setActionLoading(true);
     try {
       const formData = new FormData();
-      ["name", "category_id", "type_id", "price", "cost", "description", "stock", "discount_amount"].forEach((key) => {
+      ["name", "category_id", "type_id", "price", "cost", "description", "stock", "discount_amount", "critical_stock", "min_order_quantity"].forEach((key) => {
         if (productData[key] !== undefined && productData[key] !== null) formData.append(key, productData[key]);
       });
       if (productData.image instanceof File) formData.append("image", productData.image);
@@ -121,7 +121,7 @@ export const useAdminProducts = () => {
     setActionLoading(true);
     try {
       const formData = new FormData();
-      ["name", "category_id", "type_id", "price", "cost", "description", "stock", "discount_amount"].forEach((key) => {
+      ["name", "category_id", "type_id", "price", "cost", "description", "stock", "discount_amount", "critical_stock", "min_order_quantity"].forEach((key) => {
         if (productData[key] !== undefined && productData[key] !== null) formData.append(key, productData[key]);
       });
       if (productData.image instanceof File) formData.append("image", productData.image);

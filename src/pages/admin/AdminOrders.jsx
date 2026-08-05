@@ -25,6 +25,7 @@ import OrderDetailModal from "../../components/admin/order/OrderDetailModal";
 import ConfirmModal from "../../components/forms/ConfirmModal";
 import { useAdminOrders } from "../../hooks/admin/useAdminOrders";
 import { formatFullCurrency } from "../../utils/formatCurrency";
+import { formatDateID } from "../../utils/formatters";
 
 const PER_PAGE = 10;
 const TABS = [
@@ -279,7 +280,7 @@ const AdminOrders = () => {
                 <h1 className="text-lg md:text-xl font-black uppercase tracking-tight">
                   Kelola Pesanan
                 </h1>
-                <p className="text-[10px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest hidden md:block">
+                <p className="text-[10px] font-bold text-slate-400 mt-0.5  tracking-widest hidden md:block">
                   Monitoring Pesanan UD BAROKAH
                 </p>
               </div>
@@ -374,7 +375,6 @@ const AdminOrders = () => {
                 <thead className="bg-slate-50 sticky top-0 z-10 border-b border-slate-100">
                   <tr>
                     {[
-                      "ID",
                       "Pelanggan",
                       "Tanggal",
                       "Total Bayar",
@@ -394,7 +394,7 @@ const AdminOrders = () => {
                 <tbody className="divide-y divide-slate-50">
                   {isLoading ? (
                     <tr>
-                      <td colSpan={7} className="py-24 text-center">
+                        <td colSpan={6} className="py-24 text-center">
                         <Loader2 className="w-8 h-8 animate-spin text-emerald-600 mx-auto mb-2" />
                         <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
                           Memuat Data...
@@ -403,7 +403,7 @@ const AdminOrders = () => {
                     </tr>
                   ) : paginatedItems.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="py-24 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        <td colSpan={6} className="py-24 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">
                         DATA TIDAK DITEMUKAN
                       </td>
                     </tr>
@@ -417,13 +417,8 @@ const AdminOrders = () => {
                             className="hover:bg-slate-50/50 transition-colors h-[68px]"
                           >
                             <td className="px-4 py-5">
-                              <span className="text-[10px] font-black text-slate-900 bg-slate-100 px-2.5 py-1 rounded-md whitespace-nowrap">
-                                #{o.id}
-                              </span>
-                            </td>
-                            <td className="px-4 py-5">
                               <div className="flex flex-col">
-                                <span className="text-xs font-bold uppercase truncate tracking-tight">
+                                <span className="text-xs font-bold uppercase truncate tracking-tight text-slate-700">
                                   {o.customer_name}
                                 </span>
                                 <span className="text-[9px] text-slate-400 font-bold uppercase">
@@ -432,7 +427,7 @@ const AdminOrders = () => {
                               </div>
                             </td>
                             <td className="px-4 py-5 text-[10px] font-bold text-slate-500 uppercase whitespace-nowrap">
-                              {o.created_at}
+                              {formatDateID(o.created_at)}
                             </td>
                             <td className="px-4 py-5 text-xs font-black text-slate-900 whitespace-nowrap">
                               {formatFullCurrency(o.total_price || o.total_amount || 0)}

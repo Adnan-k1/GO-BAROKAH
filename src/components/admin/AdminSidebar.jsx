@@ -62,9 +62,6 @@ const AdminSidebar = ({ alertCount = 0, isMobileOpen, setIsMobileOpen }) => {
         </header>
 
         <nav className={`flex flex-col gap-2 mb-auto overflow-x-hidden ${isMinimized ? "mt-4" : ""}`}>
-          <p className={`text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-6 mb-1 transition-all duration-300 ${isMinimized ? "opacity-0 h-0 hidden" : "opacity-100"}`}>
-            Menu Utama
-          </p>
           {NAV_ITEMS.map(({ id, label, icon: Icon, path }) => (
             <NavLink
               key={id}

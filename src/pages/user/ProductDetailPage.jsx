@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Star, ShoppingBag, Minus, Plus, ArrowLeft, Loader2 } from 'lucide-react';
+import { Star, ShoppingBag, Minus, Plus, ArrowLeft, Loader2, EyeOff } from 'lucide-react';
 import { formatIDR } from '../../utils/formatCurrency';
 import { useProductDetail } from '../../hooks/user/useProductDetail';
 import { useAuth } from '../../context/AuthContext';
@@ -19,6 +19,7 @@ const ProductDetailPage = () => {
     handleQuantityChange, handleBlur, onAddToCart, goBack
   } = detail;
 
+  const isDisabled = product.is_active === false;
   const hasDiscount = product.discount_amount > 0 && product.final_price > 0 && product.final_price !== product.price;
   const displayPrice = hasDiscount ? product.final_price : product.price;
   const discountPercent = hasDiscount ? product.discount_amount : 0;
@@ -39,18 +40,30 @@ const ProductDetailPage = () => {
 
         <BackButton onClick={goBack} />
 
+        {isDisabled && (
+          <div className="mb-6 bg-slate-100 border border-slate-300 rounded-2xl p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0">
+              <EyeOff size={20} className="text-slate-600" />
+            </div>
+            <div>
+              <p className="font-black text-slate-900 text-sm uppercase tracking-wide">Produk Tidak Tersedia</p>
+              <p className="text-xs text-slate-600 font-medium mt-0.5">Produk ini sedang tidak dapat dibeli. Silakan cek kembali nanti.</p>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-16 items-start">
           <div className="relative">
-            {hasDiscount && (
+            {hasDiscount && !isDisabled && (
               <span className="absolute top-4 left-4 z-10 bg-red-500 text-white text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-lg">
                 -{discountPercent}%
               </span>
             )}
-            <div className="bg-white border border-gray-100 rounded-[2rem] overflow-hidden shadow-sm w-full max-h-[380px] sm:max-h-[420px] lg:max-h-[480px] flex items-center justify-center p-6">
+            <div className={`bg-white border border-gray-100 rounded-[2rem] overflow-hidden shadow-sm w-full max-h-[380px] sm:max-h-[420px] lg:max-h-[480px] flex items-center justify-center p-6 ${isDisabled ? 'opacity-60 grayscale' : ''}`}>
               <img
                 src={product.img || product.image_url || product.image}
                 alt={product.name}
-                className="w-full h-full object-contain max-h-[320px] sm:max-h-[360px] lg:max-h-[420px] hover:scale-105 transition-transform duration-700"
+                className={`w-full h-full object-contain max-h-[320px] sm:max-h-[360px] lg:max-h-[420px] ${!isDisabled ? 'hover:scale-105' : ''} transition-transform duration-700`}
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = 'https://placehold.co/600x600/FBFBFB/2D5A43?text=No+Image';
@@ -59,7 +72,7 @@ const ProductDetailPage = () => {
             </div>
           </div>
 
-          <div className="flex flex-col py-0 lg:py-2">
+          <div className={`flex flex-col py-0 lg:py-2 ${isDisabled ? 'opacity-60' : ''}`}>
             <div className="flex items-center gap-3 mb-3 flex-wrap">
               <span className="text-[#2D5A43] font-black text-[10px] uppercase tracking-[0.25em]">
                 {product.category?.name || product.category}
@@ -67,24 +80,29 @@ const ProductDetailPage = () => {
               <div className="flex items-center gap-1 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
                 <span className="text-emerald-600 font-black text-[10px] uppercase tracking-widest">Sisa Stok: {product.stock}</span>
               </div>
+              {product.min_order_quantity > 1 && (
+                <div className="flex items-center gap-1 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded-full">
+                  <span className="text-amber-600 font-black text-[10px] uppercase tracking-widest">Min. Dikirim: {product.min_order_quantity}</span>
+                </div>
+              )}
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 tracking-tighter leading-[1.05] mb-5 uppercase">
+            <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-black tracking-tighter leading-[1.05] mb-5 uppercase ${isDisabled ? 'text-gray-500' : 'text-gray-900'}`}>
               {product.name}
             </h1>
             <div className="mb-5 flex flex-col">
-              {hasDiscount && (
+              {hasDiscount && !isDisabled && (
                 <span className="text-red-500 text-sm font-bold line-through leading-none mb-1">
                   {formatIDR(product.price)}
                 </span>
               )}
-              <span className="text-3xl lg:text-4xl font-black tracking-tight text-[#2D5A43]">
+              <span className={`text-3xl lg:text-4xl font-black tracking-tight ${isDisabled ? 'text-gray-500' : 'text-[#2D5A43]'}`}>
                 {formatIDR(displayPrice)}
               </span>
             </div>
 
             <div className="h-px bg-gray-100 mb-5" />
-            <p className="text-gray-500 text-sm leading-relaxed font-medium mb-7 line-clamp-4">
+            <p className={`text-sm leading-relaxed font-medium mb-7 line-clamp-4 ${isDisabled ? 'text-gray-400' : 'text-gray-500'}`}>
               {product.description || "Kualitas bahan pangan organik terbaik dari UD Barokah. Segar, sehat, dan langsung dari petani lokal untuk meja makan Anda."}
             </p>
 
@@ -95,13 +113,13 @@ const ProductDetailPage = () => {
                 onMinus={decrease}
                 onChange={handleQuantityChange}
                 onBlur={handleBlur}
-                disabled={adding || product.stock <= 0}
+                disabled={adding || product.stock <= 0 || isDisabled}
               />
               <button
                 onClick={handleAddClick}
-                disabled={adding || product.stock <= 0}
+                disabled={adding || product.stock <= 0 || isDisabled}
                 className={`flex-1 py-4 px-6 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] flex items-center justify-center gap-2.5 transition-all shadow-lg active:scale-95 disabled:cursor-not-allowed disabled:active:scale-100 ${
-                  product.stock <= 0
+                  isDisabled || product.stock <= 0
                     ? 'bg-gray-100 text-gray-400 shadow-none'
                     : 'bg-[#2D5A43] text-white hover:bg-[#234735] shadow-[#2D5A43]/20 disabled:opacity-70'
                 }`}
@@ -110,6 +128,11 @@ const ProductDetailPage = () => {
                   <>
                     <Loader2 size={16} className="animate-spin" />
                     Menambahkan...
+                  </>
+                ) : isDisabled ? (
+                  <>
+                    <EyeOff size={16} />
+                    Tidak Tersedia
                   </>
                 ) : product.stock <= 0 ? (
                   <>

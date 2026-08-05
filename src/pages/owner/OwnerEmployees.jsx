@@ -96,7 +96,7 @@ const OwnerEmployees = () => {
             </button>
             <div>
               <h2 className="text-xl md:text-2xl font-black tracking-tighter text-slate-800 uppercase leading-none">Pegawai</h2>
-              <p className="text-[10px] text-slate-400 font-black mt-1.5 uppercase tracking-[0.2em]">Manajemen Akun User & Admin</p>
+              <p className="text-[10px] text-slate-400 font-black mt-1.5 tracking-[0.2em]">Manajemen Akun User & Admin</p>
             </div>
           </div>
         </header>

@@ -88,7 +88,7 @@ const AdminInventory = () => {
               </button>
               <div className="transition-all duration-500">
                 <h1 className="text-lg md:text-xl font-black text-slate-900 tracking-tight uppercase">Inventaris</h1>
-                <p className="text-[10px] font-bold text-slate-400 mt-0.5 uppercase tracking-[0.2em] hidden md:block">Sistem Inventaris UD BAROKAH</p>
+                <p className="text-[10px] font-bold text-slate-400 mt-0.5 tracking-[0.2em] hidden md:block">Sistem Inventaris UD BAROKAH</p>
               </div>
             </div>
             <button onClick={() => openModal("create")} className="flex items-center gap-2 bg-[#1a4d2e] text-white px-4 md:px-5 py-2.5 md:py-3 rounded-xl text-[10px] font-black uppercase shadow-lg active:scale-95 transition-all">
@@ -115,7 +115,7 @@ const AdminInventory = () => {
               <table className="w-full border-collapse min-h-full min-w-[700px]">
                 <thead className="bg-slate-50 sticky top-0 z-10 border-b border-slate-100">
                   <tr>
-                    {["ID", "Produk", "Kategori", "Stok", "Harga", "Aksi"].map((h) => (
+                    {["Produk", "Kategori", "Stok", "Harga", "Aksi"].map((h) => (
                       <th key={h} className={`px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] ${h === 'Aksi' ? 'text-right' : 'text-left'}`}>{h}</th>
                     ))}
                   </tr>
@@ -123,7 +123,7 @@ const AdminInventory = () => {
                 <tbody className="divide-y divide-slate-50">
                   {isLoading ? (
                     <tr>
-                      <td colSpan={6} className="py-24 text-center">
+                          <td colSpan={5} className="py-24 text-center">
                         <Loader2 className="w-8 h-8 animate-spin text-emerald-600 mx-auto mb-2" />
                         <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Loading...</p>
                       </td>
@@ -134,11 +134,6 @@ const AdminInventory = () => {
                         const hasDiscount = p.discount_amount > 0 && p.final_price > 0 && p.final_price !== p.price;
                         return (
                           <tr key={p.id} className={`hover:bg-slate-50/50 h-[73px] transition-colors ${!p.is_active ? "opacity-50 grayscale" : ""}`}>
-                            <td className="px-4 py-4">
-                              <span className="text-[10px] font-black text-slate-900 bg-slate-100 px-2.5 py-1 rounded-md whitespace-nowrap">
-                                #{p.id}
-                              </span>
-                            </td>
                             <td className="px-4 py-4">
                               <div className="flex items-center gap-4">
                                 <div className="w-11 h-11 rounded-xl bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center relative">
@@ -228,7 +223,7 @@ const AdminInventory = () => {
                       })}
                       {paginatedItems.length < PER_PAGE && (
                         <tr style={{ height: `${(PER_PAGE - paginatedItems.length) * 73}px` }}>
-                          <td colSpan={5} />
+                          <td colSpan={4} />
                         </tr>
                       )}
                     </>

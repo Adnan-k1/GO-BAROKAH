@@ -10,6 +10,8 @@ const INITIAL_FORM = {
   type_id: "",
   image: null,
   stock: 0,
+  critical_stock: 10,
+  min_order_quantity: 1,
   price: 0,
   cost: 0,
   discount_amount: 0,
@@ -50,6 +52,8 @@ const ProductModal = ({
         type_id: initial.type?.id || initial.type_id || "",
         discount_amount: initial.discount_amount || 0,
         cost: initial.cost || 0,
+        critical_stock: initial.critical_stock ?? 10,
+        min_order_quantity: initial.min_order_quantity ?? 1,
       });
     } else {
       setForm(INITIAL_FORM);
@@ -58,7 +62,7 @@ const ProductModal = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const numericFields = ["stock", "category_id", "type_id"];
+    const numericFields = ["stock", "category_id", "type_id", "critical_stock", "min_order_quantity"];
     setForm((prev) => ({
       ...prev,
       [name]: numericFields.includes(name) ? (value === "" ? 0 : Number(value)) : value,
@@ -283,6 +287,16 @@ const ProductModal = ({
               <div className={`transition-all duration-500 delay-[400ms] ${animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
                 <label className={labelClass}>Stok Barang</label>
                 <input required name="stock" type="number" value={form.stock} onChange={handleChange} className={inputClass} />
+              </div>
+
+              <div className={`transition-all duration-500 delay-[410ms] ${animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+                <label className={labelClass}>Batas Stok Kritis</label>
+                <input required name="critical_stock" type="number" min="0" value={form.critical_stock} onChange={handleChange} className={inputClass} />
+              </div>
+
+              <div className={`transition-all duration-500 delay-[420ms] ${animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+                <label className={labelClass}>Min. Pesanan</label>
+                <input required name="min_order_quantity" type="number" min="1" value={form.min_order_quantity} onChange={handleChange} className={inputClass} />
               </div>
               
               <div className={`transition-all duration-500 delay-[425ms] ${animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>

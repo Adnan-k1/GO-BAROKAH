@@ -61,8 +61,40 @@ const CheckoutPage = () => {
     return () => { isMounted.current = false; };
   }, [selectedAddressId, isPickup, hitungOngkir]);
 
-  const totalQuantity = cartItems?.reduce((sum, item) => sum + (item.qty || item.quantity), 0) || 0;
-  const isFormValid = (isPickup || selectedAddressId) && totalQuantity >= 10;
+  const [invalidItems, setInvalidItems] = useState([]);
+
+  useEffect(() => {
+    if (isPickup || !cartItems || cartItems.length === 0) {
+      setInvalidItems([]);
+      return;
+    }
+
+    const fetchAndValidate = async () => {
+      try {
+        const res = await import('../../services/user/productService').then(m => m.productService.getAllProducts());
+        const products = res?.data?.data || res?.data || res || [];
+
+        const invalid = cartItems.filter(item => {
+          const prod = products.find(p => String(p.id || p._id) === String(item.id));
+          const minQty = prod?.min_order_quantity || item.min_order_quantity || 1;
+          const qty = item.qty || item.quantity;
+          return minQty > 1 && qty < minQty;
+        }).map(item => {
+          const prod = products.find(p => String(p.id || p._id) === String(item.id));
+          return { ...item, min_order_quantity: prod?.min_order_quantity || item.min_order_quantity || 1 };
+        });
+
+        setInvalidItems(invalid);
+      } catch (err) {
+        console.error("Gagal validasi min order:", err);
+        setInvalidItems([]);
+      }
+    };
+
+    fetchAndValidate();
+  }, [isPickup, cartItems]);
+
+  const isFormValid = (isPickup || selectedAddressId) && invalidItems.length === 0;
 
   const handleConfirmOrder = () => {
     const orderData = {};
@@ -213,10 +245,14 @@ const CheckoutPage = () => {
                 Ringkasan <span className="text-[#2D5A43]">Order</span>
               </h3>
               
-              {totalQuantity < 10 && (
-                <div className="mb-5 bg-red-50 text-red-600 px-4 py-3 rounded-xl border border-red-100 text-center">
-                  <p className="text-[10px] font-black uppercase tracking-widest">Minimal Order 10 Barang</p>
-                  <p className="text-[9px] font-bold mt-1 opacity-80">Silakan kembali ke keranjang untuk menambah pesanan</p>
+              {invalidItems.length > 0 && (
+                <div className="mb-5 bg-red-50 text-red-600 px-4 py-3 rounded-xl border border-red-100 text-left">
+                  <p className="text-[10px] font-black uppercase tracking-widest mb-1.5">Tidak Memenuhi Min. Order</p>
+                  <ul className="text-[9px] font-bold opacity-80 list-disc pl-4 space-y-0.5">
+                    {invalidItems.map((item, idx) => (
+                      <li key={idx}>{item.name || item.productName} minimal {item.min_order_quantity} barang</li>
+                    ))}
+                  </ul>
                 </div>
               )}
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShoppingBag, Loader2 } from "lucide-react";
+import { ShoppingBag, Loader2, EyeOff } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { formatIDR } from "../../utils/formatCurrency";
 import { useAuth } from "../../context/AuthContext";
@@ -12,6 +12,7 @@ const ProductCard = ({ product }) => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
+  const isDisabled = product.is_active === false;
   const isInCart = user && cartItems.some((item) => item.id === product.id);
 
   const hasDiscount =
@@ -24,7 +25,7 @@ const ProductCard = ({ product }) => {
 
   const handleAddToCart = async (e) => {
     e.stopPropagation();
-    if (isInCart || isLoading || product.stock <= 0) return;
+    if (isInCart || isLoading || product.stock <= 0 || isDisabled) return;
     if (!user) {
       toast.error("Login terlebih dahulu!");
       return;
@@ -41,7 +42,7 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    <div className="p-3 sm:p-5 border-r border-b border-gray-100 relative group transition-all hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:z-10 bg-white flex flex-col min-h-[320px] sm:min-h-[420px] lg:min-h-[480px] text-left">
+    <div className={`p-3 sm:p-5 border-r border-b border-gray-100 relative group transition-all ${!isDisabled ? 'hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:z-10' : ''} bg-white flex flex-col min-h-[320px] sm:min-h-[420px] lg:min-h-[480px] text-left ${isDisabled ? 'opacity-60 grayscale' : ''}`}>
       <div
         onClick={() => navigate(`/product/${product.id}`)}
         className="cursor-pointer flex-1 mb-12 sm:mb-16"
@@ -50,14 +51,19 @@ const ProductCard = ({ product }) => {
           <img
             src={product.image_url || product.image}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+            className={`w-full h-full object-cover ${!isDisabled ? 'group-hover:scale-110' : ''} transition-transform duration-700 ease-out`}
             onError={(e) => {
               e.target.onerror = null;
               e.target.src =
                 "https://placehold.co/400x400/FBFBFB/3A5A4D?text=No+Image";
             }}
           />
-          {hasDiscount && (
+          {isDisabled && (
+            <div className="absolute inset-0 bg-slate-900/30 flex items-center justify-center">
+              <EyeOff size={24} className="text-white" />
+            </div>
+          )}
+          {hasDiscount && !isDisabled && (
             <div className="absolute top-2 left-2 bg-red-500 text-white text-[9px] font-black px-2 py-1 rounded-lg uppercase tracking-wider">
               -{discountPercent}%
             </div>
@@ -73,29 +79,35 @@ const ProductCard = ({ product }) => {
             <div className="h-[1px] w-3 bg-gray-200"></div>
           </div>
 
-          <h4 className="text-xs sm:text-sm font-bold text-gray-800 line-clamp-2 group-hover:text-[#3A5A4D] transition-colors leading-snug">
+          <h4 className={`text-xs sm:text-sm font-bold line-clamp-2 leading-snug ${isDisabled ? 'text-gray-500' : 'text-gray-800 group-hover:text-[#3A5A4D]'} transition-colors`}>
             {product.name}
           </h4>
           <div className="flex flex-col mt-1 sm:mt-2">
-            {hasDiscount && (
-              <span className="text-red-500 text-[10px] sm:text-xs font-bold line-through leading-none mb-0.5">
-                {formatIDR(originalPrice)}
+            {hasDiscount && !isDisabled ? (
+              <>
+                <span className="text-red-500 text-[10px] sm:text-xs font-bold line-through leading-none mb-0.5">
+                  {formatIDR(originalPrice)}
+                </span>
+                <span className="font-black tracking-tighter leading-none text-[#3A5A4D] text-base sm:text-lg">
+                  {formatIDR(displayPrice)}
+                </span>
+              </>
+            ) : (
+              <span className={`font-black tracking-tighter leading-none text-base sm:text-lg ${isDisabled ? 'text-gray-500' : 'text-[#3A5A4D]'}`}>
+                {formatIDR(displayPrice)}
               </span>
             )}
-            <span
-              className="font-black tracking-tighter leading-none text-[#3A5A4D] text-base sm:text-lg"
-            >
-              {formatIDR(displayPrice)}
-            </span>
           </div>
         </div>
       </div>
       <button
         onClick={handleAddToCart}
-        disabled={isInCart || isLoading || product.stock <= 0}
+        disabled={isInCart || isLoading || product.stock <= 0 || isDisabled}
         className={`absolute bottom-3 right-3 sm:bottom-6 sm:right-6 h-10 sm:h-11 flex items-center justify-center transition-all duration-500 z-30 rounded-xl sm:rounded-2xl shadow-lg border
           ${
-            product.stock <= 0
+            isDisabled
+              ? "bg-gray-100 text-gray-400 px-3 sm:px-4 border-gray-200 w-auto cursor-not-allowed shadow-none"
+              : product.stock <= 0
               ? "bg-gray-100 text-gray-400 px-3 sm:px-4 border-gray-200 w-auto cursor-not-allowed shadow-none"
               : isInCart
               ? "bg-[#3A5A4D] text-white px-3 sm:px-5 border-[#3A5A4D] w-auto cursor-default opacity-90"
@@ -106,6 +118,10 @@ const ProductCard = ({ product }) => {
       >
         {isLoading ? (
           <Loader2 size={16} className="animate-spin" />
+        ) : isDisabled ? (
+          <span className="text-[9px] font-black uppercase tracking-widest whitespace-nowrap">
+            Tidak Tersedia
+          </span>
         ) : product.stock <= 0 ? (
           <span className="text-[9px] font-black uppercase tracking-widest whitespace-nowrap">
             Stok Kosong
