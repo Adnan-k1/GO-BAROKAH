@@ -3,6 +3,17 @@ export { formatRupiah } from './formatCurrency';
 export const formatNumber = (num) => 
   (Number(num) || 0).toLocaleString("id-ID");
 
+export const formatDateID = (dateString) => {
+  if (!dateString) return "-";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "-";
+  return date.toLocaleDateString('id-ID', { 
+    day: 'numeric', 
+    month: 'long', 
+    year: 'numeric' 
+  });
+};
+
 export const stockPercent = (current, max = 100) => {
   const safeMax = max <= 0 ? 100 : max;
   return Math.min(Math.round((current / safeMax) * 100), 100);

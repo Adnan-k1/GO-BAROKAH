@@ -103,11 +103,6 @@ const CartPage = () => {
       </div>
       <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 px-4 pt-3 pb-6 z-50 shadow-[0_-8px_30px_rgba(0,0,0,0.06)]">
         <div className="max-w-7xl mx-auto flex flex-col gap-2">
-          {totalQuantity < 10 && (
-            <p className="text-[10px] font-bold text-red-500 text-center uppercase tracking-widest bg-red-50 py-1.5 rounded-lg mb-1">
-              Minimal pembelian 10 barang (kurang {10 - totalQuantity})
-            </p>
-          )}
           <div className="flex items-center gap-4">
             <div className="flex flex-col min-w-0">
             <span className="text-[8px] font-black uppercase tracking-widest text-gray-400">Total</span>
@@ -116,9 +111,8 @@ const CartPage = () => {
             </span>
           </div>
           <button
-            disabled={totalQuantity < 10}
             onClick={() => navigate("/checkout")}
-            className="flex-1 bg-[#00AA5B] hover:bg-[#008f4c] text-white py-4 rounded-xl font-bold text-sm transition-colors shadow-lg shadow-green-900/10 disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none"
+            className="flex-1 bg-[#00AA5B] hover:bg-[#008f4c] text-white py-4 rounded-xl font-bold text-sm transition-colors shadow-lg shadow-green-900/10"
           >
             Beli ({totalQuantity})
           </button>

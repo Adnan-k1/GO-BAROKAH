@@ -80,7 +80,7 @@ const SignUpPage = () => {
               icon={<Mail size={18} />} 
               required
             />
-            <InputField 
+            {/* <InputField 
               label="Phone Number" 
               name="phoneNumber"
               type="tel" 
@@ -89,7 +89,7 @@ const SignUpPage = () => {
               placeholder="081234567890" 
               icon={<Phone size={18} />} 
               required
-            />
+            /> */}
             <InputField 
               label="Password" 
               name="password"

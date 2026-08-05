@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { formatDateID } from "../../../utils/formatters";
 
 const STATUS_COLORS = {
   "Menunggu": "bg-amber-50 text-amber-700 border-amber-200",
@@ -16,22 +17,14 @@ const OrderRow = React.memo(({ order }) => {
   
   const badgeStyle = STATUS_COLORS[status] || "bg-slate-50 text-slate-500 border-slate-200";
 
-  const displayId = String(id).startsWith('#') ? id : `#${id}`;
-
   return (
     <div 
       onClick={() => navigate('/admin/orders', { state: { searchId: String(id) } })}
       className="flex items-center gap-4 px-6 py-4 hover:bg-slate-50/80 transition-all rounded-xl group cursor-pointer border-b border-slate-50 last:border-0"
     >
-      
-      {/* Badge ID Pendek */}
-      <div className="px-2.5 py-1 rounded-md bg-slate-100 text-slate-900 font-black text-[10px] uppercase flex-shrink-0">
-        {displayId}
-      </div>
-
       <div className="flex-1 min-w-0">
         <p className="text-sm font-bold text-slate-800 truncate leading-tight">{customer}</p>
-        <p className="text-[11px] text-slate-400 font-medium mt-1 uppercase tracking-wider">{date}</p>
+        <p className="text-[11px] text-slate-400 font-medium mt-1 uppercase tracking-wider">{formatDateID(date)}</p>
       </div>
 
       <div className="text-right flex flex-col items-end gap-1.5 flex-shrink-0">

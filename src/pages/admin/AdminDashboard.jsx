@@ -125,7 +125,7 @@ const AdminDashboard = () => {
             </button>
             <div>
               <h2 className="text-base font-black text-slate-900 tracking-tight uppercase">DASHBOARD ADMIN</h2>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+              <p className="text-[10px] text-slate-400 font-bold  tracking-widest mt-0.5">
                 Selamat datang kembali, <span className="text-emerald-600">{firstName}</span>
               </p>
             </div>

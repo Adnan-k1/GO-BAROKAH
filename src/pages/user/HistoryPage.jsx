@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ClipboardList, Eye, ShoppingBag, Package, ChevronLeft, ChevronRight } from "lucide-react";
 import { useHistoryLogic } from "../../hooks/user/useHistoryLogic";
+import { formatDateID } from "../../utils/formatters";
 import Button from "../../components/common/Button";
 import OrderDetailModal from "../../components/forms/OrderDetailModal";
 import ConfirmModal from "../../components/forms/ConfirmModal";
@@ -109,11 +110,7 @@ const HistoryPage = () => {
                       {id}
                     </p>
                     <p className="text-[11px] text-gray-400 font-medium mt-1">
-                      {new Date(created_at).toLocaleDateString("id-ID", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
+                      {formatDateID(created_at)}
                     </p>
                   </div>
                 </div>

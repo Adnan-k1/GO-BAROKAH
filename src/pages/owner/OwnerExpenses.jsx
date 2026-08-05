@@ -5,6 +5,7 @@ import ExpenseModal from "../../components/owner/expenses/ExpenseModal";
 import ConfirmModal from "../../components/forms/ConfirmModal";
 import { useOwnerExpenses } from "../../hooks/owner/useOwnerExpenses";
 import { formatIDR } from "../../utils/formatCurrency";
+import { formatDateID } from "../../utils/formatters";
 
 const PER_PAGE = 10;
 
@@ -97,7 +98,7 @@ const OwnerExpenses = () => {
             </button>
             <div>
               <h2 className="text-xl md:text-2xl font-black tracking-tighter text-slate-800 uppercase leading-none">Pengeluaran</h2>
-              <p className="text-[10px] text-slate-400 font-black mt-1.5 uppercase tracking-[0.2em]">Manajemen Operasional</p>
+              <p className="text-[10px] text-slate-400 font-black mt-1.5 tracking-[0.2em]">Manajemen Operasional</p>
             </div>
           </div>
           <button 
@@ -154,7 +155,7 @@ const OwnerExpenses = () => {
 
                       <div className="w-[15%] flex justify-center">
                         <p className="text-xs font-bold text-slate-500">
-                          {new Date(exp.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          {formatDateID(exp.date)}
                         </p>
                       </div>
 

@@ -1,42 +1,55 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Star, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight, ArrowRight, EyeOff } from "lucide-react";
 import { formatIDR } from "../../utils/formatCurrency";
 
 const FEATURED_IDS = [1, 4, 3, 5, 6]; 
 
 const ProductCard = ({ prod }) => {
   const hasDiscount = prod.discount_amount > 0 && prod.final_price > 0 && prod.final_price !== prod.price;
+  const isDisabled = prod.is_active === false;
   return (
-    <Link to={`/product/${prod.id}`} className="group block">
-      <div className="relative aspect-[4/3] rounded-xl overflow-hidden mb-2.5 bg-white border border-gray-100">
-        <img
-          src={prod.image_url}
-          alt={prod.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
-          onError={(e) => { e.target.src = "https://placehold.co/400x400/FBFBFB/3A5A4D?text=No+Image"; }}
-        />
-        {hasDiscount && (
-          <div className="absolute top-1.5 left-1.5 bg-red-500 text-white text-[7px] font-black px-1.5 py-0.5 rounded uppercase tracking-wide">
-            -{prod.discount_amount}%
-          </div>
-        )}
-      </div>
-      <p className="text-[7px] font-black text-gray-400 uppercase tracking-widest mb-0.5 truncate">
-        {prod.category?.name || prod.category}
-      </p>
-      <h3 className="text-[11px] font-black text-gray-900 uppercase tracking-tight line-clamp-2 leading-tight group-hover:text-[#2D5A43] transition-colors mb-1">
-        {prod.name}
-      </h3>
-      {hasDiscount ? (
-        <div className="flex flex-col mt-1">
-          <p className="text-[10px] font-bold text-red-500 line-through mb-0.5">{formatIDR(prod.price)}</p>
-          <p className="text-xs font-black text-[#3A5A4D]">{formatIDR(prod.final_price)}</p>
+    <div className={`relative ${isDisabled ? 'opacity-60 grayscale' : ''}`}>
+      {isDisabled && (
+        <div className="absolute top-2 right-2 z-10 bg-slate-700 text-white text-[7px] font-black px-2 py-1 rounded uppercase tracking-wide">
+          Tidak Tersedia
         </div>
-      ) : (
-        <p className="text-xs font-black text-gray-600">{formatIDR(prod.price)}</p>
       )}
-    </Link>
+      <Link to={`/product/${prod.id}`} className="group block">
+        <div className="relative aspect-[4/3] rounded-xl overflow-hidden mb-2.5 bg-white border border-gray-100">
+          <img
+            src={prod.image_url}
+            alt={prod.name}
+            className={`w-full h-full object-cover ${!isDisabled ? 'group-hover:scale-105' : ''} transition-all duration-500`}
+            onError={(e) => { e.target.src = "https://placehold.co/400x400/FBFBFB/3A5A4D?text=No+Image"; }}
+          />
+          {isDisabled && (
+            <div className="absolute inset-0 bg-slate-900/30 flex items-center justify-center">
+              <EyeOff size={20} className="text-white" />
+            </div>
+          )}
+          {hasDiscount && !isDisabled && (
+            <div className="absolute top-1.5 left-1.5 bg-red-500 text-white text-[7px] font-black px-1.5 py-0.5 rounded uppercase tracking-wide">
+              -{prod.discount_amount}%
+            </div>
+          )}
+        </div>
+        <p className="text-[7px] font-black text-gray-400 uppercase tracking-widest mb-0.5 truncate">
+          {prod.category?.name || prod.category}
+        </p>
+        <h3 className={`text-[11px] font-black uppercase tracking-tight line-clamp-2 leading-tight mb-1 ${isDisabled ? 'text-gray-500' : 'text-gray-900 group-hover:text-[#2D5A43]'} transition-colors`}>
+          {prod.name}
+        </h3>
+        {hasDiscount && !isDisabled ? (
+          <div className="flex flex-col mt-1">
+            <p className="text-[10px] font-bold text-red-500 line-through mb-0.5">{formatIDR(prod.price)}</p>
+            <p className="text-xs font-black text-[#3A5A4D]">{formatIDR(prod.final_price)}</p>
+          </div>
+        ) : (
+          <p className={`text-xs font-black ${isDisabled ? 'text-gray-500' : 'text-gray-600'}`}>{formatIDR(prod.price)}</p>
+        )}
+      </Link>
+    </div>
   );
 };
 

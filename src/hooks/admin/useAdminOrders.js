@@ -37,7 +37,7 @@ export const useAdminOrders = () => {
       customer_name: o.recipientName,
       customer_phone: o.recipientPhone,
       user_id: o.userId,
-      created_at: new Date(o.createdAt).toLocaleString("id-ID"),
+      created_at: o.createdAt,
       address: o.shippingAddress,
       total_price: o.grandTotal,
       status: mapStatusToUI(o.status, isPickup),
@@ -71,18 +71,12 @@ export const useAdminOrders = () => {
     try {
       const statusForAPI = mapStatusToAPI(newStatusUI);
       await adminOrderService.updateOrderStatus(orderId, statusForAPI);
-
-      if (statusForAPI === "COMPLETED") {
-        await adminOrderService.updatePaymentStatus(orderId, "PAID");
-      }
-
       setOrders((prev) =>
         prev.map((order) =>
           order.id === orderId
             ? {
                 ...order,
                 status: newStatusUI,
-                payment_status: statusForAPI === "COMPLETED" ? "PAID" : order.payment_status,
               }
             : order,
         ),

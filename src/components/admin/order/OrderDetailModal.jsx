@@ -5,6 +5,7 @@ import {
   CheckCircle2, AlertCircle 
 } from "lucide-react";
 import { formatFullCurrency } from "../../../utils/formatCurrency";
+import { formatDateID } from "../../../utils/formatters";
 
 const OrderDetailModal = ({ isOpen, order, onClose }) => {
   const [animate, setAnimate] = useState(false);
@@ -126,7 +127,7 @@ const OrderDetailModal = ({ isOpen, order, onClose }) => {
                 </p>
                 <div className="flex items-center gap-1 mt-1.5 opacity-60">
                   <Calendar size={10} />
-                  <span className="text-[8px] font-bold uppercase">{order.created_at}</span>
+                  <span className="text-[8px] font-bold uppercase">{formatDateID(order.created_at)}</span>
                 </div>
               </div>
             </div>
