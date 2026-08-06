@@ -12,6 +12,7 @@ export const useProfileLogic = () => {
     username: '',
     email: '',
     phone: '',
+    is_phone_verified: false,
   });
 
   useEffect(() => {
@@ -20,6 +21,7 @@ export const useProfileLogic = () => {
         username: user.username || '', 
         email: user.email || '',
         phone: user.phone_number || '',  
+        is_phone_verified: user.is_phone_verified === true,
       });
     }
   }, [user]);

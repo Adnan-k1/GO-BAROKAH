@@ -15,7 +15,8 @@ import {
   Cart, Checkout, ProfileInfoPage,
   AddressPage, OrdersPage, OrderSuccessPage
 } from "./pages/user/index";
-import VerifyOTP from "./pages/auth/VerifyOtpPage";
+import VerifyEmailOTP from "./pages/auth/VerifyEmailOtpPage";
+import VerifyPhoneOTP from "./pages/auth/VerifyPhoneOtpPage";
 import Unauthorized from "./pages/error/Unauthorized"; 
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -59,7 +60,8 @@ function App() {
 
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/verify-otp" element={<VerifyOTP />} />
+          <Route path="/verify-email" element={<VerifyEmailOTP />} />
+          <Route path="/verify-phone" element={<VerifyPhoneOTP />} />
 
           <Route element={<ProtectedRoute allowedRoles={["admin", "owner"]} />}>
             <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />

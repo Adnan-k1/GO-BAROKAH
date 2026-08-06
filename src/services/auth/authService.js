@@ -21,12 +21,22 @@ const authService = {
     return response.data;
   },
   verifyOTP: async (email, otp) => {
-    const response = await api.post('/api/otp/verify', { email, otp });
+    const response = await api.post('/api/otp/email/verify', { email, otp });
     return response.data;
   },
 
   resendOTP: async (email) => {
-    const response = await api.post('/api/otp/request', { email });
+    const response = await api.post('/api/otp/email/request', { email });
+    return response.data;
+  },
+
+  requestPhoneOTP: async () => {
+    const response = await api.post('/api/otp/phone/request');
+    return response.data;
+  },
+
+  verifyPhoneOTP: async (otp) => {
+    const response = await api.post('/api/otp/phone/verify', { otp });
     return response.data;
   },
 

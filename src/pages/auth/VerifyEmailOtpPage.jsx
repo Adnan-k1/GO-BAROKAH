@@ -6,7 +6,7 @@ import InputField from '../../components/common/FormInput';
 import Button from '../../components/common/Button';
 import toast from 'react-hot-toast';
 
-const VerifyOTP = () => {
+const VerifyEmailOTP= () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [otp, setOtp] = useState('');
@@ -127,4 +127,4 @@ const VerifyOTP = () => {
   );
 };
 
-export default VerifyOTP;
+export default VerifyEmailOTP;

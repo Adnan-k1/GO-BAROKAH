@@ -60,7 +60,7 @@ const LoginPage = () => {
                  onClick={() => {
                    if (formData.email) {
                      localStorage.setItem('pendingVerificationEmail', formData.email);
-                     navigate('/verify-otp', { state: { email: formData.email } });
+                     navigate('/verify-email', { state: { email: formData.email } });
                    } else {
                      toast.error("Silakan isi email Anda pada form di bawah");
                    }
