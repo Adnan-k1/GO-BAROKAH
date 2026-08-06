@@ -1,7 +1,7 @@
 import React from "react";
 import { ArrowRight, AlertCircle } from "lucide-react"; 
 
-const OrderSummary = ({ subtotal, total, normalSubtotal, discountTotal, totalQuantity, hasDiscount, onCheckout }) => {
+const OrderSummary = ({ total, normalSubtotal, discountTotal, totalQuantity, hasDiscount, onCheckout }) => {
   
   return (
   <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden p-6">

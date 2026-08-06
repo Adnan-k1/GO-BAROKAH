@@ -87,7 +87,7 @@ export const useAddressLogic = () => {
       await addressService.updateAddress(id, payload);
       await fetchAddresses();
       toast.success("Alamat utama berhasil diganti!");
-    } catch (err) {
+    } catch {
       toast.error("Gagal ganti alamat utama");
     } finally {
       setIsLoading(false);
@@ -100,7 +100,7 @@ export const useAddressLogic = () => {
       await addressService.deleteAddress(id);
       toast.success("Alamat dihapus");
       await fetchAddresses();
-    } catch (err) {
+    } catch {
       toast.error("Gagal menghapus alamat");
     } finally {
       setIsLoading(false);

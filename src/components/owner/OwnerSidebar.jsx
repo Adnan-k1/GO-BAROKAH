@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { LogOut, ChevronRight, ChevronLeft, LayoutDashboard, Receipt, Users, ArrowRightLeft } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
@@ -11,7 +11,7 @@ const NAV_ITEMS = [
 ];
 
 const OwnerSidebar = ({ isMobileOpen, setIsMobileOpen }) => {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const [isUserMinimized, setIsUserMinimized] = useState(() => {
@@ -63,7 +63,9 @@ const OwnerSidebar = ({ isMobileOpen, setIsMobileOpen }) => {
           <p className={`text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-6 mb-1 transition-all duration-300 ${isMinimized ? "opacity-0 h-0 hidden" : "opacity-100"}`}>
             Menu Utama
           </p>
-          {NAV_ITEMS.map(({ id, label, icon: Icon, path }) => (
+          {NAV_ITEMS.map(({ id, label, icon, path }) => {
+            const Icon = icon;
+            return (
             <NavLink
               key={id}
               to={path}
@@ -84,7 +86,8 @@ const OwnerSidebar = ({ isMobileOpen, setIsMobileOpen }) => {
                 </>
               )}
             </NavLink>
-          ))}
+            );
+          })}
         </nav>
 
         <footer className="mt-auto pt-6 flex flex-col gap-2 overflow-x-hidden border-t border-slate-100 mx-4">

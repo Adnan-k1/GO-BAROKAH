@@ -111,11 +111,9 @@ const AdminDashboard = () => {
   if (isLoading) return <LoadingSkeleton />;
   if (!orders && !products) return <ErrorState message="Data dashboard kosong." />;
 
-  const lowStockCount = lowStockProducts.length;
-
   return (
     <div className="flex h-screen bg-[#F8FAFC] font-sans text-slate-900 overflow-hidden text-[13px]">
-      <AdminSidebar user={user} alertCount={lowStockCount} isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
+      <AdminSidebar isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
 
       <main className="flex-1 flex flex-col overflow-hidden">
         <header className="bg-white border-b border-slate-100 px-4 md:px-8 py-4 md:py-0 md:h-[72px] flex flex-col md:flex-row md:items-center justify-between flex-shrink-0 z-10 gap-4 md:gap-0">

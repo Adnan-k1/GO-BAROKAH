@@ -9,9 +9,21 @@ import { formatDateID } from "../../utils/formatters";
 
 const PER_PAGE = 10;
 
+const LoadingSkeleton = () => (
+  <div className="flex h-screen bg-[#F8FAFC]">
+    <OwnerSidebar />
+    <main className="flex-1 flex flex-col items-center justify-center gap-4">
+      <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
+      <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em]">
+        Memuat data pengeluaran...
+      </p>
+    </main>
+  </div>
+);
+
 const OwnerExpenses = () => {
   const { 
-    expenses, isLoading, actionLoading, 
+    expenses, isLoading,
     fetchExpenses, handleCreate, handleUpdate, handleDelete 
   } = useOwnerExpenses();
 
@@ -71,18 +83,6 @@ const OwnerExpenses = () => {
     };
     return colors[cat] || "bg-gray-50 text-gray-600 border-gray-200";
   };
-
-  const LoadingSkeleton = () => (
-    <div className="flex h-screen bg-[#F8FAFC]">
-      <OwnerSidebar />
-      <main className="flex-1 flex flex-col items-center justify-center gap-4">
-        <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
-        <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em]">
-          Memuat data pengeluaran...
-        </p>
-      </main>
-    </div>
-  );
 
   if (isLoading) return <LoadingSkeleton />;
 

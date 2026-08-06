@@ -7,7 +7,7 @@ export const useHomeLogic = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilters, setActiveFilters] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery] = useState("");
 
   useEffect(() => {
     const fetchAllData = async () => {

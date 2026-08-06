@@ -38,7 +38,7 @@ const CartItem = ({
       setLoadingAction("input");
       try {
         await onQuantityChange(item.id, val);
-      } catch (err) {
+      } catch {
         setInputQty(item.quantity);
       } finally {
         setLoadingAction(null);

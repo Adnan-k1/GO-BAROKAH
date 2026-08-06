@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { User, Mail, Lock, ArrowLeft, Eye, EyeOff } from "lucide-react"; 
 import { useSignupLogic } from "../../hooks/auth/useSignupLogic"; 
 import InputField from "../../components/common/FormInput";
@@ -15,8 +15,7 @@ const SignUpPage = () => {
     handleChange, 
     handleSignUp, 
     togglePassword,
-    handleGoogleSuccess,
-    setShowPassword
+    handleGoogleSuccess
   } = useSignupLogic();
 
   const containerRef = React.useRef(null);
