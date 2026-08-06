@@ -18,8 +18,10 @@ const ConfirmModal = ({
   useEffect(() => {
     if (isOpen) {
       setShouldRender(true);
-      const timer = setTimeout(() => setAnimate(true), 10);
-      return () => clearTimeout(timer);
+      const raf = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setAnimate(true));
+      });
+      return () => cancelAnimationFrame(raf);
     } else {
       setAnimate(false);
       const timer = setTimeout(() => setShouldRender(false), 300);

@@ -53,10 +53,22 @@ const ExpenseModal = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === "amount") {
+      const digits = value.replace(/\D/g, "");
+      setForm(prev => ({
+        ...prev,
+        amount: digits ? Number(digits) : 0,
+      }));
+      return;
+    }
     setForm(prev => ({
       ...prev,
-      [name]: name === "amount" ? Number(value) || 0 : value
+      [name]: value
     }));
+  };
+
+  const formatAmountDisplay = (value) => {
+    return value ? new Intl.NumberFormat("id-ID").format(value) : "";
   };
 
   const handleClose = () => {
@@ -124,16 +136,20 @@ const ExpenseModal = ({
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Nominal (Rp)</label>
-                <input
-                  type="number"
-                  name="amount"
-                  value={form.amount || ""}
-                  onChange={handleChange}
-                  required
-                  min="0"
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-bold rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all placeholder:font-medium placeholder:text-slate-400"
-                />
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Nominal</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400">Rp</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    name="amount"
+                    value={formatAmountDisplay(form.amount)}
+                    onChange={handleChange}
+                    required
+                    placeholder="0"
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-bold rounded-xl pl-10 pr-4 py-3 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all placeholder:font-medium placeholder:text-slate-400"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Tanggal</label>

@@ -188,7 +188,7 @@ const TableRow = ({ order, onOpenDetail }) => {
             {order.customer_name}
           </span>
           <span className="text-[9px] text-slate-400 font-bold uppercase">
-            {order.customer_phone || "-"}
+            {order.order_number || `#${order.id}`}
           </span>
         </div>
       </td>
@@ -203,7 +203,6 @@ const TableRow = ({ order, onOpenDetail }) => {
           <CreditCard size={12} /> {paymentLabel}
         </div>
       </td>
-      {/* Pake formatRupiahUtuh di sini */}
       <td className="px-4 py-5 text-xs font-black text-slate-900 tabular-nums whitespace-nowrap">{formatRupiahUtuh(order.total_price)}</td>
       <td className="px-4 py-5">
         <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[9px] font-black uppercase tracking-wider whitespace-nowrap ${config?.bg} ${config?.text} ${config?.border}`}>

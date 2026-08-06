@@ -19,6 +19,8 @@ const VerifyPhoneOtp = () => {
   const [error, setError] = useState(null);
   const sentRef = useRef(false);
 
+  const otpSentKey = `otp_sent_${phone}`;
+
   useEffect(() => {
     if (!phone) {
       toast.error("Silakan isi nomor telepon terlebih dahulu.");
@@ -31,23 +33,31 @@ const VerifyPhoneOtp = () => {
   useEffect(() => {
     if (phone && !sentRef.current) {
       sentRef.current = true;
-      handleResendOTP();
+      const alreadySent = sessionStorage.getItem(otpSentKey) === "true";
+      if (!alreadySent) {
+        handleResendOTP();
+        sessionStorage.setItem(otpSentKey, "true");
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phone]);
 
   const handleResendOTP = async () => {
     setIsResending(true);
     setError(null);
     try {
-      await authService.requestPhoneOTP();
-      toast.success("Kode OTP telah dikirim ke WhatsApp!", {
-        style: { background: "#2D5A43", color: "#fff" },
-      });
+      await toast.promise(
+        authService.requestPhoneOTP(),
+        {
+          loading: 'Mengirim kode ke WhatsApp...',
+          success: 'Kode OTP telah dikirim ke WhatsApp!',
+          error: (err) => err.response?.data?.message || 'Gagal mengirim kode OTP.',
+        },
+        {
+          success: { style: { background: '#2D5A43', color: '#fff' } },
+        }
+      );
     } catch (err) {
-      const msg = err.response?.data?.message || "Gagal mengirim kode OTP.";
-      setError(msg);
-      toast.error(msg);
+      setError(err.response?.data?.message || 'Gagal mengirim kode OTP.');
     } finally {
       setIsResending(false);
     }
@@ -61,7 +71,8 @@ const VerifyPhoneOtp = () => {
     try {
       await authService.verifyPhoneOTP(otp);
       localStorage.removeItem("pendingVerificationPhone");
-      updateUser({ ...user, is_phone_verified: true });
+      sessionStorage.removeItem(otpSentKey);
+      updateUser({ ...user, phone_number_verified: true });
       toast.success("Nomor Telepon Berhasil Diverifikasi!", {
         style: { background: "#2D5A43", color: "#fff" },
       });
