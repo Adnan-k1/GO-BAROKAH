@@ -9,7 +9,7 @@ const ProfileInfoPage = () => {
   const navigate = useNavigate();
   const { user, formData, handleChange, saveProfile } = useProfileLogic();
 
-  const phoneVerified = formData?.is_phone_verified === true;
+  const phoneVerified = formData?.phone_number_verified === true;
   const hasPhone = Boolean(formData?.phone);
   const isPhoneChanged = (user?.phone_number || '') !== (formData?.phone || '');
 

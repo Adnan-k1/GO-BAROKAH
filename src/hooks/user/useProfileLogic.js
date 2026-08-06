@@ -12,16 +12,16 @@ export const useProfileLogic = () => {
     username: '',
     email: '',
     phone: '',
-    is_phone_verified: false,
+    phone_number_verified: false,
   });
 
   useEffect(() => {
     if (user) {
       setFormData({
-        username: user.username || '', 
+        username: user.username || user.name || '',
         email: user.email || '',
-        phone: user.phone_number || '',  
-        is_phone_verified: user.is_phone_verified === true,
+        phone: user.phone_number || user.phoneNumber || '',
+        phone_number_verified: user.phone_number_verified === true,
       });
     }
   }, [user]);
@@ -31,22 +31,35 @@ export const useProfileLogic = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
- const saveProfile = async () => {
+  const saveProfile = async () => {
     const loadingToast = toast.loading("Menyimpan perubahan...");
     try {
-      const currentId = user._id || user.id;
-      if (!currentId){
-        throw new Error("User ID tidak ditemukan. ");
-      }
       const payload = {
         username: formData.username,
         email: formData.email,
-        phone_number: formData.phone 
+        phone_number: formData.phone,
       };
-      const response = await userService.updateProfile(payload);
-      const dataTerbaru = response.data || response;
 
-      updateUser({ ...user, ...payload});
+      const isPhoneChanged = formData.phone !== (user.phone_number || user.phoneNumber);
+
+      const response = await userService.updateProfile(payload);
+      const rawData = response?.data?.data || response?.data || response || {};
+
+      const updatedUser = {
+        ...user,
+        ...payload,
+        phone_number: rawData.phoneNumber ?? rawData.phone_number ?? payload.phone_number,
+        username: rawData.name ?? rawData.username ?? payload.username,
+        email_verified: rawData.emailVerified ?? rawData.email_verified ?? user.email_verified,
+      };
+
+      if (isPhoneChanged) {
+        updatedUser.phone_number_verified = false;
+      } else {
+        updatedUser.phone_number_verified = rawData.phoneNumberVerified ?? rawData.phone_number_verified ?? user.phone_number_verified;
+      }
+
+      updateUser(updatedUser);
       toast.success('Profil diperbarui!', { id: loadingToast });
     } catch (err) {
       console.log("ERROR DETAIL:", err);

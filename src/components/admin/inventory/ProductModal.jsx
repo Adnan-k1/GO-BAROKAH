@@ -35,8 +35,10 @@ const ProductModal = ({
   useEffect(() => {
     if (mode) {
       setShouldRender(true);
-      const timer = setTimeout(() => setAnimate(true), 10);
-      return () => clearTimeout(timer);
+      const raf = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setAnimate(true));
+      });
+      return () => cancelAnimationFrame(raf);
     } else {
       setAnimate(false);
       const timer = setTimeout(() => setShouldRender(false), 300);
@@ -318,8 +320,12 @@ const ProductModal = ({
               <div className={`transition-all duration-500 delay-[500ms] ${animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
                 <label className={labelClass}>Potongan / Diskon</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400">Rp</span>
-                  <input name="discount_amount" type="text" value={form.discount_amount ? form.discount_amount.toLocaleString("id-ID") : ""} onChange={handleCurrencyChange} className={`${inputClass} pl-10`} placeholder="0" />
+                  <input name="discount_amount" type="text" value={form.discount_amount || ""} onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "");
+                    const num = val ? Math.min(Number(val), 100) : 0;
+                    setForm((prev) => ({ ...prev, discount_amount: num }));
+                  }} className={`${inputClass} pr-10`} placeholder="0" />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400">%</span>
                 </div>
               </div>
               

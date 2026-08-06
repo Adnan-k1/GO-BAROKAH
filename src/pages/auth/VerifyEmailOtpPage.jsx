@@ -24,19 +24,25 @@ const VerifyEmailOTP= () => {
 
   const handleResendOTP = async () => {
     if (!email) {
-      toast.error("Email tidak ditemukan, silakan register ulang.");
+      toast.error('Email tidak ditemukan, silakan register ulang.');
+      navigate('/signup');
       return;
     }
 
     setIsResending(true);
     try {
-      await authService.resendOTP(email);
-      toast.success('Kode OTP baru telah dikirim ke email!', {
-        style: { background: '#2D5A43', color: '#fff' }
-      });
+      await toast.promise(
+        authService.resendOTP(email),
+        {
+          loading: 'Mengirim kode ke email...',
+          success: 'Kode OTP baru telah dikirim ke email!',
+          error: (err) => err.response?.data?.message || 'Gagal mengirim ulang kode.',
+        },
+        {
+          success: { style: { background: '#2D5A43', color: '#fff' } },
+        }
+      );
     } catch (err) {
-      const msg = err.response?.data?.message || "Gagal mengirim ulang kode.";
-      toast.error(msg);
     } finally {
       setIsResending(false);
     }

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { translateError } from './errorTranslator';
 
 export const API_URL = import.meta.env.VITE_API_URL;
 
@@ -20,6 +21,16 @@ api.interceptors.request.use(
     return config;
   },
   (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.data?.message) {
+      error.response.data.message = translateError(error.response.data.message);
+    }
+    return Promise.reject(error);
+  }
 );
 
 export default api;

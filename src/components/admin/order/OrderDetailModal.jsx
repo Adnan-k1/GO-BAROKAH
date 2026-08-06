@@ -14,8 +14,10 @@ const OrderDetailModal = ({ isOpen, order, onClose }) => {
   useEffect(() => {
     if (isOpen) {
       setShouldRender(true);
-      const timer = setTimeout(() => setAnimate(true), 10);
-      return () => clearTimeout(timer);
+      const raf = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setAnimate(true));
+      });
+      return () => cancelAnimationFrame(raf);
     } else {
       setAnimate(false);
       const timer = setTimeout(() => setShouldRender(false), 300);
@@ -53,22 +55,13 @@ const OrderDetailModal = ({ isOpen, order, onClose }) => {
                 Detail Pesanan
               </h2>
               <div className="flex items-center gap-2 mt-0.5">
-                <div className="flex items-center gap-1">
-                  <Hash size={8} className="text-slate-400" />
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                    {order.id}
-                  </span>
-                </div>
                 {order.order_number && (
-                  <>
-                    <span className="text-slate-200">·</span>
-                    <div className="flex items-center gap-1">
-                      <Receipt size={8} className="text-emerald-500" />
-                      <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">
-                        {order.order_number}
-                      </span>
-                    </div>
-                  </>
+                  <div className="flex items-center gap-1">
+                    <Receipt size={8} className="text-emerald-500" />
+                    <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">
+                      {order.order_number}
+                    </span>
+                  </div>
                 )}
               </div>
             </div>
@@ -89,9 +82,6 @@ const OrderDetailModal = ({ isOpen, order, onClose }) => {
                 <div>
                   <p className="text-[10px] font-black text-slate-900 uppercase">
                     {order.customer_name}
-                  </p>
-                  <p className="text-[7.5px] font-bold text-slate-400 tracking-wider break-all mt-0.5 leading-relaxed pr-2">
-                    ID: {order.user_id}
                   </p>
                 </div>
                 {order.customer_phone && (
