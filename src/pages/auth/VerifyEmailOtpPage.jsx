@@ -42,7 +42,7 @@ const VerifyEmailOTP= () => {
           success: { style: { background: '#2D5A43', color: '#fff' } },
         }
       );
-    } catch (err) {
+    } catch {
     } finally {
       setIsResending(false);
     }

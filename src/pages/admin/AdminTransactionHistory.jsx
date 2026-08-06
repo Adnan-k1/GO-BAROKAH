@@ -33,7 +33,6 @@ const AdminTransactionHistory = () => {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("Semua");
   const [page, setPage] = useState(1);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -43,14 +42,6 @@ const AdminTransactionHistory = () => {
     setSelectedOrder(order);
     setIsModalOpen(true);
   };
-
-  useEffect(() => {
-    const el = tableScrollRef.current;
-    if (!el) return;
-    const onScroll = () => setIsScrolled(el.scrollTop > 40);
-    el.addEventListener("scroll", onScroll);
-    return () => el.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     if (tableScrollRef.current) {

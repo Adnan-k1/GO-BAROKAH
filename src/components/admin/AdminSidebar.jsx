@@ -1,11 +1,11 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { LogOut, ChevronRight, ChevronLeft, LayoutDashboard, ArrowRightLeft } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { NAV_ITEMS } from "../../constants/adminConstants";
 import LogoutModal from "./LogoutModal"; 
 
-const AdminSidebar = ({ alertCount = 0, isMobileOpen, setIsMobileOpen }) => {
+const AdminSidebar = ({ isMobileOpen, setIsMobileOpen }) => {
   const { user, logout } = useAuth();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   
@@ -25,11 +25,6 @@ const AdminSidebar = ({ alertCount = 0, isMobileOpen, setIsMobileOpen }) => {
   }, []);
 
   const isMinimized = isUserMinimized && !isMobile;
-
-  const initials = useMemo(() => {
-    const displayName = user?.username || user?.name || "Admin";
-    return displayName.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
-  }, [user]);
 
   const isOwner = user?.role === "owner" || user?.Role === "owner" || user?.data?.role === "owner";
 
@@ -62,7 +57,9 @@ const AdminSidebar = ({ alertCount = 0, isMobileOpen, setIsMobileOpen }) => {
         </header>
 
         <nav className={`flex flex-col gap-2 mb-auto overflow-x-hidden ${isMinimized ? "mt-4" : ""}`}>
-          {NAV_ITEMS.map(({ id, label, icon: Icon, path }) => (
+          {NAV_ITEMS.map(({ id, label, icon, path }) => {
+            const Icon = icon;
+            return (
             <NavLink
               key={id}
               to={path}
@@ -83,7 +80,8 @@ const AdminSidebar = ({ alertCount = 0, isMobileOpen, setIsMobileOpen }) => {
                 </>
               )}
             </NavLink>
-          ))}
+            );
+          })}
         </nav>
 
         <footer className="mt-auto pt-6 flex flex-col gap-2 overflow-x-hidden border-t border-slate-100 mx-4">

@@ -6,6 +6,18 @@ import { useOwnerEmployees } from "../../hooks/owner/useOwnerEmployees";
 
 const PER_PAGE = 10;
 
+const LoadingSkeleton = () => (
+  <div className="flex h-screen bg-[#F8FAFC]">
+    <OwnerSidebar />
+    <main className="flex-1 flex flex-col items-center justify-center gap-4">
+      <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
+      <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em]">
+        Memuat data pegawai...
+      </p>
+    </main>
+  </div>
+);
+
 const OwnerEmployees = () => {
   const { 
     users, admins, isLoading, actionLoading, 
@@ -58,18 +70,6 @@ const OwnerEmployees = () => {
 
   const totalPages = Math.ceil(filteredEmployees.length / PER_PAGE) || 1;
   const paginated = filteredEmployees.slice((page - 1) * PER_PAGE, page * PER_PAGE);
-
-  const LoadingSkeleton = () => (
-    <div className="flex h-screen bg-[#F8FAFC]">
-      <OwnerSidebar />
-      <main className="flex-1 flex flex-col items-center justify-center gap-4">
-        <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
-        <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em]">
-          Memuat data pegawai...
-        </p>
-      </main>
-    </div>
-  );
 
   const onConfirmAction = async () => {
     const { type, email } = confirmModal;

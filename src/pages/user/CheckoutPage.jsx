@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react"; 
 import { useCheckoutLogic } from "../../hooks/user/useCheckoutLogic";
 import { usePaymentLogic } from "../../hooks/user/usePaymentLogic";
-import { useAuth } from "../../context/AuthContext";
 import { 
   Truck, Store, ChevronLeft, ArrowRight, Info, FileText, 
   Loader2, Package 
@@ -13,7 +12,6 @@ import CustomAddressSelector from "../../components/forms/CustomAddressSelector"
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
   
   const {
     cartItems, subtotal, shippingFee, total,

@@ -115,7 +115,7 @@ export const CartProvider = ({ children }) => {
         ? await cartService.deleteItem(productId)
         : await cartService.updateItem(productId, existing.quantity - 1);
       syncCart(res.data);
-    } catch (err) {
+    } catch {
       toast.error("Gagal update keranjang");
     }
   };
@@ -125,7 +125,7 @@ export const CartProvider = ({ children }) => {
     try {
       const res = await cartService.deleteItem(productId);
       syncCart(res.data);
-    } catch (err) {
+    } catch {
       toast.error("Gagal menghapus item");
     }
   };
@@ -159,7 +159,7 @@ export const CartProvider = ({ children }) => {
       await cartService.clearCart();
       setCartItems([]);
       setCartSummary(null);
-    } catch (err) {
+    } catch {
       toast.error("Gagal mengosongkan keranjang");
     }
   };

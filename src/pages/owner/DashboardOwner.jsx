@@ -49,20 +49,6 @@ const DashboardOwner = () => {
     return "text-yellow-500 bg-yellow-50";
   };
 
-  const getStatusIcon = (status) => {
-    if (status === "POSITIVE") return <TrendingUp size={20} />;
-    if (status === "NEGATIVE") return <TrendingDown size={20} />;
-    return <Activity size={20} />;
-  };
-
-  const topProductData = useMemo(() => {
-    if (!omzet?.per_product) return [];
-    return omzet.per_product.slice(0, 5).map(p => ({
-      name: p.product_name,
-      revenue: p.revenue
-    }));
-  }, [omzet]);
-
   if (isLoading) {
     return (
       <div className="flex h-screen bg-[#F8FAFC]">
