@@ -29,7 +29,7 @@ export const useSignupLogic = () => {
       await authService.register(payload); 
       toast.success('Pendaftaran berhasil! Cek email untuk kode OTP.');
       localStorage.setItem('pendingVerificationEmail', formData.email);
-      navigate("/verify-otp", { state: { email: formData.email } });
+      navigate("/verify-email", { state: { email: formData.email } });
     } catch (error) {
       const msg = error.response?.data?.message || "Gagal mendaftar";
       toast.error(msg);

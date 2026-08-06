@@ -1,15 +1,25 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useProfileLogic } from '../../hooks/user/useProfileLogic';
-import { User, Mail, Phone } from 'lucide-react';
+import { User, Mail, Phone, ShieldCheck, ArrowRight } from 'lucide-react';
 import Button from '../../components/common/Button';
 import FormInput from '../../components/common/FormInput';
 
 const ProfileInfoPage = () => {
-  const { formData, handleChange, saveProfile } = useProfileLogic();
+  const navigate = useNavigate();
+  const { user, formData, handleChange, saveProfile } = useProfileLogic();
+
+  const phoneVerified = formData?.is_phone_verified === true;
+  const hasPhone = Boolean(formData?.phone);
+  const isPhoneChanged = (user?.phone_number || '') !== (formData?.phone || '');
 
   const handleSaveProfile = (e) => {
     e.preventDefault();
     saveProfile();
+  };
+
+  const handleVerifyPhone = () => {
+    navigate('/verify-phone', { state: { phone: formData.phone } });
   };
 
   return (
@@ -44,21 +54,50 @@ const ProfileInfoPage = () => {
           className="!py-3.5 !rounded-2xl !bg-gray-100 !border-gray-200 text-gray-500 font-bold cursor-not-allowed opacity-80"
           required
         />
-        <FormInput
-          label="Nomor Telepon"
-          name="phone"
-          type="text"
-          value={formData?.phone || ''}
-          onChange={(e) => {
-            if (/^\d*$/.test(e.target.value)) {
-              handleChange(e);
+        <div>
+          <FormInput
+            label="Nomor Telepon"
+            name="phone"
+            type="text"
+            value={formData?.phone || ''}
+            onChange={(e) => {
+              if (/^\d*$/.test(e.target.value)) {
+                handleChange(e);
+              }
+            }}
+            placeholder="Contoh: 08123456789"
+            icon={<Phone size={18} className="text-gray-400" />}
+            className="!py-3.5 !rounded-2xl !bg-gray-50 !border-gray-100 hover:!border-gray-200 focus:!bg-white focus:!border-[#2D5A43] focus:!ring-4 focus:!ring-[#2D5A43]/10 text-gray-900 font-bold transition-all"
+            rightIcon={
+              hasPhone && isPhoneChanged ? (
+                <button
+                  type="button"
+                  disabled
+                  title="Simpan perubahan terlebih dahulu"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest bg-gray-200 text-gray-400 cursor-not-allowed transition-all shadow-sm"
+                >
+                  Verifikasi
+                  <ArrowRight size={12} />
+                </button>
+              ) : hasPhone && !phoneVerified ? (
+                <button
+                  type="button"
+                  onClick={handleVerifyPhone}
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest bg-[#2D5A43] text-white hover:bg-[#234735] transition-all active:scale-95 shadow-sm"
+                >
+                  Verifikasi
+                  <ArrowRight size={12} />
+                </button>
+              ) : hasPhone && phoneVerified ? (
+                <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100">
+                  <ShieldCheck size={12} />
+                  Terverifikasi
+                </div>
+              ) : null
             }
-          }}
-          placeholder="Contoh: 08123456789"
-          icon={<Phone size={18} className="text-gray-400" />}
-          className="!py-3.5 !rounded-2xl !bg-gray-50 !border-gray-100 hover:!border-gray-200 focus:!bg-white focus:!border-[#2D5A43] focus:!ring-4 focus:!ring-[#2D5A43]/10 text-gray-900 font-bold transition-all"
-          required
-        />
+            required
+          />
+        </div>
 
         <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-3 pt-6 border-t border-gray-50">
           <Button
