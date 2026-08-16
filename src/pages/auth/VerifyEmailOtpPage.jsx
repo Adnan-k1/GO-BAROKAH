@@ -6,11 +6,8 @@ import InputField from '../../components/common/FormInput';
 import Button from '../../components/common/Button';
 import toast from 'react-hot-toast';
 import { useOtpCooldown } from '../../hooks/auth/useOtpCooldown';
-import {
-  formatOtpCooldown,
-  getOtpRequestErrorMessage,
-  getRetryAfterSeconds,
-} from '../../utils/otpCooldown';
+import { formatOtpCooldown } from '../../utils/otpCooldown';
+import { getOtpRequestErrorMessage, getRetryAfterSeconds } from '../../utils/otpError';
 
 const VerifyEmailOTP= () => {
   const navigate = useNavigate();

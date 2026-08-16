@@ -4,11 +4,8 @@ import authService from '../../services/auth/authService';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import { useOtpCooldown } from './useOtpCooldown';
-import {
-  formatOtpCooldown,
-  getOtpRequestErrorMessage,
-  getRetryAfterSeconds,
-} from '../../utils/otpCooldown';
+import { formatOtpCooldown } from '../../utils/otpCooldown';
+import { getOtpRequestErrorMessage, getRetryAfterSeconds } from '../../utils/otpError';
 
 export const useSignupLogic = () => {
   const [formData, setFormData] = useState({ username: "", email: "", password: "" });

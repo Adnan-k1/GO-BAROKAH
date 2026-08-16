@@ -6,36 +6,51 @@ import {
 } from "../../utils/otpCooldown";
 
 export const useOtpCooldown = (channel, identifier) => {
+  const normalizedIdentifier = String(identifier || "").trim();
+  const hasIdentifier = Boolean(normalizedIdentifier);
   const [cooldownSeconds, setCooldownSeconds] = useState(() =>
-    getOtpCooldownSeconds(channel, identifier),
+    hasIdentifier ? getOtpCooldownSeconds(channel, normalizedIdentifier) : 0,
   );
 
   useEffect(() => {
+    if (!hasIdentifier) return undefined;
+
     const updateCooldown = () => {
-      setCooldownSeconds(getOtpCooldownSeconds(channel, identifier));
+      setCooldownSeconds(getOtpCooldownSeconds(channel, normalizedIdentifier));
     };
 
-    updateCooldown();
+    const initialUpdateId = window.setTimeout(updateCooldown, 0);
     const intervalId = window.setInterval(updateCooldown, 1000);
 
-    return () => window.clearInterval(intervalId);
-  }, [channel, identifier]);
+    return () => {
+      window.clearTimeout(initialUpdateId);
+      window.clearInterval(intervalId);
+    };
+  }, [channel, hasIdentifier, normalizedIdentifier]);
 
   const startCooldown = useCallback(
     (seconds) => {
-      setOtpCooldown(channel, identifier, seconds);
-      setCooldownSeconds(getOtpCooldownSeconds(channel, identifier));
+      if (!hasIdentifier) return;
+
+      setOtpCooldown(channel, normalizedIdentifier, seconds);
+      setCooldownSeconds(getOtpCooldownSeconds(channel, normalizedIdentifier));
     },
-    [channel, identifier],
+    [channel, hasIdentifier, normalizedIdentifier],
   );
 
+  const clearCooldown = useCallback(() => {
+    if (!hasIdentifier) return;
+
+    clearOtpCooldown(channel, normalizedIdentifier);
+    setCooldownSeconds(0);
+  }, [channel, hasIdentifier, normalizedIdentifier]);
+
+  const visibleCooldownSeconds = hasIdentifier ? cooldownSeconds : 0;
+
   return {
-    cooldownSeconds,
-    isOnCooldown: cooldownSeconds > 0,
+    cooldownSeconds: visibleCooldownSeconds,
+    isOnCooldown: visibleCooldownSeconds > 0,
     startCooldown,
-    clearCooldown: useCallback(() => {
-      clearOtpCooldown(channel, identifier);
-      setCooldownSeconds(0);
-    }, [channel, identifier]),
+    clearCooldown,
   };
 };
