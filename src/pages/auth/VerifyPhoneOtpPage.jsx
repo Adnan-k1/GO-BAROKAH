@@ -10,11 +10,10 @@ import { useOtpCooldown } from "../../hooks/auth/useOtpCooldown";
 import {
   clearOtpInitialRequest,
   formatOtpCooldown,
-  getOtpRequestErrorMessage,
-  getRetryAfterSeconds,
   hasOtpInitialRequest,
   markOtpInitialRequest,
 } from "../../utils/otpCooldown";
+import { getOtpRequestErrorMessage, getRetryAfterSeconds } from "../../utils/otpError";
 
 const VerifyPhoneOtp = () => {
   const navigate = useNavigate();
