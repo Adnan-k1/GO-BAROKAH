@@ -4,17 +4,36 @@ import { useProfileLogic } from '../../hooks/user/useProfileLogic';
 import { User, Mail, Phone, ShieldCheck, ArrowRight } from 'lucide-react';
 import Button from '../../components/common/Button';
 import FormInput from '../../components/common/FormInput';
+import ConfirmModal from '../../components/forms/ConfirmModal';
 
 const ProfileInfoPage = () => {
   const navigate = useNavigate();
   const { user, formData, handleChange, saveProfile } = useProfileLogic();
+  const [isConfirmingPhoneChange, setIsConfirmingPhoneChange] = React.useState(false);
 
   const phoneVerified = formData?.phone_number_verified === true;
   const hasPhone = Boolean(formData?.phone);
-  const isPhoneChanged = (user?.phone_number || '') !== (formData?.phone || '');
+  const currentPhone = user?.phone_number || user?.phoneNumber || '';
+  const isPhoneChanged = currentPhone !== (formData?.phone || '');
+  const phoneChangeMessage = currentPhone
+    ? formData?.phone
+      ? 'Nomor telepon akan diubah. Nomor baru perlu diverifikasi setelah disimpan. Lanjutkan?'
+      : 'Nomor telepon akan dihapus dari profil Anda. Lanjutkan?'
+    : 'Nomor telepon akan ditambahkan ke profil Anda. Setelah disimpan, nomor tersebut perlu diverifikasi. Lanjutkan?';
 
   const handleSaveProfile = (e) => {
     e.preventDefault();
+
+    if (isPhoneChanged) {
+      setIsConfirmingPhoneChange(true);
+      return;
+    }
+
+    saveProfile();
+  };
+
+  const handleConfirmPhoneChange = () => {
+    setIsConfirmingPhoneChange(false);
     saveProfile();
   };
 
@@ -116,6 +135,16 @@ const ProfileInfoPage = () => {
           </Button>
         </div>
       </form>
+
+      <ConfirmModal
+        isOpen={isConfirmingPhoneChange}
+        onClose={() => setIsConfirmingPhoneChange(false)}
+        onConfirm={handleConfirmPhoneChange}
+        title="Konfirmasi Perubahan Nomor"
+        message={phoneChangeMessage}
+        confirmText="Ya, Simpan"
+        variant="primary"
+      />
     </div>
   );
 };

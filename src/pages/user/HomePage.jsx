@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import CategorySection from '../../components/features/CategorySection';
 import DiscountSection from '../../components/features/DiscountSection';
-import FeaturedSection from '../../components/features/FeaturedSection';
 import ProductSection from '../../components/features/ProductSection';
 import { Loader2 } from "lucide-react";
 import { useHomeLogic } from "../../hooks/user/useHomeLogic";
@@ -48,7 +47,6 @@ const HomePage = () => {
       />
       
       <DiscountSection filteredProducts={filteredProducts} />
-      <FeaturedSection filteredProducts={filteredProducts} />
       <ProductSection filteredProducts={filteredProducts} />
     </div>
   );
