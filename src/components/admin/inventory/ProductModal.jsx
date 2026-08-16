@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, ImageIcon, Plus, Check, RotateCcw, Tag, Edit2, ChevronDown } from "lucide-react";
+import { X, ImageIcon, Plus, Check, RotateCcw, Tag, Edit2, ChevronDown, ChartNoAxesColumnIncreasingIcon, XIcon } from "lucide-react";
 import Button from "../../common/Button";
 import CustomSelect from "../../common/CustomSelect";
 
@@ -183,7 +183,7 @@ const ProductModal = ({
                         <Check size={18} />
                       </button>
                       <button type="button" onClick={() => { setCatAction(null); setTempValue(""); }} className="p-3 bg-slate-100 text-slate-400 rounded-xl hover:bg-slate-200 transition-colors">
-                        <RotateCcw size={18} />
+                        <XIcon size={18} />
                       </button>
                     </>
                   ) : (
@@ -227,7 +227,7 @@ const ProductModal = ({
                         <Check size={18} />
                       </button>
                       <button type="button" onClick={() => { setTypeAction(null); setTempValue(""); }} className="p-3 bg-slate-100 text-slate-400 rounded-xl hover:bg-slate-200 transition-colors">
-                        <RotateCcw size={18} />
+                        <XIcon size={18} />
                       </button>
                     </>
                   ) : (
