@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import adminOrderService from "../../services/admin/adminOrderService";
+import toast from "react-hot-toast";
 
 export const useAdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -83,7 +84,7 @@ export const useAdminOrders = () => {
       );
     } catch (error) {
       console.error("Gagal mengupdate status:", error);
-      alert("Gagal update status pesanan. Coba lagi.");
+      toast.error("Gagal update status pesanan. Coba lagi.");
     }
   };
 

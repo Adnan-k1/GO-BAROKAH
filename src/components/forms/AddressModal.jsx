@@ -13,6 +13,7 @@ import FormInput from "../common/FormInput";
 import FormTextarea from "../common/FormTextarea";
 import Button from "../common/Button";
 import { useAuth } from "../../context/AuthContext";
+import toast from "react-hot-toast";
 
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
@@ -76,7 +77,7 @@ const AddressModal = ({
 
   const handleCurrentLocation = () => {
     if (!navigator.geolocation) {
-      alert("Browser kamu tidak support fitur GPS");
+      toast.error("Browser kamu tidak support fitur GPS");
       return;
     }
 
@@ -89,8 +90,8 @@ const AddressModal = ({
         setIsLocating(false);
       },
       (err) => {
-        console.error("Gagal dapet GPS:", err);
-        alert("Gagal ambil lokasi. Pastikan GPS nyala dan browser diizinkan akses lokasi.");
+        console.error("Gagal mendapatkan GPS:", err);
+        toast.error("Gagal ambil lokasi. Pastikan GPS nyala dan browser diizinkan akses lokasi.");
         setIsLocating(false);
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
