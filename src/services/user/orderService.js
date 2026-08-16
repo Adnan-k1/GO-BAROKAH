@@ -25,9 +25,12 @@ const orderService = {
     return response.data;
   },
 
-  calculateShippingFee: async (addressId) => {
+  calculateShippingFee: async (addressId, cartItemIds = []) => {
     const response = await api.get('/api/orders/shipping-fee', {
-      params: { address_id: addressId }
+      params: {
+        address_id: addressId,
+        cart_item_ids: cartItemIds.join(','),
+      }
     });
     return response.data;
   }

@@ -1,11 +1,20 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { KeyRound, ArrowLeft, RefreshCw, ShieldCheck } from "lucide-react";
+import { KeyRound, ArrowLeft, RefreshCw } from "lucide-react";
 import authService from "../../services/auth/authService";
 import { useAuth } from "../../context/AuthContext";
 import InputField from "../../components/common/FormInput";
 import Button from "../../components/common/Button";
 import toast from "react-hot-toast";
+import { useOtpCooldown } from "../../hooks/auth/useOtpCooldown";
+import {
+  clearOtpInitialRequest,
+  formatOtpCooldown,
+  getOtpRequestErrorMessage,
+  getRetryAfterSeconds,
+  hasOtpInitialRequest,
+  markOtpInitialRequest,
+} from "../../utils/otpCooldown";
 
 const VerifyPhoneOtp = () => {
   const navigate = useNavigate();
@@ -18,8 +27,12 @@ const VerifyPhoneOtp = () => {
   const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState(null);
   const sentRef = useRef(false);
-
-  const otpSentKey = `otp_sent_${phone}`;
+  const {
+    cooldownSeconds,
+    isOnCooldown,
+    startCooldown,
+    clearCooldown,
+  } = useOtpCooldown("phone", phone);
 
   useEffect(() => {
     if (!phone) {
@@ -30,18 +43,9 @@ const VerifyPhoneOtp = () => {
     localStorage.setItem("pendingVerificationPhone", phone);
   }, [phone, navigate]);
 
-  useEffect(() => {
-    if (phone && !sentRef.current) {
-      sentRef.current = true;
-      const alreadySent = sessionStorage.getItem(otpSentKey) === "true";
-      if (!alreadySent) {
-        handleResendOTP();
-        sessionStorage.setItem(otpSentKey, "true");
-      }
-    }
-  }, [phone]);
+  const handleResendOTP = useCallback(async () => {
+    if (isOnCooldown) return;
 
-  const handleResendOTP = async () => {
     setIsResending(true);
     setError(null);
     try {
@@ -50,18 +54,32 @@ const VerifyPhoneOtp = () => {
         {
           loading: 'Mengirim kode ke WhatsApp...',
           success: 'Kode OTP telah dikirim ke WhatsApp!',
-          error: (err) => err.response?.data?.message || 'Gagal mengirim kode OTP.',
+          error: (err) => getOtpRequestErrorMessage(err, 'Gagal mengirim kode OTP.'),
         },
         {
           success: { style: { background: '#2D5A43', color: '#fff' } },
         }
       );
+      startCooldown(60);
     } catch (err) {
-      setError(err.response?.data?.message || 'Gagal mengirim kode OTP.');
+      if (err.response?.status === 429) {
+        startCooldown(getRetryAfterSeconds(err));
+      }
+      setError(getOtpRequestErrorMessage(err, 'Gagal mengirim kode OTP.'));
     } finally {
       setIsResending(false);
     }
-  };
+  }, [isOnCooldown, startCooldown]);
+
+  useEffect(() => {
+    if (phone && !sentRef.current) {
+      sentRef.current = true;
+      if (!isOnCooldown && !hasOtpInitialRequest("phone", phone)) {
+        markOtpInitialRequest("phone", phone);
+        handleResendOTP();
+      }
+    }
+  }, [phone, isOnCooldown, handleResendOTP]);
 
   const handleVerify = async (e) => {
     e.preventDefault();
@@ -71,7 +89,8 @@ const VerifyPhoneOtp = () => {
     try {
       await authService.verifyPhoneOTP(otp);
       localStorage.removeItem("pendingVerificationPhone");
-      sessionStorage.removeItem(otpSentKey);
+      clearOtpInitialRequest("phone", phone);
+      clearCooldown();
       updateUser({ ...user, phone_number_verified: true });
       toast.success("Nomor Telepon Berhasil Diverifikasi!", {
         style: { background: "#2D5A43", color: "#fff" },
@@ -142,11 +161,15 @@ const VerifyPhoneOtp = () => {
             <button
               type="button"
               onClick={handleResendOTP}
-              disabled={isResending}
-              className={`text-[#2D5A43] hover:underline ml-1 font-black inline-flex items-center gap-1 ${isResending ? "opacity-50 cursor-not-allowed" : ""}`}
+              disabled={isResending || isOnCooldown}
+              className={`text-[#2D5A43] hover:underline ml-1 font-black inline-flex items-center gap-1 ${isResending || isOnCooldown ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               {isResending ? <RefreshCw size={12} className="animate-spin" /> : null}
-              {isResending ? "MENGIRIM..." : "KIRIM ULANG"}
+              {isResending
+                ? "MENGIRIM..."
+                : isOnCooldown
+                  ? `TUNGGU ${formatOtpCooldown(cooldownSeconds)}`
+                  : "KIRIM ULANG"}
             </button>
           </p>
         </div>

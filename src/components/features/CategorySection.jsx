@@ -111,7 +111,7 @@ const CategorySection = ({
               }`}
             >
               <p
-                className={`font-black uppercase text-[10px] md:text-xs tracking-widest whitespace-nowrap transition-colors ${
+                className={`font-black text-[10px] md:text-xs tracking-widest whitespace-nowrap transition-colors ${
                   activeFilters.includes(cat)
                     ? "text-white"
                     : "text-gray-500"

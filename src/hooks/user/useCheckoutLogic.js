@@ -1,12 +1,19 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext'; 
 import { addressService } from '../../services/user/addressService'; 
 import orderService from '../../services/user/orderService'; 
 import { formatIDR } from '../../utils/formatCurrency';
+import toast from 'react-hot-toast';
 
 export const useCheckoutLogic = () => {
-  const { cartItems, cartSummary } = useCart();
+  const {
+    cartItems,
+    selectedCartItemIds,
+    isSelectionHydrated,
+    isLoading: isCartLoading,
+    updateQuantity,
+  } = useCart();
   const { user } = useAuth(); 
   
   const [isPickup, setIsPickup] = useState(false);
@@ -17,7 +24,16 @@ export const useCheckoutLogic = () => {
   const [rawTotal, setRawTotal] = useState(0);
   const [isLoadingShipping, setIsLoadingShipping] = useState(false);
 
-  const rawSubtotal = cartSummary?.grand_total ?? cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const selectedItems = useMemo(
+    () => cartItems.filter((item) =>
+      selectedCartItemIds.some((id) => String(id) === String(item.cartItemId)),
+    ),
+    [cartItems, selectedCartItemIds],
+  );
+  const rawSubtotal = selectedItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0,
+  );
 
   useEffect(() => {
     if (user && user.username) {
@@ -50,7 +66,11 @@ export const useCheckoutLogic = () => {
     }
   }, [isPickup, rawSubtotal]);
 
-  const hitungOngkir = useCallback(async (addressId, isMounted = { current: true }) => {
+  const hitungOngkir = useCallback(async (
+    addressId,
+    isMounted = { current: true },
+    cartItemIds = selectedCartItemIds,
+  ) => {
     if (!addressId || isPickup) {
       setRawShipping(0);
       setRawTotal(rawSubtotal);
@@ -59,26 +79,41 @@ export const useCheckoutLogic = () => {
 
     try {
       setIsLoadingShipping(true);
-      const response = await orderService.calculateShippingFee(addressId);
+      const response = await orderService.calculateShippingFee(addressId, cartItemIds);
       if (!isMounted.current) return;
       
-      if (response && response.data) {
-        setRawShipping(response.data.shippingFee);
-        setRawTotal(response.data.grandTotal);
+      const shippingData = response?.data?.data || response?.data || response || {};
+      const shippingFee = shippingData.shippingFee ?? shippingData.shipping_fee;
+      const grandTotal = shippingData.grandTotal ?? shippingData.grand_total;
+
+      if (shippingFee !== undefined && grandTotal !== undefined) {
+        setRawShipping(Number(shippingFee) || 0);
+        setRawTotal(Number(grandTotal) || rawSubtotal);
+      } else {
+        throw new Error('Response ongkir tidak memiliki shippingFee atau grandTotal');
       }
     } catch (error) {
       if (isMounted.current) {
         console.error("Gagal kalkulasi ongkos kirim:", error);
         setRawShipping(0);
         setRawTotal(rawSubtotal);
+        const errorMessage = error.response?.data?.message || "";
+        if (errorMessage.toLowerCase() !== "jumlah pesanan tidak valid") {
+          toast.error(errorMessage || "Gagal menghitung ongkos kirim");
+        }
       }
     } finally {
       if (isMounted.current) setIsLoadingShipping(false);
     }
-  }, [isPickup, rawSubtotal]);
+  }, [isPickup, rawSubtotal, selectedCartItemIds]);
 
   return {
     cartItems,
+    selectedItems,
+    selectedCartItemIds,
+    isSelectionHydrated,
+    updateQuantity,
+    isCartLoading,
     isPickup,         
     setIsPickup,      
     namaPenerima, 

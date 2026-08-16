@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowRight, AlertCircle } from "lucide-react"; 
+import { ArrowRight } from "lucide-react";
 
 const OrderSummary = ({ total, normalSubtotal, discountTotal, totalQuantity, hasDiscount, onCheckout }) => {
   

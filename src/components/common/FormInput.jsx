@@ -10,6 +10,7 @@ const FormInput = ({
   rightIcon,
   className = "",
   variant = "default", 
+  required = false,
   ...props
 }) => {
 
@@ -23,6 +24,7 @@ const FormInput = ({
       {label && (
         <label className="text-xs font-semibold text-gray-500 mb-1">
           {label}
+          {required && <span className="text-red-500 ml-1" aria-hidden="true">*</span>}
         </label>
       )}
 
@@ -38,6 +40,7 @@ const FormInput = ({
           name={name}
           value={value ?? ''}
           onChange={onChange}
+          required={required}
           className={`
             w-full px-4 py-2 rounded-lg border outline-none transition
             ${icon ? 'pl-10' : ''}

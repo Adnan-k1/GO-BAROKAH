@@ -5,9 +5,9 @@ import { useCart } from '../../context/CartContext';
 
 export const usePaymentLogic = () => {
   const [loading, setLoading] = useState(false);
-  const { loadCart } = useCart(); 
+  const { loadCart, clearSelectedCartItems } = useCart();
 
-  const processOrder = async (orderData, isPickup, navigate) => {
+  const processOrder = async (orderData, isPickup, selectedCartItemIds, navigate) => {
     try {
       setLoading(true);
       
@@ -15,29 +15,37 @@ export const usePaymentLogic = () => {
 
       if (isPickup) {
         const payloadPickup = {
+          cart_item_ids: selectedCartItemIds,
           notes: orderData.notes 
         };
         response = await orderService.createPickupOrder(payloadPickup);
       } else {
         const payloadDelivery = {
           notes: orderData.notes,
-          address_id: Number(orderData.address_id) 
+          address_id: Number(orderData.address_id),
+          cart_item_ids: selectedCartItemIds,
         };
         response = await orderService.createDeliveryOrder(payloadDelivery);
       }
-      
-      await loadCart();
 
       const orderId = response?.data?.id || response?.data?.data?.id || response?.id;
+      const createdOrder = response?.data?.data || response?.data || response;
 
       if (orderId) {
         if (isPickup) {
+          clearSelectedCartItems();
           navigate('/order-success', {
             replace: true,
-            state: { order: response?.data?.data || response?.data || response }
+            state: { order: createdOrder }
+          });
+          loadCart().catch((error) => {
+            console.error("Gagal menyinkronkan keranjang setelah pickup:", error);
           });
           return;
         }
+
+        await loadCart();
+        clearSelectedCartItems();
 
         const paymentRes = await orderService.payOrder(orderId);
         
@@ -50,9 +58,12 @@ export const usePaymentLogic = () => {
         }
       }
 
+      await loadCart();
+      clearSelectedCartItems();
+
       navigate('/order-success', {
         replace: true,
-        state: { order: response?.data || response }
+        state: { order: createdOrder }
       });
 
     } catch (error) {

@@ -3,12 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import authService from '../../services/auth/authService';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
+import { useOtpCooldown } from './useOtpCooldown';
+import {
+  formatOtpCooldown,
+  getOtpRequestErrorMessage,
+  getRetryAfterSeconds,
+} from '../../utils/otpCooldown';
 
 export const useSignupLogic = () => {
   const [formData, setFormData] = useState({ username: "", email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const {
+    cooldownSeconds,
+    isOnCooldown,
+    startCooldown,
+  } = useOtpCooldown('email', formData.email);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,6 +29,12 @@ export const useSignupLogic = () => {
 
  const handleSignUp = async (e) => {
     e.preventDefault();
+
+    if (isOnCooldown) {
+      toast.error(`Silakan tunggu ${formatOtpCooldown(cooldownSeconds)} sebelum meminta OTP lagi.`);
+      return;
+    }
+
     setIsLoading(true);
     try {
       const payload = {
@@ -26,12 +43,17 @@ export const useSignupLogic = () => {
         password: formData.password
       };
       
-      await authService.register(payload); 
+      await authService.register(payload);
+      startCooldown(60);
       toast.success('Pendaftaran berhasil! Cek email untuk kode OTP.');
       localStorage.setItem('pendingVerificationEmail', formData.email);
       navigate("/verify-email", { state: { email: formData.email } });
     } catch (error) {
-      const msg = error.response?.data?.message || "Gagal mendaftar";
+      if (error.response?.status === 429) {
+        startCooldown(getRetryAfterSeconds(error));
+      }
+
+      const msg = getOtpRequestErrorMessage(error, "Gagal mendaftar");
       toast.error(msg);
     } finally {
       setIsLoading(false);
@@ -67,5 +89,15 @@ export const useSignupLogic = () => {
     }
   };
 
-  return { formData, isLoading, showPassword, handleChange, handleSignUp, togglePassword, handleGoogleSuccess };
+  return {
+    formData,
+    isLoading,
+    showPassword,
+    cooldownSeconds,
+    isOnCooldown,
+    handleChange,
+    handleSignUp,
+    togglePassword,
+    handleGoogleSuccess,
+  };
 };

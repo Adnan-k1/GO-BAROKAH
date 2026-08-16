@@ -1,24 +1,29 @@
-import React, { useState, useEffect } from "react"; 
+import React, { useState, useEffect, useRef } from "react";
 import { useCheckoutLogic } from "../../hooks/user/useCheckoutLogic";
 import { usePaymentLogic } from "../../hooks/user/usePaymentLogic";
 import { 
   Truck, Store, ChevronLeft, ArrowRight, Info, FileText, 
-  Loader2, Package 
+  Loader2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { addressService } from "../../services/user/addressService"; 
+import { addressService } from "../../services/user/addressService";
+import toast from "react-hot-toast";
 
-import CustomAddressSelector from "../../components/forms/CustomAddressSelector"; 
+import CustomAddressSelector from "../../components/forms/CustomAddressSelector";
+import CheckoutProductItem from "../../components/features/cart/CheckoutProductItem";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
   
   const {
-    cartItems, subtotal, shippingFee, total,
+    selectedItems, selectedCartItemIds, subtotal, shippingFee, total,
+    isSelectionHydrated,
     isPickup, setIsPickup,
     alamatDetail, setAlamatDetail,
     hitungOngkir,
-    isLoadingShipping
+    isLoadingShipping,
+    isCartLoading,
+    updateQuantity,
   } = useCheckoutLogic();
 
   const { processOrder, loading } = usePaymentLogic();
@@ -26,6 +31,17 @@ const CheckoutPage = () => {
   const [userAddresses, setUserAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState("");
   const [orderNotes, setOrderNotes] = useState("");
+  const [updatingItemId, setUpdatingItemId] = useState(null);
+  const hasRedirectedRef = useRef(false);
+
+  useEffect(() => {
+    if (isCartLoading || !isSelectionHydrated || hasRedirectedRef.current) return;
+    if (selectedCartItemIds.length === 0) {
+      hasRedirectedRef.current = true;
+      toast.error("Pilih barang dulu sebelum checkout");
+      navigate("/cart", { replace: true });
+    }
+  }, [isCartLoading, isSelectionHydrated, navigate, selectedCartItemIds.length]);
 
   useEffect(() => {
     const fetchUserAddresses = async () => {
@@ -54,25 +70,26 @@ const CheckoutPage = () => {
   useEffect(() => {
     const isMounted = { current: true };
     if (!isPickup && selectedAddressId) {
-      hitungOngkir(selectedAddressId, isMounted);
+      hitungOngkir(selectedAddressId, isMounted, selectedCartItemIds);
     }
     return () => { isMounted.current = false; };
-  }, [selectedAddressId, isPickup, hitungOngkir]);
+  }, [selectedAddressId, isPickup, hitungOngkir, selectedCartItemIds]);
 
   const [invalidItems, setInvalidItems] = useState([]);
 
   useEffect(() => {
-    if (isPickup || !cartItems || cartItems.length === 0) {
+    if (isPickup || selectedItems.length === 0) {
       setInvalidItems([]);
       return;
     }
+
+    let isActive = true;
 
     const fetchAndValidate = async () => {
       try {
         const res = await import('../../services/user/productService').then(m => m.productService.getAllProducts());
         const products = res?.data?.data || res?.data || res || [];
-
-        const invalid = cartItems.filter(item => {
+        const invalid = selectedItems.filter(item => {
           const prod = products.find(p => String(p.id || p._id) === String(item.id));
           const minQty = prod?.min_order_quantity || item.min_order_quantity || 1;
           const qty = item.qty || item.quantity;
@@ -82,17 +99,28 @@ const CheckoutPage = () => {
           return { ...item, min_order_quantity: prod?.min_order_quantity || item.min_order_quantity || 1 };
         });
 
-        setInvalidItems(invalid);
+        if (isActive) setInvalidItems(invalid);
       } catch (err) {
         console.error("Gagal validasi min order:", err);
-        setInvalidItems([]);
+        if (isActive) setInvalidItems([]);
       }
     };
 
     fetchAndValidate();
-  }, [isPickup, cartItems]);
+    return () => {
+      isActive = false;
+    };
+  }, [isPickup, selectedItems]);
 
-  const isFormValid = (isPickup || selectedAddressId) && invalidItems.length === 0;
+  const isFormValid = selectedItems.length > 0 && (isPickup || selectedAddressId) && invalidItems.length === 0;
+
+  if (isCartLoading || !isSelectionHydrated || selectedItems.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FBFBFB]">
+        <Loader2 className="w-8 h-8 text-[#2D5A43] animate-spin" />
+      </div>
+    );
+  }
 
   const handleConfirmOrder = () => {
     const orderData = {};
@@ -105,40 +133,33 @@ const CheckoutPage = () => {
       orderData.address_id = Number(selectedAddressId);
     }
 
-    processOrder(orderData, isPickup, navigate);
+    processOrder(orderData, isPickup, selectedCartItemIds, navigate);
   };
 
   const displayTotal = isPickup ? subtotal : selectedAddressId ? total : subtotal;
 
-  const formatItemPrice = (price) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(price || 0);
+  const handleQuantityChange = async (item, nextQuantity) => {
+    if (nextQuantity < 1) return;
+
+    setUpdatingItemId(item.cartItemId);
+    try {
+      await updateQuantity(item.id, nextQuantity);
+    } finally {
+      setUpdatingItemId(null);
+    }
   };
 
   const renderOrderItems = () => (
     <div className="space-y-4 max-h-[320px] overflow-y-auto custom-scrollbar pr-2">
-      {cartItems?.map((item, index) => (
-        <div key={index} className="flex gap-3 items-center pb-3 border-b border-gray-50 last:border-0 last:pb-0">
-          <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex-shrink-0 flex items-center justify-center overflow-hidden">
-            {item.image || item.productImageUrl || item.image_url ? (
-              <img src={item.image || item.productImageUrl || item.image_url} alt={item.name || item.productName} className="w-full h-full object-cover" />
-            ) : (
-              <Package size={20} className="text-gray-300" />
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="text-[11px] font-black text-gray-900 truncate">{item.name || item.productName}</h4>
-            <p className="text-[9px] font-bold text-gray-400 mt-0.5">
-              {item.qty || item.quantity} x {formatItemPrice(item.price || item.unitPrice)}
-            </p>
-          </div>
-          <div className="text-[11px] font-black text-[#2D5A43] shrink-0">
-            {formatItemPrice((item.qty || item.quantity) * (item.price || item.unitPrice))}
-          </div>
-        </div>
+      {selectedItems.map((item) => (
+        <CheckoutProductItem
+          key={item.cartItemId}
+          item={item}
+          isUpdating={updatingItemId === item.cartItemId}
+          onDecrease={() => handleQuantityChange(item, item.quantity - 1)}
+          onIncrease={() => handleQuantityChange(item, item.quantity + 1)}
+          onQuantityChange={(quantity) => handleQuantityChange(item, quantity)}
+        />
       ))}
     </div>
   );
@@ -209,7 +230,7 @@ const CheckoutPage = () => {
               )}
               
               <div className="pt-2 border-t border-dashed border-gray-200 space-y-2.5 mt-2">
-                <label className="flex items-center gap-1.5 text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                <label className="flex items-center gap-1.5 text-[9px] font-black text-gray-400 tracking-[0.2em]">
                   <FileText size={11} className="text-[#2D5A43]" /> Catatan Pesanan <span className="lowercase text-gray-300 tracking-normal font-medium">(Opsional)</span>
                 </label>
                 <textarea

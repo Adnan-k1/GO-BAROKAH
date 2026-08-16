@@ -12,13 +12,42 @@ import { buildImageUrl } from "../utils/imageUrl";
 import toast from "react-hot-toast";
 
 const CartContext = createContext();
+const getCartSelectionKey = (user) => {
+  const userKey = user?.id || user?._id || user?.email;
+  return userKey ? `cart_selection_${userKey}` : null;
+};
+
+const readCartSelection = (storageKey) => {
+  if (!storageKey) return [];
+  try {
+    const storedSelection = sessionStorage.getItem(storageKey);
+    const parsedSelection = storedSelection ? JSON.parse(storedSelection) : [];
+    return Array.isArray(parsedSelection) ? parsedSelection : [];
+  } catch {
+    return [];
+  }
+};
 
 export const CartProvider = ({ children }) => {
   const { user } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [cartSummary, setCartSummary] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedCartItemIds, setSelectedCartItemIds] = useState([]);
+  const [isSelectionHydrated, setIsSelectionHydrated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [allProducts, setAllProducts] = useState([]);
+  const selectionStorageKey = getCartSelectionKey(user);
+
+  useEffect(() => {
+    setIsSelectionHydrated(false);
+    setSelectedCartItemIds(readCartSelection(selectionStorageKey));
+    setIsSelectionHydrated(true);
+  }, [selectionStorageKey]);
+
+  useEffect(() => {
+    if (!isSelectionHydrated || !selectionStorageKey) return;
+    sessionStorage.setItem(selectionStorageKey, JSON.stringify(selectedCartItemIds));
+  }, [isSelectionHydrated, selectedCartItemIds, selectionStorageKey]);
   
   useEffect(() => {
     productService.getAllProducts()
@@ -65,7 +94,15 @@ export const CartProvider = ({ children }) => {
     });
 
   const syncCart = (data) => {
-    if (data?.items) setCartItems(mapItems(data.items));
+    if (Array.isArray(data?.items)) {
+      const nextItems = mapItems(data.items);
+      setCartItems(nextItems);
+      setSelectedCartItemIds((previousIds) =>
+        previousIds.filter((selectedId) =>
+          nextItems.some((item) => String(item.cartItemId) === String(selectedId)),
+        ),
+      );
+    }
     if (data?.summary) setCartSummary(data.summary);
   };
 
@@ -89,6 +126,8 @@ export const CartProvider = ({ children }) => {
     } else {
       setCartItems([]);
       setCartSummary(null);
+      setSelectedCartItemIds([]);
+      setIsLoading(false);
     }
   }, [user]);
 
@@ -159,22 +198,42 @@ export const CartProvider = ({ children }) => {
       await cartService.clearCart();
       setCartItems([]);
       setCartSummary(null);
+      setSelectedCartItemIds([]);
     } catch {
       toast.error("Gagal mengosongkan keranjang");
     }
   };
+
+  const toggleCartItemSelection = (cartItemId) => {
+    setSelectedCartItemIds((previousIds) =>
+      previousIds.some((id) => String(id) === String(cartItemId))
+        ? previousIds.filter((id) => String(id) !== String(cartItemId))
+        : [...previousIds, cartItemId],
+    );
+  };
+
+  const selectAllCartItems = () => {
+    setSelectedCartItemIds(cartItems.map((item) => item.cartItemId));
+  };
+
+  const clearSelectedCartItems = () => setSelectedCartItemIds([]);
 
   return (
     <CartContext.Provider
       value={{
         cartItems,
         cartSummary,
+        selectedCartItemIds,
+        isSelectionHydrated,
         isLoading,
         addToCart,
         removeFromCart,
         removeItem,
         updateQuantity,
         clearCart,
+        toggleCartItemSelection,
+        selectAllCartItems,
+        clearSelectedCartItems,
         totalItems: cartItems.length,
         totalQuantity: cartItems.reduce((acc, item) => acc + item.quantity, 0),
         loadCart,

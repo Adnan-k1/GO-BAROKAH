@@ -8,6 +8,7 @@ const FormTextarea = ({
   placeholder,
   className = "",
   variant = "default",
+  required = false,
   ...props
 }) => {
   const variants = {
@@ -20,6 +21,7 @@ const FormTextarea = ({
       {label && (
         <label className="text-xs font-semibold text-gray-500 mb-1">
           {label}
+          {required && <span className="text-red-500 ml-1" aria-hidden="true">*</span>}
         </label>
       )}
       <textarea
@@ -27,6 +29,7 @@ const FormTextarea = ({
         value={value ?? ''}
         onChange={onChange}
         placeholder={placeholder}
+        required={required}
         className={`
           w-full px-4 py-3 rounded-xl border outline-none transition min-h-[100px] text-sm
           ${variants[variant]}

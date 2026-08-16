@@ -110,7 +110,7 @@ const ExpenseModal = ({
         <div className="p-6 overflow-visible">
           <form id="expense-form" onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Kategori</label>
+              <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Kategori <span className="text-red-500" aria-hidden="true">*</span></label>
               <CustomSelect
                 name="category"
                 value={form.category}
@@ -122,7 +122,7 @@ const ExpenseModal = ({
             </div>
 
             <div>
-              <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Deskripsi</label>
+              <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Deskripsi <span className="text-red-500" aria-hidden="true">*</span></label>
               <textarea
                 name="description"
                 value={form.description}
@@ -136,7 +136,7 @@ const ExpenseModal = ({
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Nominal</label>
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Nominal <span className="text-red-500" aria-hidden="true">*</span></label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400">Rp</span>
                   <input
@@ -152,7 +152,7 @@ const ExpenseModal = ({
                 </div>
               </div>
               <div>
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Tanggal</label>
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Tanggal <span className="text-red-500" aria-hidden="true">*</span></label>
                 <div className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-all">
                   <DatePicker
                     value={form.date}

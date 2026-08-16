@@ -8,6 +8,8 @@ const Spinner = () => (
 
 const CartItem = ({
   item,
+  isSelected,
+  onToggleSelection,
   isDeleting,
   onIncrement,
   onDecrement,
@@ -58,7 +60,14 @@ const CartItem = ({
   const originalPrice = item.original_price;
 
   return (
-    <div className={`relative flex gap-3 md:gap-5 py-4 px-2 md:px-4 mb-2 border border-transparent hover:border-gray-100 hover:bg-gray-50/50 rounded-2xl transition-all duration-300 group ${isDeleting ? "opacity-50 scale-[0.98]" : "opacity-100"}`}>
+    <div className={`relative flex items-center gap-3 md:gap-5 py-4 px-2 md:px-4 mb-2 border border-transparent hover:border-gray-100 hover:bg-gray-50/50 rounded-2xl transition-all duration-300 group ${isDeleting ? "opacity-50 scale-[0.98]" : "opacity-100"}`}>
+      <input
+        type="checkbox"
+        checked={isSelected}
+        onChange={() => onToggleSelection(item.cartItemId)}
+        aria-label={`Pilih ${item.name}`}
+        className="w-4 h-4 shrink-0 accent-[#2D5A43] cursor-pointer"
+      />
       <div className="w-[80px] h-[80px] md:w-[96px] md:h-[96px] rounded-xl border border-gray-200/80 overflow-hidden shrink-0 shadow-sm relative group-hover:shadow-md transition-all duration-300">
         <img
           src={item.image_url || item.image}
