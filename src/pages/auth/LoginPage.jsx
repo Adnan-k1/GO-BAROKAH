@@ -82,26 +82,19 @@ const LoginPage = () => {
             placeholder="example@gmail.com" 
             value={formData.email} 
             onChange={handleChange} 
-            required
+            required={null}
           />
           
           <div className="space-y-1">
-            <div className="flex justify-between items-center px-1">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
-                Password
-              </label>
-              <Link to="/forgot-password" size={14} className="text-[10px] font-black text-[#2D5A43] hover:underline uppercase tracking-widest">
-                Lupa?
-              </Link>
-            </div>
             <InputField 
+              label="Password"
               icon={<Lock size={18} />} 
               type={showPassword ? "text" : "password"} 
               name="password"
               placeholder="••••••••" 
               value={formData.password} 
               onChange={handleChange} 
-              required
+              required={null}
               rightIcon={
                 <button
                   type="button"

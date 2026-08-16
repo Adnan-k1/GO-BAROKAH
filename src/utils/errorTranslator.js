@@ -36,6 +36,8 @@ const errorDictionary = {
   "OTP verification failed": "Verifikasi OTP gagal",
   "Failed to send OTP code": "Gagal mengirim kode OTP",
   "Failed to send OTP": "Gagal mengirim kode OTP",
+  "Please wait before requesting another OTP": "Silakan tunggu sebelum meminta OTP lagi",
+  "OTP service is temporarily unavailable": "Layanan OTP sedang tidak tersedia",
 
   "Category not found": "Kategori tidak ditemukan",
   "Category already exists": "Kategori sudah ada",
@@ -96,6 +98,13 @@ const keywordMap = [
 
 export const translateError = (message) => {
   if (!message || typeof message !== "string") return message;
+
+  const criticalStockMatch = message.match(
+    /^(.+?)\s+stock would fall below critical level after this purchase$/i,
+  );
+  if (criticalStockMatch) {
+    return `Produk ${criticalStockMatch[1]} tidak bisa dibeli dalam jumlah tersebut. Silakan kurangi jumlahnya atau pilih produk lain`;
+  }
 
   if (errorDictionary[message]) return errorDictionary[message];
 

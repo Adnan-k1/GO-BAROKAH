@@ -163,18 +163,18 @@ const ProductModal = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               
               <div className={`md:col-span-2 transition-all duration-500 delay-[150ms] ${animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-                <label className={labelClass}>Nama Produk</label>
+                <label className={labelClass}>Nama Produk <span className="text-red-500" aria-hidden="true">*</span></label>
                 <input required name="name" type="text" value={form.name} onChange={handleChange} className={inputClass} placeholder="Contoh: Kurma Ajwa" />
               </div>
               
               <div className={`md:col-span-2 transition-all duration-500 delay-[200ms] ${animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-                <label className={labelClass}>Deskripsi Singkat</label>
+                <label className={labelClass}>Deskripsi Singkat <span className="text-red-500" aria-hidden="true">*</span></label>
                 <textarea required name="description" rows={2} value={form.description} onChange={handleChange} className={`${inputClass} resize-none`} placeholder="Detail produk..." />
               </div>
               
               {/* KOLOM KATEGORI */}
               <div className={`transition-all duration-500 delay-[250ms] relative z-50 ${animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-                <label className={labelClass}>Kategori</label>
+                <label className={labelClass}>Kategori <span className="text-red-500" aria-hidden="true">*</span></label>
                 <div className="flex gap-2">
                   {catAction ? (
                     <>
@@ -218,7 +218,7 @@ const ProductModal = ({
               
               {/* KOLOM SATUAN */}
               <div className={`transition-all duration-500 delay-[300ms] relative z-40 ${animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-                <label className={labelClass}>Satuan</label>
+                <label className={labelClass}>Satuan <span className="text-red-500" aria-hidden="true">*</span></label>
                 <div className="flex gap-2">
                   {typeAction ? (
                     <>
@@ -261,7 +261,7 @@ const ProductModal = ({
               </div>
               
               <div className={`md:col-span-2 transition-all duration-500 delay-[350ms] ${animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-                <label className={labelClass}>Upload Gambar Produk</label>
+                <label className={labelClass}>Upload Gambar Produk <span className="text-red-500" aria-hidden="true">*</span></label>
                 <div className="relative group">
                   <div className={`w-full h-40 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center transition-all ${form.image ? "border-emerald-500 bg-emerald-50" : "border-slate-200 bg-slate-50 hover:border-emerald-300 hover:bg-emerald-50/30"}`}>
                     {form.image ? (
@@ -287,22 +287,22 @@ const ProductModal = ({
               </div>
               
               <div className={`transition-all duration-500 delay-[400ms] ${animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-                <label className={labelClass}>Stok Barang</label>
+                <label className={labelClass}>Stok Barang <span className="text-red-500" aria-hidden="true">*</span></label>
                 <input required name="stock" type="number" value={form.stock} onChange={handleChange} className={inputClass} />
               </div>
 
               <div className={`transition-all duration-500 delay-[410ms] ${animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-                <label className={labelClass}>Batas Stok Kritis</label>
+                <label className={labelClass}>Batas Stok Kritis <span className="text-red-500" aria-hidden="true">*</span></label>
                 <input required name="critical_stock" type="number" min="0" value={form.critical_stock} onChange={handleChange} className={inputClass} />
               </div>
 
               <div className={`transition-all duration-500 delay-[420ms] ${animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-                <label className={labelClass}>Min. Pesanan</label>
+                <label className={labelClass}>Min. Pesanan <span className="text-red-500" aria-hidden="true">*</span></label>
                 <input required name="min_order_quantity" type="number" min="1" value={form.min_order_quantity} onChange={handleChange} className={inputClass} />
               </div>
               
               <div className={`transition-all duration-500 delay-[425ms] ${animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-                <label className={labelClass}>Harga Pokok / Modal</label>
+                <label className={labelClass}>Harga Pokok / Modal <span className="text-red-500" aria-hidden="true">*</span></label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400">Rp</span>
                   <input required name="cost" type="text" value={form.cost ? form.cost.toLocaleString("id-ID") : ""} onChange={handleCurrencyChange} className={`${inputClass} pl-10`} placeholder="0" />
@@ -310,7 +310,7 @@ const ProductModal = ({
               </div>
               
               <div className={`transition-all duration-500 delay-[450ms] ${animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-                <label className={labelClass}>Harga Jual</label>
+                <label className={labelClass}>Harga Jual <span className="text-red-500" aria-hidden="true">*</span></label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400">Rp</span>
                   <input required name="price" type="text" value={form.price ? form.price.toLocaleString("id-ID") : ""} onChange={handleCurrencyChange} className={`${inputClass} pl-10`} placeholder="0" />

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useCart } from "../../context/CartContext";
 import { formatIDR } from "../../utils/formatCurrency";
 import toast from "react-hot-toast";
@@ -5,13 +6,15 @@ import toast from "react-hot-toast";
 export const useCartLogic = () => {
   const {
     cartItems,
-    cartSummary,
+    selectedCartItemIds,
+    toggleCartItemSelection,
+    selectAllCartItems,
+    clearSelectedCartItems,
     addToCart,
     removeFromCart,
     removeItem,
     clearCart,
     updateQuantity,
-    totalQuantity,
   } = useCart();
 
   const handleIncrement = (item) => addToCart(item);
@@ -23,37 +26,46 @@ export const useCartLogic = () => {
     toast.success("Item dihapus dari keranjang");
   };
 
-  const normalSubtotal =
-    cartSummary?.normal_subtotal ??
-    cartItems.reduce(
-      (acc, item) => acc + (item.original_price || item.price) * item.quantity,
-      0,
-    );
-
-  const discountTotal = cartSummary?.discount_total ?? 0;
-
-  const subtotalAfterDiscount =
-    cartSummary?.subtotal ??
-    cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-
-  const grandTotal = cartSummary?.grand_total ?? subtotalAfterDiscount; 
-
-  const hasDiscount = discountTotal > 0;
+  const selectedItems = useMemo(
+    () => cartItems.filter((item) =>
+      selectedCartItemIds.some((id) => String(id) === String(item.cartItemId)),
+    ),
+    [cartItems, selectedCartItemIds],
+  );
+  const selectedNormalSubtotal = selectedItems.reduce(
+    (acc, item) => acc + (item.original_price || item.price) * item.quantity,
+    0,
+  );
+  const selectedSubtotal = selectedItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0,
+  );
+  const selectedDiscountTotal = selectedNormalSubtotal - selectedSubtotal;
+  const selectedTotalQuantity = selectedItems.reduce(
+    (acc, item) => acc + item.quantity,
+    0,
+  );
+  const hasDiscount = selectedDiscountTotal > 0;
 
   return {
     cartItems,
-    cartSummary,
-    totalQuantity,
-    subtotal: formatIDR(subtotalAfterDiscount),
-    total: formatIDR(grandTotal), 
-    normalSubtotal: formatIDR(normalSubtotal),
-    discountTotal: formatIDR(discountTotal),
+    selectedItems,
+    selectedCartItemIds,
+    selectedTotalQuantity,
+    subtotal: formatIDR(selectedSubtotal),
+    total: formatIDR(selectedSubtotal),
+    normalSubtotal: formatIDR(selectedNormalSubtotal),
+    discountTotal: formatIDR(selectedDiscountTotal),
     hasDiscount,
     handleIncrement,
     handleDecrement,
     handleQuantityChange,
     handleRemove,
     clearCart,
+    toggleCartItemSelection,
+    selectAllCartItems,
+    clearSelectedCartItems,
+    hasSelectedItems: selectedCartItemIds.length > 0,
     isEmpty: cartItems.length === 0,
   };
 };

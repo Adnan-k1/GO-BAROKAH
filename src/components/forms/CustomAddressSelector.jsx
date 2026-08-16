@@ -32,8 +32,8 @@ const CustomAddressSelector = ({
 
   return (
     <div className="space-y-3">
-      <label className="flex items-center gap-1.5 text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">
-        <MapPin size={11} className="text-[#2D5A43]" /> Pilih Alamat Terdaftar
+      <label className="flex items-center gap-1.5 text-[9px] font-black text-gray-400 tracking-[0.2em]">
+        <MapPin size={11} className="text-[#2D5A43]" /> Pilih Alamat Terdaftar <span className="text-red-500" aria-hidden="true">*</span>
       </label>
       
       <div className="relative" ref={dropdownRef}>

@@ -12,6 +12,7 @@ import L from "leaflet";
 import FormInput from "../common/FormInput";
 import FormTextarea from "../common/FormTextarea";
 import Button from "../common/Button";
+import { useAuth } from "../../context/AuthContext";
 
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
@@ -38,6 +39,7 @@ const AddressModal = ({
   const [shouldRender, setShouldRender] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (isOpen) {
@@ -74,7 +76,7 @@ const AddressModal = ({
 
   const handleCurrentLocation = () => {
     if (!navigator.geolocation) {
-      alert("Browser kamu nggak support fitur GPS bro.");
+      alert("Browser kamu tidak support fitur GPS");
       return;
     }
 
@@ -88,7 +90,7 @@ const AddressModal = ({
       },
       (err) => {
         console.error("Gagal dapet GPS:", err);
-        alert("Gagal ambil lokasi. Pastiin GPS nyala dan browser diijinin akses lokasi ya.");
+        alert("Gagal ambil lokasi. Pastikan GPS nyala dan browser diizinkan akses lokasi.");
         setIsLocating(false);
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
@@ -122,6 +124,14 @@ const AddressModal = ({
       map.setView([lat, lng], 18);
     }, [lat, lng]);
     return null;
+  };
+
+  const handleUseMyPhone = () => {
+    const userPhone = user?.phone_number || user?.phoneNumber || "";
+    if (userPhone) {
+      const normalized = userPhone.replace(/\D/g, "");
+      onChange({ target: { name: "recipient_phone", value: normalized } });
+    }
   };
 
   const handleSubmit = (e) => {
@@ -204,13 +214,34 @@ const AddressModal = ({
             }}
             placeholder="0812xxxx"
             required
+            rightIcon={
+              <button
+                type="button"
+                onClick={handleUseMyPhone}
+                disabled={isLoading}
+                className="text-[10px] uppercase font-bold text-[#2D5A43] bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors disabled:opacity-50 whitespace-nowrap"
+              >
+                {isLoading ? (
+                  <Loader2 size={12} className="animate-spin" />
+                ) : (
+                  "Gunakan no. telepon saya"
+                )}
+              </button>
+            }
           />
 
           <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                Titik Lokasi Pengiriman (Geser Pin Jika Kurang Pas)
-              </label>
+            <div className="flex justify-between items-start gap-3">
+              <div className="min-w-0">
+                <label className="text-xs font-semibold text-gray-500 mb-1 flex items-center gap-1.5">
+                  <MapPin size={14} className="text-[#2D5A43] shrink-0" />
+                  Titik Lokasi Pengiriman
+                  <span className="text-red-500" aria-hidden="true">*</span>
+                </label>
+                <p className="text-[10px] text-gray-400 font-medium mt-1 ml-[21px]">
+                  Geser pin jika kurang pas
+                </p>
+              </div>
               
               <button
                 type="button"
@@ -219,7 +250,7 @@ const AddressModal = ({
                 className="text-[10px] uppercase font-bold text-[#2D5A43] bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors disabled:opacity-50"
               >
                 <LocateFixed size={12} />
-                {isLocating ? "Mencari GPS..." : "Gunakan Lokasi Saya"}
+                {isLocating ? "Memuat..." : "Gunakan Lokasi Saya"}
               </button>
             </div>
             
@@ -241,8 +272,8 @@ const AddressModal = ({
           </div>
 
           <div className="space-y-2 relative">
-            <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest block">
-              Detail Alamat (Nama Jalan, RT/RW, Kelurahan)
+            <label className="text-xs font-semibold text-gray-500 mb-1 block">
+              Detail Alamat (Nama Jalan, RT/RW, Kelurahan) <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <div className="relative group">
               <FormTextarea
@@ -266,7 +297,7 @@ const AddressModal = ({
           </div>
 
           <div className="space-y-2 relative">
-            <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest block">
+            <label className="text-xs font-semibold text-gray-500 mb-1 block">
               Catatan Untuk Kurir (Opsional)
             </label>
             <FormTextarea

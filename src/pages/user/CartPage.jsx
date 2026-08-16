@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { ArrowRight, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import toast from "react-hot-toast";
 import { useCartLogic } from "../../hooks/user/useCartLogic";
 import { useNavigate } from "react-router-dom";
 import ConfirmModal from "../../components/forms/ConfirmModal";
@@ -10,7 +11,8 @@ import EmptyCartView from "../../components/features/cart/EmptyCartView";
 const CartPage = () => {
   const {
     cartItems,
-    subtotal,
+    selectedCartItemIds,
+    selectedTotalQuantity,
     total,
     normalSubtotal,
     discountTotal,
@@ -20,7 +22,10 @@ const CartPage = () => {
     handleRemove,
     handleQuantityChange,
     isEmpty,
-    totalQuantity,
+    toggleCartItemSelection,
+    selectAllCartItems,
+    clearSelectedCartItems,
+    hasSelectedItems,
   } = useCartLogic();
 
   const navigate = useNavigate();
@@ -30,6 +35,16 @@ const CartPage = () => {
     itemName: "",
   });
   const [deletingId, setDeletingId] = useState(null);
+
+  const allItemsSelected = cartItems.length > 0 && selectedCartItemIds.length === cartItems.length;
+
+  const handleCheckout = () => {
+    if (!hasSelectedItems) {
+      toast.error("Pilih barang dulu sebelum checkout");
+      return;
+    }
+    navigate("/checkout");
+  };
 
   const openDeleteModal = (item) =>
     setDeleteModal({ isOpen: true, itemId: item.id, itemName: item.name });
@@ -63,18 +78,32 @@ const CartPage = () => {
             </h1>
           </div>
           <p className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 border-b-2 border-gray-100 pb-2 self-start sm:self-auto">
-            {totalQuantity} Barang Terpilih
+            {selectedTotalQuantity} Barang Terpilih
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10 items-start">
           <div className="lg:col-span-2">
             <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden p-4 md:p-6">
+              <div className="flex items-center gap-2 px-2 pb-4 mb-2 border-b border-gray-100">
+                <input
+                  type="checkbox"
+                  checked={allItemsSelected}
+                  onChange={allItemsSelected ? clearSelectedCartItems : selectAllCartItems}
+                  aria-label="Pilih semua barang"
+                  className="w-4 h-4 accent-[#2D5A43] cursor-pointer"
+                />
+                <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">
+                  Pilih Semua ({cartItems.length})
+                </span>
+              </div>
               <div className="flex flex-col">
                 {cartItems.map((item) => (
                   <CartItem
-                    key={item.id}
+                    key={item.cartItemId}
                     item={item}
+                    isSelected={selectedCartItemIds.some((id) => String(id) === String(item.cartItemId))}
+                    onToggleSelection={toggleCartItemSelection}
                     isDeleting={deletingId === item.id}
                     onIncrement={() => handleIncrement(item)}
                     onDecrement={() =>
@@ -89,13 +118,12 @@ const CartPage = () => {
           </div>
           <div className="hidden lg:block lg:col-span-1 sticky top-32">
             <OrderSummary
-              subtotal={subtotal}
               total={total}
               normalSubtotal={normalSubtotal}
               discountTotal={discountTotal}
               hasDiscount={hasDiscount}
-              totalQuantity={totalQuantity}
-              onCheckout={() => navigate("/checkout")}
+              totalQuantity={selectedTotalQuantity}
+              onCheckout={handleCheckout}
             />
           </div>
 
@@ -111,10 +139,10 @@ const CartPage = () => {
             </span>
           </div>
           <button
-            onClick={() => navigate("/checkout")}
+            onClick={handleCheckout}
             className="flex-1 bg-[#00AA5B] hover:bg-[#008f4c] text-white py-4 rounded-xl font-bold text-sm transition-colors shadow-lg shadow-green-900/10"
           >
-            Beli ({totalQuantity})
+            Beli ({selectedTotalQuantity})
           </button>
         </div>
       </div>

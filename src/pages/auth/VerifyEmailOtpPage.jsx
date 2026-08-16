@@ -5,6 +5,12 @@ import authService from '../../services/auth/authService';
 import InputField from '../../components/common/FormInput';
 import Button from '../../components/common/Button';
 import toast from 'react-hot-toast';
+import { useOtpCooldown } from '../../hooks/auth/useOtpCooldown';
+import {
+  formatOtpCooldown,
+  getOtpRequestErrorMessage,
+  getRetryAfterSeconds,
+} from '../../utils/otpCooldown';
 
 const VerifyEmailOTP= () => {
   const navigate = useNavigate();
@@ -14,6 +20,12 @@ const VerifyEmailOTP= () => {
   const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState(null);
   const email = location.state?.email || localStorage.getItem('pendingVerificationEmail') || "";
+  const {
+    cooldownSeconds,
+    isOnCooldown,
+    startCooldown,
+    clearCooldown,
+  } = useOtpCooldown('email', email);
 
   useEffect(() => {
     if (!email) {
@@ -29,20 +41,28 @@ const VerifyEmailOTP= () => {
       return;
     }
 
+    if (isOnCooldown) return;
+
     setIsResending(true);
+    setError(null);
     try {
       await toast.promise(
         authService.resendOTP(email),
         {
           loading: 'Mengirim kode ke email...',
           success: 'Kode OTP baru telah dikirim ke email!',
-          error: (err) => err.response?.data?.message || 'Gagal mengirim ulang kode.',
+          error: (err) => getOtpRequestErrorMessage(err, 'Gagal mengirim ulang kode.'),
         },
         {
           success: { style: { background: '#2D5A43', color: '#fff' } },
         }
       );
-    } catch {
+      startCooldown(60);
+    } catch (err) {
+      if (err.response?.status === 429) {
+        startCooldown(getRetryAfterSeconds(err));
+      }
+      setError(getOtpRequestErrorMessage(err, 'Gagal mengirim ulang kode.'));
     } finally {
       setIsResending(false);
     }
@@ -56,6 +76,7 @@ const VerifyEmailOTP= () => {
     try {
       await authService.verifyOTP(email, otp);
       localStorage.removeItem('pendingVerificationEmail');
+      clearCooldown();
       toast.success('Akun Berhasil Diverifikasi!', {
         style: { background: '#2D5A43', color: '#fff' }
       });
@@ -120,11 +141,15 @@ const VerifyEmailOTP= () => {
             <button 
               type="button"
               onClick={handleResendOTP}
-              disabled={isResending}
-              className={`text-[#2D5A43] hover:underline ml-1 font-black inline-flex items-center gap-1 ${isResending ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={isResending || isOnCooldown}
+              className={`text-[#2D5A43] hover:underline ml-1 font-black inline-flex items-center gap-1 ${isResending || isOnCooldown ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {isResending ? <RefreshCw size={12} className="animate-spin" /> : null}
-              {isResending ? 'MENGIRIM...' : 'KIRIM ULANG'}
+              {isResending
+                ? 'MENGIRIM...'
+                : isOnCooldown
+                  ? `TUNGGU ${formatOtpCooldown(cooldownSeconds)}`
+                  : 'KIRIM ULANG'}
             </button>
           </p>
         </div>

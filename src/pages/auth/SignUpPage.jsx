@@ -6,11 +6,14 @@ import InputField from "../../components/common/FormInput";
 import Button from "../../components/common/Button"; 
 import toast from 'react-hot-toast';
 import { GoogleLogin } from '@react-oauth/google';
+import { formatOtpCooldown } from '../../utils/otpCooldown';
 
 const SignUpPage = () => {
   const { 
     formData, 
     isLoading, 
+    cooldownSeconds,
+    isOnCooldown,
     showPassword, 
     handleChange, 
     handleSignUp, 
@@ -79,16 +82,6 @@ const SignUpPage = () => {
               icon={<Mail size={18} />} 
               required
             />
-            {/* <InputField 
-              label="Phone Number" 
-              name="phoneNumber"
-              type="tel" 
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              placeholder="081234567890" 
-              icon={<Phone size={18} />} 
-              required
-            /> */}
             <InputField 
               label="Password" 
               name="password"
@@ -114,7 +107,8 @@ const SignUpPage = () => {
             <Button 
               type="submit"
               isLoading={isLoading} 
-              text="DAFTAR SEKARANG" 
+              disabled={isOnCooldown}
+              text={isOnCooldown ? `TUNGGU ${formatOtpCooldown(cooldownSeconds)}` : "DAFTAR SEKARANG"}
               className="w-full py-5 text-white shadow-lg shadow-green-900/10 active:scale-[0.98] transition-all font-black tracking-widest"
             />
           </div>

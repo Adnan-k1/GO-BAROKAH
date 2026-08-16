@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from "react";
-import { DollarSign, TrendingUp, TrendingDown, Activity, Package, Menu } from "lucide-react";
+import { DollarSign, TrendingDown, Activity, Package, Menu } from "lucide-react";
 import DatePicker from "../../components/common/DatePicker";
 import OwnerSidebar from "../../components/owner/OwnerSidebar";
-import StatCard from "../../components/admin/dashboard/StatCard";
+import StatCard from "../../components/owner/StatCard";
+import CashFlowCard from "../../components/owner/CashFlowCard";
 import { useOwnerAnalytics } from "../../hooks/owner/useOwnerAnalytics";
 import { useAuth } from "../../context/AuthContext";
 import { formatIDR } from "../../utils/formatCurrency";
@@ -42,12 +43,6 @@ const DashboardOwner = () => {
   }, [user]);
 
   const { omzet, netProfit, cashFlow, expenseAnalysis } = analytics;
-
-  const getStatusColor = (status) => {
-    if (status === "POSITIVE") return "text-emerald-500 bg-emerald-50";
-    if (status === "NEGATIVE") return "text-red-500 bg-red-50";
-    return "text-yellow-500 bg-yellow-50";
-  };
 
   if (isLoading) {
     return (
@@ -115,34 +110,25 @@ const DashboardOwner = () => {
         <div className="p-4 md:p-8 flex-1 flex flex-col overflow-y-auto custom-scrollbar overflow-x-hidden">
           {/* STATS GRID */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <StatCard 
-              config={{ label: "Total Omzet", icon: DollarSign, variant: "emerald", key: "revenue" }} 
-              statData={{ value: formatIDR(omzet?.omzet || 0) }} 
+            <StatCard
+              label="Total Omzet"
+              value={formatIDR(omzet?.omzet || 0)}
+              icon={DollarSign}
+              variant="emerald"
             />
-            <StatCard 
-              config={{ label: "Laba Bersih", icon: Activity, variant: "blue", key: "revenue" }} 
-              statData={{ value: formatIDR(netProfit?.filter_3?.value || 0) }} 
+            <StatCard
+              label="Laba Bersih"
+              value={formatIDR(netProfit?.filter_3?.value || 0)}
+              icon={Activity}
+              variant="blue"
             />
-            <StatCard 
-              config={{ label: "Total Expenses", icon: TrendingDown, variant: "red", key: "revenue" }} 
-              statData={{ value: formatIDR(expenseAnalysis?.total_cost || 0) }} 
+            <StatCard
+              label="Total Expenses"
+              value={formatIDR(expenseAnalysis?.total_cost || 0)}
+              icon={TrendingDown}
+              variant="red"
             />
-            <StatCard 
-              config={{ 
-                label: "Arus Kas", 
-                icon: cashFlow?.status === "POSITIVE" ? TrendingUp : (cashFlow?.status === "NEGATIVE" ? TrendingDown : Activity), 
-                variant: cashFlow?.status === "POSITIVE" ? "emerald" : (cashFlow?.status === "NEGATIVE" ? "red" : "amber"), 
-                key: "revenue" 
-              }} 
-              statData={{ 
-                value: formatIDR(cashFlow?.net_cash_flow || 0),
-                badge: (
-                  <div className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold ${getStatusColor(cashFlow?.status)}`}>
-                    {cashFlow?.status || "BREAK_EVEN"}
-                  </div>
-                )
-              }} 
-            />
+            <CashFlowCard cashFlow={cashFlow} />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
