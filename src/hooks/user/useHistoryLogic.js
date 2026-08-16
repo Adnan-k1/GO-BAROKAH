@@ -97,7 +97,7 @@ export const useHistoryLogic = () => {
       fetchHistory(); 
     } catch (error) {
       console.error("Gagal membatalkan pesanan:", error);
-      alert("Gagal membatalkan pesanan. Coba lagi.");
+      toast.error("Gagal membatalkan pesanan. Coba lagi.");
     }
   };
   const handleStartShopping = () => navigate('/store');
@@ -108,7 +108,7 @@ export const useHistoryLogic = () => {
       localStorage.setItem('pendingPayment', 'true');
       window.location.href = url;
     } else {
-      alert("Link pembayaran tidak ditemukan.");
+      toast.error("Link pembayaran tidak ditemukan.");
     }
   };
 
