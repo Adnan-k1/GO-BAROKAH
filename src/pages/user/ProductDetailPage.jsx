@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Star, ShoppingBag, Minus, Plus, ArrowLeft, Loader2, EyeOff } from 'lucide-react';
 import { formatIDR } from '../../utils/formatCurrency';
 import { useProductDetail } from '../../hooks/user/useProductDetail';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../hooks/auth/useAuth';
 import toast from 'react-hot-toast';
 
 const ProductDetailPage = () => {

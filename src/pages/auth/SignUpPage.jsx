@@ -25,25 +25,26 @@ const SignUpPage = () => {
   const [btnWidth, setBtnWidth] = React.useState(340);
 
   React.useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !window.ResizeObserver) return undefined;
+
     const updateWidth = () => {
-      if (containerRef.current) {
-        const width = containerRef.current.offsetWidth;
-        setBtnWidth(Math.min(400, Math.max(200, width)));
-      }
+      setBtnWidth(Math.min(400, Math.max(200, container.clientWidth)));
     };
-    const timeout = setTimeout(updateWidth, 100);
-    window.addEventListener('resize', updateWidth);
+    const observer = new window.ResizeObserver(updateWidth);
+    observer.observe(container);
+    updateWidth();
+
     return () => {
-      clearTimeout(timeout);
-      window.removeEventListener('resize', updateWidth);
+      observer.disconnect();
     };
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FBFBFB] px-4 md:px-6 py-12">
-      <div className="max-w-md w-full bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 shadow-2xl shadow-gray-200/60 border border-gray-100 animate-in fade-in zoom-in duration-500">
+    <div className="min-h-[100dvh] w-full overflow-x-hidden flex flex-col bg-[#FBFBFB] px-3 py-4 sm:px-4 sm:py-8 md:px-6 lg:py-6">
+      <div className="max-w-md lg:max-w-lg w-full mx-auto my-auto bg-white rounded-[1.75rem] sm:rounded-[2rem] md:rounded-[2.5rem] p-5 sm:p-6 md:p-8 shadow-2xl shadow-gray-200/60 border border-gray-100 animate-in fade-in zoom-in duration-500">
         
-        <div className="mb-10">
+        <div className="mb-7 sm:mb-8 lg:mb-6">
           <Link 
             to="/store" 
             className="inline-flex items-center gap-2 text-[10px] font-black text-gray-400 hover:text-[#2D5A43] transition-all tracking-widest group"
@@ -52,16 +53,16 @@ const SignUpPage = () => {
           </Link>
         </div>
 
-        <div className="text-left mb-10">
-          <h2 className="text-4xl font-black text-gray-900 tracking-tighter leading-tight">
+        <div className="text-left mb-7 sm:mb-8 lg:mb-6">
+          <h2 className="text-[2rem] sm:text-4xl lg:text-3xl font-black text-gray-900 tracking-tighter leading-tight">
             Daftar <span className="text-[#2D5A43]">Sekarang.</span>
           </h2>
-          <p className="text-sm text-gray-500 font-medium mt-3 leading-relaxed">
+          <p className="text-sm text-gray-500 font-medium mt-3 lg:mt-2 leading-relaxed">
             Buat akun baru untuk mulai berbelanja di UD Barokah dengan mudah.
           </p>
         </div>
 
-        <form onSubmit={handleSignUp} className="space-y-6">
+        <form onSubmit={handleSignUp} className="space-y-4 sm:space-y-5">
           <div className="space-y-4">
             <InputField 
               label="Username" 
@@ -70,7 +71,7 @@ const SignUpPage = () => {
               onChange={handleChange}
               placeholder="johndoe" 
               icon={<User size={18} />} 
-              required
+              required={null}
             />
             <InputField 
               label="Email Address" 
@@ -80,19 +81,19 @@ const SignUpPage = () => {
               onChange={handleChange}
               placeholder="example@gmail.com" 
               icon={<Mail size={18} />} 
-              required
+              required={null}
             />
-            <InputField 
-              label="Password" 
+            <InputField
+              label="Password"
               name="password"
-              type={showPassword ? "text" : "password"} 
+              type={showPassword ? "text" : "password"}
               value={formData.password}
               onChange={handleChange}
-              placeholder="••••••••" 
-              icon={<Lock size={18} />} 
-              required
+              placeholder="••••••••"
+              icon={<Lock size={18} />}
+              required={null}
               rightIcon={
-                <button 
+                <button
                   type="button"
                   onClick={togglePassword}
                   className="text-gray-400 hover:text-[#2D5A43] transition-colors p-1"
@@ -103,7 +104,7 @@ const SignUpPage = () => {
             />
           </div>
 
-          <div className="pt-2"> 
+          <div className="pt-0">
             <Button 
               type="submit"
               isLoading={isLoading} 
@@ -114,12 +115,12 @@ const SignUpPage = () => {
           </div>
         </form>
 
-        <div className="mt-8 relative flex items-center justify-center">
+        <div className="mt-6 sm:mt-7 relative flex items-center justify-center">
           <div className="absolute inset-x-0 h-px bg-gray-200"></div>
           <span className="relative bg-white px-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Atau daftar dengan</span>
         </div>
 
-        <div ref={containerRef} className="mt-6 flex justify-center hover:-translate-y-0.5 transition-transform duration-200 w-full overflow-hidden rounded-full">
+        <div ref={containerRef} className="mt-5 sm:mt-6 flex justify-center hover:-translate-y-0.5 transition-transform duration-200 w-full overflow-hidden rounded-full">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => toast.error('Login/Daftar Google dibatalkan atau gagal.')}
@@ -131,7 +132,7 @@ const SignUpPage = () => {
           />
         </div>
 
-        <div className="mt-8 text-center">
+        <div className="mt-6 sm:mt-7 text-center">
           <p className="text-sm text-gray-400 font-medium">
             Sudah punya akun?{' '}
             <Link to="/login" className="text-[#2D5A43] font-black hover:underline tracking-tight ml-1">

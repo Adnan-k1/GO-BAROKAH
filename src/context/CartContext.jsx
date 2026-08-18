@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "../hooks/auth/useAuth";
 import { cartService } from "../services/user/cartService";
 import { productService } from "../services/user/productService";
 import { buildImageUrl } from "../utils/imageUrl";

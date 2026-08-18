@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, AlertTriangle, Loader2, XCircle, Menu } from "lucide-react";
 
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/auth/useAuth";
 import { STAT_CONFIG } from "../../constants/adminConstants";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import StatCard from "../../components/admin/dashboard/StatCard";

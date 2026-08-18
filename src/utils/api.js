@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { translateError } from './errorTranslator';
+import { AUTH_SESSION_EXPIRED_EVENT, clearAuthSession, getToken } from './authStorage';
 
 export const API_URL = import.meta.env.VITE_API_URL;
 
@@ -13,10 +14,9 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     if (token) {
-      const cleanToken = token.replace(/['"]+/g, '');
-      config.headers.Authorization = `Bearer ${cleanToken}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -26,6 +26,15 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    const authorization = error.config?.headers?.Authorization
+      || error.config?.headers?.authorization
+      || error.config?.headers?.get?.('Authorization');
+
+    if (error.response?.status === 401 && authorization) {
+      clearAuthSession();
+      window.dispatchEvent(new Event(AUTH_SESSION_EXPIRED_EVENT));
+    }
+
     if (error.response?.data?.message) {
       error.response.data.message = translateError(error.response.data.message);
     }

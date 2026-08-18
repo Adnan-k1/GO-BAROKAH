@@ -1,5 +1,13 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import authService from "../services/auth/authService";
+import {
+  AUTH_SESSION_EXPIRED_EVENT,
+  clearAuthSession,
+  getSavedUser,
+  getToken,
+  setAuthSession,
+  setSavedUser,
+} from "../utils/authStorage";
 
 const AuthContext = createContext();
 
@@ -8,40 +16,38 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      const token = localStorage.getItem("token");
-      const savedUser = localStorage.getItem("user_session");
+    const handleSessionExpired = () => {
+      setUser(null);
+    };
 
-      if (savedUser) {
-        try {
-          setUser(JSON.parse(savedUser));
-        } catch (err) {
-          console.error("Parse Error:", err);
-        }
+    window.addEventListener(AUTH_SESSION_EXPIRED_EVENT, handleSessionExpired);
+    return () => window.removeEventListener(AUTH_SESSION_EXPIRED_EVENT, handleSessionExpired);
+  }, []);
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      const token = getToken();
+      const savedUser = getSavedUser();
+
+      if (!token) {
+        clearAuthSession();
+        setLoading(false);
+        return;
       }
 
-      if (token) {
-        try {
-          const response = await authService.getMe();
-          const serverUser = response?.user || response?.data?.user || response?.account || response;
-          
-          let validUser = serverUser;
-          if (savedUser) {
-            try {
-              validUser = { ...JSON.parse(savedUser), ...serverUser };
-            } catch (e) {
-              console.error('Gagal parsing session data:', e);
-            }
-          }
+      if (savedUser) setUser(savedUser);
 
-          setUser(validUser);
-          localStorage.setItem("user_session", JSON.stringify(validUser));
-        } catch (err) {
-          console.error("Auth Error (Token Invalid/Expired):", err);
-          setUser(null);
-          localStorage.removeItem("user_session");
-          localStorage.removeItem("token");
-        }
+      try {
+        const response = await authService.getMe();
+        const serverUser = response?.user || response?.data?.user || response?.account || response;
+        const validUser = serverUser;
+
+        setUser(validUser);
+        setSavedUser(validUser);
+      } catch (err) {
+        console.error("Auth Error (Token Invalid/Expired):", err);
+        setUser(null);
+        clearAuthSession();
       }
       setLoading(false);
     };
@@ -50,20 +56,20 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (userData, token) => {
+    if (!userData || !token) return;
+
     setUser(userData);
-    localStorage.setItem("user_session", JSON.stringify(userData));
-    if (token) localStorage.setItem("token", token);
+    setAuthSession(userData, token);
   };
 
   const updateUser = (newUserData) => {
-  setUser(newUserData); 
-  localStorage.setItem("user_session", JSON.stringify(newUserData)); 
-};
+    setUser(newUserData);
+    setSavedUser(newUserData);
+  };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("user_session");
-    localStorage.removeItem("token");
+    clearAuthSession();
   };
 
   return (
@@ -73,4 +79,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export { AuthContext };

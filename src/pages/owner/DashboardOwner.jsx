@@ -5,7 +5,7 @@ import OwnerSidebar from "../../components/owner/OwnerSidebar";
 import StatCard from "../../components/owner/StatCard";
 import CashFlowCard from "../../components/owner/CashFlowCard";
 import { useOwnerAnalytics } from "../../hooks/owner/useOwnerAnalytics";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/auth/useAuth";
 import { formatIDR } from "../../utils/formatCurrency";
 
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
