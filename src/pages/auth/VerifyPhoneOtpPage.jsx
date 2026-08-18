@@ -2,7 +2,7 @@ import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { KeyRound, ArrowLeft, RefreshCw } from "lucide-react";
 import authService from "../../services/auth/authService";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/auth/useAuth";
 import InputField from "../../components/common/FormInput";
 import Button from "../../components/common/Button";
 import toast from "react-hot-toast";

@@ -40,10 +40,6 @@ const authService = {
     return response.data;
   },
 
-  logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user_session'); 
-  }
 };
 
 export default authService;

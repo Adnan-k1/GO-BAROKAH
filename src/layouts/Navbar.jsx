@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/auth/useAuth';
 
 const NAV_LINKS = [
   { to: '/', label: 'Home' },

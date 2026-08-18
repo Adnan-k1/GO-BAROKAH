@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { LogOut, ChevronRight, ChevronLeft, LayoutDashboard, ArrowRightLeft } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/auth/useAuth";
 import { NAV_ITEMS } from "../../constants/adminConstants";
 import LogoutModal from "./LogoutModal"; 
 

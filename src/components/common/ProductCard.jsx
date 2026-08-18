@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ShoppingBag, Loader2, EyeOff } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { formatIDR } from "../../utils/formatCurrency";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/auth/useAuth";
 import toast from "react-hot-toast";
 
 const ProductCard = ({ product }) => {

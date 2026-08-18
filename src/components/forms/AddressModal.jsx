@@ -12,7 +12,7 @@ import L from "leaflet";
 import FormInput from "../common/FormInput";
 import FormTextarea from "../common/FormTextarea";
 import Button from "../common/Button";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/auth/useAuth";
 import toast from "react-hot-toast";
 
 import markerIcon from "leaflet/dist/images/marker-icon.png";

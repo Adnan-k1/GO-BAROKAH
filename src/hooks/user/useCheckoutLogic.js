@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useCart } from '../../context/CartContext';
-import { useAuth } from '../../context/AuthContext'; 
+import { useAuth } from '../auth/useAuth';
 import { addressService } from '../../services/user/addressService'; 
 import orderService from '../../services/user/orderService'; 
 import { formatIDR } from '../../utils/formatCurrency';

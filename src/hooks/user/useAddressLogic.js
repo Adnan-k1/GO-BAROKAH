@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { addressService } from "../../services/user/addressService";
 import toast from "react-hot-toast";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../auth/useAuth";
 
 export const useAddressLogic = () => {
   const [addresses, setAddresses] = useState([]);

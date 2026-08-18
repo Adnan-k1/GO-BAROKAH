@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../../services/auth/authService';
 import toast from 'react-hot-toast';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from './useAuth';
 import { useOtpCooldown } from './useOtpCooldown';
 import { formatOtpCooldown } from '../../utils/otpCooldown';
 import { getOtpRequestErrorMessage, getRetryAfterSeconds } from '../../utils/otpError';
@@ -66,8 +66,7 @@ export const useSignupLogic = () => {
       const token = result?.data?.token;
 
       if (token && user) { 
-        localStorage.setItem('token', token);
-        setGlobalUser(user);
+        setGlobalUser(user, token);
         toast.success(`Selamat Datang, ${user.username || 'di UD Barokah'}!`, {
           style: { borderRadius: '16px', background: '#2D5A43', color: '#fff', fontWeight: 'bold' },
         });
