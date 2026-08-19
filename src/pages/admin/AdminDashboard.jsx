@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, AlertTriangle, Loader2, XCircle, Menu } from "lucide-react";
+import { ArrowRight, AlertTriangle, XCircle, Menu } from "lucide-react";
 
 import { useAuth } from "../../hooks/auth/useAuth";
 import { STAT_CONFIG } from "../../constants/adminConstants";
@@ -8,22 +8,11 @@ import AdminSidebar from "../../components/admin/AdminSidebar";
 import StatCard from "../../components/admin/dashboard/StatCard";
 import OrderRow from "../../components/admin/dashboard/OrderRow";
 import StockAlertItem from "../../components/admin/StockAlertItem";
+import DashboardSkeleton from "../../components/admin/dashboard/DashboardSkeleton";
 
 import { useAdminOrders } from "../../hooks/admin/useAdminOrders";
 import { useAdminProducts } from "../../hooks/admin/useAdminProducts";
 import { formatIDR as formatRupiahUtuh } from "../../utils/formatCurrency";
-
-const LoadingSkeleton = () => (
-  <div className="flex h-screen bg-[#F8FAFC]">
-    <AdminSidebar />
-    <main className="flex-1 flex flex-col items-center justify-center gap-4">
-      <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
-      <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em]">
-        Memuat data dashboard...
-      </p>
-    </main>
-  </div>
-);
 
 const ErrorState = ({ message }) => (
   <div className="flex h-screen bg-[#F8FAFC] items-center justify-center p-8">
@@ -108,7 +97,7 @@ const AdminDashboard = () => {
     };
   }, [orders, products]);
 
-  if (isLoading) return <LoadingSkeleton />;
+  if (isLoading) return <DashboardSkeleton />;
   if (!orders && !products) return <ErrorState message="Data dashboard kosong." />;
 
   return (
@@ -148,7 +137,7 @@ const AdminDashboard = () => {
                 <h3 className="font-black text-slate-900 text-xs uppercase tracking-widest">Transaksi Terakhir</h3>
                 <button 
                   onClick={() => navigate("/admin/orders")}
-                  className="group flex items-center gap-2 text-[10px] font-black text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white px-4 py-2 rounded-xl transition-all uppercase tracking-tighter"
+                  className="group flex items-center gap-2 text-[10px] font-black text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white px-4 py-2 rounded-xl transition-all  tracking-tighter"
                 >
                   Buka Laporan
                   <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
@@ -171,7 +160,7 @@ const AdminDashboard = () => {
                 </div>
                 <div>
                   <h3 className="font-black text-slate-900 text-xs uppercase tracking-widest">Stok Kritis</h3>
-                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">List Stock Yang Kritis</p>
+                  <p className="text-[10px] text-slate-400 font-bold tracking-tighter">List Stock Yang Kritis</p>
                 </div>
               </div>
               <div className="p-6 space-y-4 overflow-y-auto flex-1 custom-scrollbar">

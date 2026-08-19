@@ -28,7 +28,20 @@ const ProductFilterBar = ({ search, onSearchChange, activecat, onCatChange, cate
   }, []);
 
   return (
-    <div className="bg-white p-2.5 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+    <div className="bg-white px-3 sm:px-5 py-2 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row items-center gap-2 md:gap-4">
+      <div className="relative w-full md:flex-1 md:min-w-0 group">
+        <Search size={16} className="absolute left-1 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#1a4d2e] transition-colors" />
+        <input
+          type="text"
+          placeholder="Cari berdasarkan nama atau email..."
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="w-full pl-8 pr-4 py-2 text-xs bg-transparent border-transparent rounded-xl focus:bg-slate-50 focus:outline-none focus:ring-0 focus:border-transparent transition-all font-medium"
+        />
+      </div>
+
+      <div className="hidden md:block w-px h-7 bg-slate-200 flex-shrink-0" />
+
       <div ref={scrollRef} className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto no-scrollbar">
         {filterOptions.map((category) => {
           const isActive = category.id === "all"
@@ -36,28 +49,18 @@ const ProductFilterBar = ({ search, onSearchChange, activecat, onCatChange, cate
             : activeCategoryIds.includes(category.id);
 
           return (
-          <button
-            key={category.id}
-            onClick={() => onCatChange(category.id === "all" ? "all" : category.id)}
-            className={`px-5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200
-              ${isActive
-                ? "bg-[#1a4d2e] text-white shadow-lg shadow-emerald-900/20"
-                : "bg-slate-50 text-slate-500 hover:bg-slate-100"}`}
-          >
-            {category.name}
-          </button>
+            <button
+              key={category.id}
+              onClick={() => onCatChange(category.id === "all" ? "all" : category.id)}
+              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider whitespace-nowrap transition-all duration-200 border
+                ${isActive
+                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                  : "bg-white text-slate-400 border-transparent hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200"}`}
+            >
+              {category.id === "all" ? "ALL" : category.name}
+            </button>
           );
         })}
-      </div>
-      <div className="relative w-full md:w-72 group">
-        <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#1a4d2e] transition-colors" />
-        <input
-          type="text"
-          placeholder="Cari nama barang..."
-          value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full pl-11 pr-4 py-3 text-sm bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
-        />
       </div>
     </div>
   );
