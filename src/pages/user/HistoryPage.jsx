@@ -5,10 +5,12 @@ import { formatDateID } from "../../utils/formatters";
 import Button from "../../components/common/Button";
 import OrderDetailModal from "../../components/forms/OrderDetailModal";
 import ConfirmModal from "../../components/forms/ConfirmModal";
+import OrderCardSkeleton from "../../components/common/OrderCardSkeleton";
 
 const HistoryPage = () => {
   const {
     orders,
+    isLoading,
     activeTab,
     setActiveTab,
     statuses,
@@ -94,7 +96,9 @@ const HistoryPage = () => {
       </div>
 
       <div className="space-y-4">
-        {orders.length > 0 ? (
+        {isLoading && orders.length === 0 ? (
+          [...Array(3)].map((_, index) => <OrderCardSkeleton key={index} />)
+        ) : orders.length > 0 ? (
           orders.map(({ id, dbId, created_at, status, items, total_amount, paymentStatus, paymentUrl, isPickup }) => (
             <div
               key={id}

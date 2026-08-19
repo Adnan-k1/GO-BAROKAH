@@ -2,7 +2,14 @@ import React, { useRef, useEffect } from "react";
 import { Search } from "lucide-react";
 
 const ProductFilterBar = ({ search, onSearchChange, activecat, onCatChange, categories = [] }) => {
-  const filterOptions = ["Semua", ...categories.map(c => c.name)];
+  const activeCategoryIds = Array.isArray(activecat) ? activecat.map(String) : [];
+  const filterOptions = [
+    { id: "all", name: "Semua" },
+    ...categories.map((category) => ({
+      id: String(category.id ?? category._id),
+      name: category.name,
+    })),
+  ];
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -23,18 +30,24 @@ const ProductFilterBar = ({ search, onSearchChange, activecat, onCatChange, cate
   return (
     <div className="bg-white p-2.5 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
       <div ref={scrollRef} className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto no-scrollbar">
-        {filterOptions.map((cat) => (
+        {filterOptions.map((category) => {
+          const isActive = category.id === "all"
+            ? activeCategoryIds.length === 0
+            : activeCategoryIds.includes(category.id);
+
+          return (
           <button
-            key={cat}
-            onClick={() => onCatChange(cat)}
+            key={category.id}
+            onClick={() => onCatChange(category.id === "all" ? "all" : category.id)}
             className={`px-5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200
-              ${activecat === cat
+              ${isActive
                 ? "bg-[#1a4d2e] text-white shadow-lg shadow-emerald-900/20"
                 : "bg-slate-50 text-slate-500 hover:bg-slate-100"}`}
           >
-            {cat}
+            {category.name}
           </button>
-        ))}
+          );
+        })}
       </div>
       <div className="relative w-full md:w-72 group">
         <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#1a4d2e] transition-colors" />

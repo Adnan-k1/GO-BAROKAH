@@ -8,8 +8,12 @@ export const useAdminInventoryLogic = () => {
     products,
     categories,
     types,
+    meta,
+    criticalStockProducts,
     isLoading,
     actionLoading,
+    filters,
+    setFilters,
     handleCreate,
     handleUpdate,
     handleDelete,
@@ -21,9 +25,7 @@ export const useAdminInventoryLogic = () => {
   } = useAdminProducts();
 
   const [search, setSearch] = useState("");
-  const [activeCat, setActiveCat] = useState("Semua");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [page, setPage] = useState(1);
   const [modalMode, setModalMode] = useState(null);
   const [selected, setSelected] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -42,28 +44,27 @@ export const useAdminInventoryLogic = () => {
     if (tableScrollRef.current) {
       tableScrollRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, [page]);
+  }, [filters.page]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const nextQuery = search.trim();
+      setFilters((prev) => (
+        prev.q === nextQuery && prev.page === 1
+          ? prev
+          : { ...prev, q: nextQuery, page: 1 }
+      ));
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [search, setFilters]);
 
   const stats = useMemo(() => {
-    const needRestockProducts = products.filter((p) => (Number(p.stock) || 0) <= 10);
-    const availableProducts = products.filter((p) => (Number(p.stock) || 0) > 10);
-    return { needRestockProducts, availableProducts };
-  }, [products]);
+    return { needRestockProducts: criticalStockProducts };
+  }, [criticalStockProducts]);
 
-  const filteredProducts = useMemo(
-    () =>
-      products.filter((p) => {
-        const pCategoryName = p.category?.name || p.category;
-        return (
-          (activeCat === "Semua" || pCategoryName === activeCat) &&
-          p.name?.toLowerCase().includes(search.toLowerCase())
-        );
-      }),
-    [products, activeCat, search],
-  );
-
-  const totalPages = Math.ceil(filteredProducts.length / PER_PAGE) || 1;
-  const paginatedItems = filteredProducts.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const totalPages = meta?.totalPages || 1;
+  const paginatedItems = products;
 
   const openModal = (mode, item = null) => {
     setSelected(item);
@@ -77,12 +78,27 @@ export const useAdminInventoryLogic = () => {
 
   const handleSearchChange = (value) => {
     setSearch(value);
-    setPage(1);
   };
 
   const handleCatChange = (value) => {
-    setActiveCat(value);
-    setPage(1);
+    setFilters((prev) => {
+      const currentIds = prev.category_id ? prev.category_id.split(",") : [];
+      const nextIds = value === "all"
+        ? []
+        : currentIds.includes(String(value))
+          ? currentIds.filter((id) => id !== String(value))
+          : [...currentIds, String(value)];
+
+      return {
+        ...prev,
+        category_id: nextIds.join(","),
+        page: 1,
+      };
+    });
+  };
+
+  const handlePageChange = (page) => {
+    setFilters((prev) => ({ ...prev, page }));
   };
 
   return {
@@ -92,19 +108,18 @@ export const useAdminInventoryLogic = () => {
     isLoading,
     actionLoading,
     search,
-    activeCat,
+    activeCat: filters.category_id ? filters.category_id.split(",") : [],
     isMobileOpen,
-    page,
+    page: filters.page,
     modalMode,
     selected,
     isScrolled,
     deleteModal,
     tableScrollRef,
     stats,
-    filteredProducts,
-    paginatedItems,
     totalPages,
-    setPage,
+    paginatedItems,
+    setPage: handlePageChange,
     openModal,
     handleDeleteConfirm,
     handleSearchChange,

@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useStoreLogic } from '../../hooks/user/useStoreLogic';
 import ProductCard from '../../components/common/ProductCard';
+import ProductCardSkeleton from '../../components/common/ProductCardSkeleton';
 import FilterSidebar from '../../components/features/FilterSidebar';
 import { ShoppingBasket, LayoutGrid, SlidersHorizontal, X } from 'lucide-react';
 
 const StorePage = () => {
   const {
     filter, categories, filteredData, totalCount,
-    currentLimit, handleFilterChange, loadMore, clearFilter,
-    isLoading
+    currentPage, totalPages, q,
+    handleLoadMore,
+    handleFilterChange, clearFilter, isLoading
   } = useStoreLogic();
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+
   useEffect(() => {
     if (isFilterOpen) {
       document.body.style.overflow = 'hidden';
@@ -25,7 +28,22 @@ const StorePage = () => {
 
   const handleClose = () => {
     setIsVisible(false);
-    setTimeout(() => setIsFilterOpen(false), 280); 
+    setTimeout(() => setIsFilterOpen(false), 280);
+  };
+
+  const renderLoadMore = () => {
+    if (currentPage >= totalPages) return null;
+    return (
+      <div className="mt-8 sm:mt-12 flex justify-center">
+        <button
+          onClick={handleLoadMore}
+          disabled={isLoading}
+          className="bg-white border-2 border-gray-900 px-8 sm:px-10 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-900 hover:text-white disabled:opacity-50 transition-all active:scale-95"
+        >
+          {isLoading ? "Memuat..." : "Load More"}
+        </button>
+      </div>
+    );
   };
 
   return (
@@ -62,6 +80,18 @@ const StorePage = () => {
             </button>
           </div>
         </header>
+
+        {q && (
+          <div className="mb-5 flex items-center gap-2">
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+              Hasil pencarian untuk:
+            </span>
+            <span className="text-[10px] font-black text-[#2D5A43] bg-emerald-50 px-3 py-1 rounded-full">
+              {q}
+            </span>
+          </div>
+        )}
+
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
           <aside className="hidden lg:block lg:w-60 flex-shrink-0">
             <div className="sticky top-8">
@@ -76,12 +106,7 @@ const StorePage = () => {
           <main className="flex-1 min-w-0">
             {isLoading && (!filteredData || filteredData.length === 0) ? (
               <div className="grid grid-cols-2 xl:grid-cols-3 gap-px bg-transparent border-transparent rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-white p-4 animate-pulse rounded-2xl m-1 border border-gray-100">
-                    <div className="bg-gray-100 aspect-square rounded-2xl mb-4"></div>
-                    <div className="h-4 w-3/4 bg-gray-100 rounded"></div>
-                  </div>
-                ))}
+                {[...Array(6)].map((_, i) => <ProductCardSkeleton key={i} />)}
               </div>
             ) : filteredData && filteredData.length > 0 ? (
               <>
@@ -93,16 +118,7 @@ const StorePage = () => {
                   ))}
                 </div>
 
-                {currentLimit < totalCount && (
-                  <div className="mt-8 sm:mt-12 flex justify-center">
-                    <button
-                      onClick={loadMore}
-                      className="bg-white border-2 border-gray-900 px-8 sm:px-10 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-900 hover:text-white transition-all active:scale-95"
-                    >
-                      Load More
-                    </button>
-                  </div>
-                )}
+                {renderLoadMore()}
               </>
             ) : (
               <div className="py-16 sm:py-20 text-center bg-white rounded-[2rem] sm:rounded-[2.5rem] border border-dashed border-gray-200">
@@ -170,7 +186,7 @@ const StorePage = () => {
                 activeFilters={filter}
                 onFilterChange={handleFilterChange}
                 onClear={clearFilter}
-                hideHeader 
+                hideHeader
               />
             </div>
             <div className="px-5 py-5 border-t border-gray-100">
