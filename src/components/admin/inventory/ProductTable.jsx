@@ -71,8 +71,8 @@ const PriceCell = ({ product }) => {
           {formatRupiah(product.price)}
         </span>
       )}
-      <span className="text-[9px] text-slate-400 font-bold uppercase mt-1">
-        Modal: {formatRupiah(product.cost || 0)}
+      <span className="text-[9px] text-slate-400 font-bold  mt-1">
+        HPP/Harga Pokok Produk: {formatRupiah(product.cost || 0)}
       </span>
     </div>
   );
@@ -112,14 +112,13 @@ const ProductRow = ({ product, onToggleActive, onEdit, onDelete }) => (
       </div>
     </td>
     <td className="px-4 py-4">
-      <span className="text-[9px] font-black text-blue-600 bg-blue-50/50 px-2.5 py-1.5 rounded-lg border border-blue-100/50 uppercase">
+        <span className="text-[9px] font-black text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-200">
         {product.category?.name || product.category}
       </span>
     </td>
     <td className="px-4 py-4">
       <div className="flex flex-col">
         <span className={`font-black text-xs ${Number(product.stock) <= 5 ? "text-red-500" : "text-slate-700"}`}>{product.stock}</span>
-        <span className="text-[9px] text-slate-400 font-bold uppercase">{product.type?.name || product.unit}</span>
       </div>
     </td>
     <td className="px-4 py-4">

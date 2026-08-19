@@ -26,7 +26,6 @@ const HistoryPage = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cancelData, setCancelData] = useState({ isOpen: false, orderId: null });
-
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [page]);
@@ -84,7 +83,7 @@ const HistoryPage = () => {
           <button
             key={status}
             onClick={() => setActiveTab(status)}
-            className={`px-8 py-2 rounded-xl text-[11px] font-black  tracking-widest whitespace-nowrap transition-all duration-200 ${
+            className={`px-8 py-2 rounded-xl text-[11px] font-black tracking-widest whitespace-nowrap transition-all duration-200 ${
               activeTab === status
                 ? "bg-[#2D5A43] text-white shadow-lg shadow-[#2D5A43]/20"
                 : "bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600"

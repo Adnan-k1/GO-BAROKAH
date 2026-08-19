@@ -53,9 +53,9 @@ const OwnerSidebar = ({ isMobileOpen, setIsMobileOpen }) => {
 
         <header className={`flex-shrink-0 flex flex-col overflow-hidden transition-all duration-300 ${isMinimized ? "opacity-0 h-0 mb-0" : "px-6 mb-10 h-auto opacity-100"}`}>
           <h1 className="text-2xl font-black tracking-tighter text-[#1a4d2e] uppercase leading-none">
-            UD. BAROKAH
+            GO - BAROKAH
           </h1>
-          <div className="h-[4px] w-12 bg-[#f5c518] rounded-full mt-2" />
+          <div className="h-[4px] w-23 bg-[#f5c518] rounded-full mt-2" />
           <p className="text-[9px] text-slate-400 font-black mt-3 uppercase tracking-[0.3em]">Owner Management</p>
         </header>
 

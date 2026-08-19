@@ -1,8 +1,9 @@
 import React from "react";
-import { Search, Menu, ShoppingCart, Clock, Package, CheckCircle2, Truck, Store } from "lucide-react";
+import { Menu, ShoppingCart, Clock, Package, CheckCircle2, Truck, Store } from "lucide-react";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import InventoryStatCard from "../../components/admin/inventory/InventoryStatCard";
 import OrdersTable from "../../components/admin/order/OrdersTable";
+import OrderFilterBar from "../../components/admin/order/OrderFilterBar";
 import OrderDetailModal from "../../components/admin/order/OrderDetailModal";
 import ConfirmModal from "../../components/forms/ConfirmModal";
 import { useAdminOrdersLogic, TABS } from "../../hooks/admin/useAdminOrdersLogic";
@@ -80,31 +81,14 @@ const AdminOrders = () => {
             </div>
           </div>
 
-          <div className="px-4 md:px-8 py-2 flex flex-col sm:flex-row gap-4 items-stretch sm:items-center bg-[#F8FAFC] relative z-20">
-            <div className="relative flex-1 group">
-              <Search
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#1a4d2e]"
-                size={14}
-              />
-              <input
-                type="text"
-                placeholder="Cari Pesanan..."
-                value={search}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="w-full bg-white border border-slate-100 rounded-xl py-3.5 pl-11 pr-4 text-[11px] font-bold shadow-sm focus:outline-none focus:border-emerald-500/20"
-              />
-            </div>
-            <div className="flex gap-1.5 overflow-x-auto no-scrollbar py-1">
-              {TABS.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => handleTabChange(t)}
-                  className={`px-5 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border whitespace-nowrap ${activeTab === t ? "bg-[#1a4d2e] text-white border-[#1a4d2e] shadow-lg" : "bg-white text-slate-400 border-slate-100 hover:border-slate-200"}`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
+          <div className="px-4 md:px-8 py-2 bg-[#F8FAFC] relative z-20">
+            <OrderFilterBar
+              search={search}
+              onSearchChange={handleSearchChange}
+              activeStatus={activeTab}
+              onStatusChange={handleTabChange}
+              statuses={TABS}
+            />
           </div>
         </div>
 

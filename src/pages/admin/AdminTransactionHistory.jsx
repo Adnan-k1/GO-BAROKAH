@@ -1,10 +1,11 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import {
-  ChevronLeft, ChevronRight, Search, Loader2, Wallet, Clock, 
+  ChevronLeft, ChevronRight, Loader2, Wallet, Clock,
   CheckCircle2, XCircle, CreditCard, Calendar, Store, Truck, Package, Eye, Menu
 } from "lucide-react";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import OrderDetailModal from "../../components/admin/order/OrderDetailModal";
+import OrderFilterBar from "../../components/admin/order/OrderFilterBar";
 import { useAdminOrders } from "../../hooks/admin/useAdminOrders";
 import { formatDateID } from "../../utils/formatters";
 
@@ -81,13 +82,14 @@ const AdminTransactionHistory = () => {
             </div>
           </div>
 
-          <div className="px-4 md:px-8 py-4 md:py-6 flex flex-col sm:flex-row gap-4 items-stretch sm:items-center bg-[#F8FAFC]">
-            <SearchInput value={search} onChange={(val) => { setSearch(val); setPage(1); }} />
-            <div className="flex gap-1.5 overflow-x-auto no-scrollbar py-1">
-              {TABS.map(t => (
-                <TabButton key={t} label={t} active={activeTab === t} onClick={() => { setActiveTab(t); setPage(1); }} />
-              ))}
-            </div>
+          <div className="px-4 md:px-8 py-2 bg-[#F8FAFC] relative z-20">
+            <OrderFilterBar
+              search={search}
+              onSearchChange={(value) => { setSearch(value); setPage(1); }}
+              activeStatus={activeTab}
+              onStatusChange={(status) => { setActiveTab(status); setPage(1); }}
+              statuses={TABS}
+            />
           </div>
         </div>
         <main className="flex-1 px-4 md:px-8 pb-4 md:pb-8 flex flex-col min-h-0 mt-2">
@@ -124,28 +126,6 @@ const AdminTransactionHistory = () => {
     </div>
   );
 };
-
-const SearchInput = ({ value, onChange }) => (
-  <div className="relative flex-1 group">
-    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#1a4d2e] transition-colors" size={14} />
-    <input 
-      type="text" 
-      placeholder="Cari transaksi..." 
-      className="w-full bg-white border border-slate-100 rounded-xl py-3.5 pl-11 pr-4 text-[11px] font-bold text-slate-700 focus:outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500/20 transition-all shadow-sm" 
-      value={value} 
-      onChange={(e) => onChange(e.target.value)} 
-    />
-  </div>
-);
-
-const TabButton = ({ label, active, onClick }) => (
-  <button 
-    onClick={onClick}
-    className={`px-5 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border whitespace-nowrap ${active ? "bg-[#1a4d2e] text-white border-[#1a4d2e] shadow-lg" : "bg-white text-slate-400 border-slate-100 hover:border-slate-200"}`}
-  >
-    {label}
-  </button>
-);
 
 const LoadingState = () => (
   <tr>
