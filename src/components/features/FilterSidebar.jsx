@@ -18,11 +18,13 @@ const FilterSidebar = ({ categories, activeFilters, onFilterChange, onClear, hid
         </div>
       )}
       <div className="flex flex-col gap-1.5">
-        {categories.map(c => {
-          const isActive = activeFilters.includes(c);
+        {categories.map((category) => {
+          const categoryId = String(category?.id ?? category?._id ?? category);
+          const categoryName = category?.name ?? category;
+          const isActive = activeFilters.includes(categoryId);
           return (
             <label 
-              key={c} 
+              key={categoryId}
               className={`flex items-center gap-3 p-2 rounded-xl cursor-pointer transition-all duration-200 group
                 ${isActive ? 'bg-emerald-50/50' : 'hover:bg-slate-50'}`}
             >
@@ -30,7 +32,7 @@ const FilterSidebar = ({ categories, activeFilters, onFilterChange, onClear, hid
                 <input 
                   type="checkbox" 
                   checked={isActive}
-                  onChange={() => onFilterChange(c)}
+                  onChange={() => onFilterChange(category)}
                   className="peer w-4 h-4 appearance-none rounded border-2 border-slate-200 checked:border-[#2D5A43] checked:bg-[#2D5A43] transition-all cursor-pointer" 
                 />
                 <svg 
@@ -44,7 +46,7 @@ const FilterSidebar = ({ categories, activeFilters, onFilterChange, onClear, hid
               <span className={`text-[11px] font-bold tracking-tight transition-colors ${
                 isActive ? 'text-[#2D5A43]' : 'text-slate-500 group-hover:text-slate-900'
               }`}>
-                {c}
+                {categoryName}
               </span>
             </label>
           );

@@ -1,5 +1,5 @@
 import React from "react";
-import { Plus, Menu, AlertCircle, Package } from "lucide-react";
+import { Plus, Menu, AlertCircle } from "lucide-react";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import InventoryStatCard from "../../components/admin/inventory/InventoryStatCard";
 import ProductFilterBar from "../../components/admin/inventory/ProductFilterBar";
@@ -43,29 +43,12 @@ const AdminInventory = () => {
     setIsMobileOpen,
   } = useAdminInventoryLogic();
 
-  const statCards = [
-    {
-      label: "Perlu Restock",
-      value: stats.needRestockProducts.length,
-      icon: <AlertCircle size={16} />,
-      iconBg: "bg-red-50 text-red-600",
-      items: stats.needRestockProducts,
-    },
-    {
-      label: "Stok Tersedia",
-      value: stats.availableProducts.length,
-      icon: <Package size={16} />,
-      iconBg: "bg-emerald-50 text-emerald-600",
-      items: stats.availableProducts,
-    },
-  ];
-
   return (
     <div className="flex h-screen bg-[#F8FAFC] overflow-hidden font-sans">
       <AdminSidebar isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-shrink-0 bg-[#F8FAFC] relative z-50">
-          <div className="flex items-center justify-between px-4 md:px-8 pt-4 md:pt-8 relative z-20 bg-[#F8FAFC]">
+          <div className="flex items-center justify-between px-4 md:px-8 pt-4 md:pt-8 relative z-[80] bg-[#F8FAFC]">
             <div className="flex items-center gap-3 md:gap-0">
               <button className="md:hidden p-2 -ml-2 rounded-xl text-slate-400 hover:bg-slate-50 hover:text-[#1a4d2e] relative z-50" onClick={() => setIsMobileOpen(true)}>
                 <Menu size={20} />
@@ -75,18 +58,27 @@ const AdminInventory = () => {
                 <p className="text-[10px] font-bold text-slate-400 mt-0.5 tracking-[0.2em] hidden md:block">Sistem Inventaris UD BAROKAH</p>
               </div>
             </div>
-            <button onClick={() => openModal("create")} className="flex items-center gap-2 bg-[#1a4d2e] text-white px-4 md:px-5 py-2.5 md:py-3 rounded-xl text-[10px] font-black uppercase shadow-lg active:scale-95 transition-all">
-              <Plus size={14} strokeWidth={3} />
-              <span className={isScrolled ? "hidden md:block" : "block"}>Produk Baru</span>
-            </button>
-          </div>
-
-          <div
-            className={`transition-all duration-500 ease-in-out ${isScrolled ? 'overflow-hidden' : 'overflow-visible relative z-40'}`}
-            style={{ maxHeight: isScrolled ? "0px" : "500px", opacity: isScrolled ? 0 : 1 }}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 px-4 md:px-8 py-4 md:py-6">
-              {statCards.map((s) => <InventoryStatCard key={s.label} {...s} />)}
+            <div className="flex items-center gap-2">
+              <div className="hidden md:block w-[280px] lg:w-[340px]">
+                <InventoryStatCard
+                  compact
+                  label="Perlu Restock"
+                  value={`${stats.needRestockProducts.length} produk`}
+                  icon={<AlertCircle size={14} />}
+                  iconBg="bg-white text-red-600"
+                  items={stats.needRestockProducts}
+                />
+              </div>
+              <div className="md:hidden flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-red-50 border border-red-100 text-red-600">
+                <AlertCircle size={14} />
+                <span className="text-[9px] font-black uppercase tracking-wider">
+                  {stats.needRestockProducts.length} restock
+                </span>
+              </div>
+              <button onClick={() => openModal("create")} className="h-[52px] flex items-center gap-2 bg-[#1a4d2e] text-white px-4 md:px-5 rounded-xl text-[10px] font-black uppercase shadow-lg active:scale-95 transition-all">
+                <Plus size={14} strokeWidth={3} />
+                <span className={isScrolled ? "hidden md:block" : "block"}>Produk Baru</span>
+              </button>
             </div>
           </div>
 

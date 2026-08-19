@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import CategorySection from '../../components/features/CategorySection';
 import DiscountSection from '../../components/features/DiscountSection';
 import ProductSection from '../../components/features/ProductSection';
-import { Loader2 } from "lucide-react";
+import ProductCardSkeleton from '../../components/common/ProductCardSkeleton';
 import { useHomeLogic } from "../../hooks/user/useHomeLogic";
 
 const HomePage = () => {
@@ -28,9 +28,15 @@ const HomePage = () => {
 
   if (loading) {
     return (
-      <div className="py-40 flex flex-col items-center justify-center gap-4 bg-[#FBFBFB] min-h-screen">
-        <Loader2 className="animate-spin text-[#2D5A43]" size={40} />
-        <p className="font-black uppercase tracking-widest text-[10px]">Loading ...</p>
+      <div className="min-h-screen bg-[#FBFBFB] py-10 md:py-14" aria-busy="true">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <div className="h-7 w-40 rounded-full bg-gray-200 animate-pulse mb-6" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+            {[...Array(10)].map((_, index) => (
+              <ProductCardSkeleton key={index} compact />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }

@@ -23,7 +23,8 @@ const LoadingSkeleton = () => (
 
 const OwnerExpenses = () => {
   const { 
-    expenses, isLoading,
+    expenses,
+    isInitialLoading,
     fetchExpenses, handleCreate, handleUpdate, handleDelete 
   } = useOwnerExpenses();
 
@@ -84,7 +85,7 @@ const OwnerExpenses = () => {
     return colors[cat] || "bg-gray-50 text-gray-600 border-gray-200";
   };
 
-  if (isLoading) return <LoadingSkeleton />;
+  if (isInitialLoading) return <LoadingSkeleton />;
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] font-sans text-slate-900 overflow-hidden text-[13px]">

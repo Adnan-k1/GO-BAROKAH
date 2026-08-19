@@ -1,12 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
-import { API_URL } from "../../utils/api";
 import { buildImageUrl } from "../../utils/imageUrl";
-import { 
-  getAllProducts, getAllCategories, getAllTypes, 
-  createProduct, updateProduct, deleteProduct, 
+import {
+  getAllProducts, getAllCategories, getAllTypes,
+  createProduct, updateProduct, deleteProduct,
   updateCategory, updateType, toggleProductActive,
-  createCategory, createType
+  createCategory, createType, getCriticalStockProducts,
 } from "../../services/admin/productService";
 
 const normalizeProduct = (p) => ({
@@ -25,19 +24,44 @@ export const useAdminProducts = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [types, setTypes] = useState([]);
+  const [meta, setMeta] = useState({ page: 1, limit: 10, total: 0, totalPages: 1 });
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [criticalStockProducts, setCriticalStockProducts] = useState([]);
+  const [filters, setFilters] = useState({ q: "", page: 1, limit: 10, category_id: "" });
 
-  const fetchProducts = useCallback(async (isInitial = false) => {
-    if (isInitial) setIsLoading(true);
+  const fetchMasterData = useCallback(async () => {
     try {
-      const [prodRes, catRes, typeRes] = await Promise.all([getAllProducts(), getAllCategories(), getAllTypes()]);
-      const prodData = prodRes?.data?.data || prodRes?.data || prodRes || [];
+      const [catRes, typeRes] = await Promise.all([getAllCategories(), getAllTypes()]);
       const catData = catRes?.data?.data || catRes?.data || catRes || [];
       const typeData = typeRes?.data?.data || typeRes?.data || typeRes || [];
-      setProducts(prodData.map(normalizeProduct));
-      setCategories(catData);
-      setTypes(typeData);
+      setCategories(Array.isArray(catData) ? catData : []);
+      setTypes(Array.isArray(typeData) ? typeData : []);
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Gagal memuat kategori dan satuan"));
+    }
+  }, []);
+
+  const fetchProducts = useCallback(async (params = {}) => {
+    setIsLoading(true);
+    try {
+      const prodRes = await getAllProducts({
+        page: params.page ?? 1,
+        limit: params.limit ?? 10,
+        q: params.q || undefined,
+        category_id: params.category_id || undefined,
+      });
+      const prodData = prodRes?.data?.data || prodRes?.data || prodRes || [];
+      const prodMeta = prodRes?.meta || null;
+      setProducts(Array.isArray(prodData) ? prodData.map(normalizeProduct) : []);
+      if (prodMeta) {
+        setMeta({
+          page: Number(prodMeta.page) || 1,
+          limit: Number(prodMeta.limit) || 10,
+          total: Number(prodMeta.total) || 0,
+          totalPages: Number(prodMeta.totalPages) || 1,
+        });
+      }
     } catch (err) {
       toast.error(getErrorMessage(err, "Gagal memuat daftar produk"));
     } finally {
@@ -45,7 +69,24 @@ export const useAdminProducts = () => {
     }
   }, []);
 
-  useEffect(() => { fetchProducts(true); }, [fetchProducts]);
+  const fetchCriticalStock = useCallback(async () => {
+    try {
+      const response = await getCriticalStockProducts();
+      const data = response?.data || response || [];
+      setCriticalStockProducts(Array.isArray(data) ? data : []);
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Gagal memuat stok kritis"));
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMasterData();
+    fetchCriticalStock();
+  }, [fetchCriticalStock, fetchMasterData]);
+
+  useEffect(() => {
+    fetchProducts(filters);
+  }, [fetchProducts, filters]);
 
   const handleAddCategory = async (data) => {
     try {
@@ -108,7 +149,8 @@ export const useAdminProducts = () => {
       });
       if (productData.image instanceof File) formData.append("image", productData.image);
       await createProduct(formData);
-      await fetchProducts();
+      await fetchProducts(filters);
+      await fetchCriticalStock();
       toast.success("Produk berhasil ditambah!");
       return { success: true };
     } catch (err) {
@@ -128,6 +170,7 @@ export const useAdminProducts = () => {
       const response = await updateProduct(id, formData);
       const updated = response?.data?.data || response?.data || response;
       setProducts((prev) => prev.map((p) => (p.id === String(id) ? normalizeProduct(updated) : p)));
+      await fetchCriticalStock();
       toast.success("Produk berhasil diperbarui");
       return { success: true };
     } catch (err) {
@@ -140,7 +183,8 @@ export const useAdminProducts = () => {
     setActionLoading(true);
     try {
       await deleteProduct(id);
-      setProducts((prev) => prev.filter((p) => p.id !== String(id)));
+      await fetchProducts(filters);
+      await fetchCriticalStock();
       toast.success("Produk telah dihapus secara permanen");
       return { success: true };
     } catch (err) {
@@ -153,15 +197,15 @@ export const useAdminProducts = () => {
     setActionLoading(true);
     try {
       await toggleProductActive(id);
-      
-      // Update state secara lokal biar aman dari perbedaan format response backend
+
       setProducts((prev) => prev.map((p) => {
         if (p.id === String(id)) {
-           return { ...p, is_active: !p.is_active };
+          return { ...p, is_active: !p.is_active };
         }
         return p;
       }));
-      
+      await fetchCriticalStock();
+
       toast.success("Status produk berhasil diubah");
       return { success: true };
     } catch (err) {
@@ -170,10 +214,11 @@ export const useAdminProducts = () => {
     } finally { setActionLoading(false); }
   };
 
-  return { 
-    products, categories, types, isLoading, actionLoading, 
-    fetchProducts, handleCreate, handleUpdate, handleDelete, handleToggleActive,
-    handleAddCategory, handleAddType, 
-    handleEditCategory, handleEditType
+  return {
+    products, categories, types, meta, criticalStockProducts, isLoading, actionLoading,
+    fetchProducts, filters, setFilters,
+    handleCreate, handleUpdate, handleDelete, handleToggleActive,
+    handleAddCategory, handleAddType,
+    handleEditCategory, handleEditType,
   };
 };

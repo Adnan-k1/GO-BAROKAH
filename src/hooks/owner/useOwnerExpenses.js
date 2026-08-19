@@ -5,6 +5,7 @@ import ownerService from "../../services/owner/ownerService";
 export const useOwnerExpenses = () => {
   const [expenses, setExpenses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
   const fetchExpenses = useCallback(async (params = {}, isMounted = { current: true }) => {
@@ -17,7 +18,10 @@ export const useOwnerExpenses = () => {
     } catch (err) {
       if (isMounted.current) toast.error(err?.response?.data?.message || err?.message || "Gagal memuat pengeluaran");
     } finally {
-      if (isMounted.current) setIsLoading(false);
+      if (isMounted.current) {
+        setIsLoading(false);
+        setHasLoaded(true);
+      }
     }
   }, []);
 
@@ -72,6 +76,7 @@ export const useOwnerExpenses = () => {
   return {
     expenses,
     isLoading,
+    isInitialLoading: isLoading && !hasLoaded,
     actionLoading,
     fetchExpenses,
     handleCreate,

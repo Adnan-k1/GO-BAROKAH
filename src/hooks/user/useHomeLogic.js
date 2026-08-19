@@ -12,13 +12,14 @@ export const useHomeLogic = () => {
   useEffect(() => {
     const fetchAllData = async () => {
       try {
-        const response = await productService.getAllProducts();
+        const response = await productService.getAllProducts({ limit: 50 });
         const actualData = Array.isArray(response)
           ? response
           : response?.data || response?.products || [];
         
-        setProducts(actualData.map((p) => ({
+        setProducts((Array.isArray(actualData) ? actualData : []).map((p) => ({
           ...p,
+          id: p._id || p.id,
           image_url: buildImageUrl(p.image_url || p.image),
         })));
       } catch (err) {

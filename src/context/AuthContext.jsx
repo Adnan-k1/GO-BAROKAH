@@ -40,7 +40,10 @@ export const AuthProvider = ({ children }) => {
       try {
         const response = await authService.getMe();
         const serverUser = response?.user || response?.data?.user || response?.account || response;
-        const validUser = serverUser;
+        const validUser = {
+          ...savedUser,
+          ...serverUser,
+        };
 
         setUser(validUser);
         setSavedUser(validUser);

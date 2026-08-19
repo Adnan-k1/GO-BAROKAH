@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import {
-  MapPin, Plus, Trash2, PencilLine, Loader2,
+  MapPin, Plus, Trash2, PencilLine,
   Home, Briefcase, Map, Phone, User,
 } from "lucide-react";
 import AddressModal from "../../components/forms/AddressModal";
 import ConfirmModal from "../../components/forms/ConfirmModal";
+import AddressCardSkeleton from "../../components/common/AddressCardSkeleton";
 import { useAddressLogic } from "../../hooks/user/useAddressLogic";
 
 const AddressPage = () => {
@@ -79,10 +80,8 @@ const AddressPage = () => {
         </button>
       </header>
       <div className="grid grid-cols-1 gap-5">
-        {isLoading ? (
-          <div className="flex justify-center py-40">
-            <Loader2 className="animate-spin text-[#3A5A4D]" size={32} />
-          </div>
+        {isLoading && addresses.length === 0 ? (
+          [...Array(2)].map((_, index) => <AddressCardSkeleton key={index} />)
         ) : addresses.length > 0 ? (
           addresses.map((item) => {
             const itemId = item.id || item._id;

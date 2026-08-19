@@ -24,7 +24,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const [searchValue, setSearchValue] = useState(searchParams.get('search') || '');
+  const [searchValue, setSearchValue] = useState(searchParams.get('q') || '');
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -35,7 +35,7 @@ const Navbar = () => {
   const closeAll = () => { setMenuOpen(false); setSearchOpen(false); };
 
   useEffect(() => {
-    setSearchValue(searchParams.get('search') || '');
+    setSearchValue(searchParams.get('q') || '');
   }, [searchParams]);
 
   useEffect(() => { closeAll(); }, [pathname]);
@@ -59,7 +59,7 @@ const Navbar = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchValue.trim()) {
-      navigate(`/store?search=${encodeURIComponent(searchValue.trim())}`);
+      navigate(`/store?q=${encodeURIComponent(searchValue.trim())}`);
       setSearchOpen(false);
     } else {
       navigate('/store');
