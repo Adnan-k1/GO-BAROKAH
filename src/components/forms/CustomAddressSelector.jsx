@@ -98,9 +98,10 @@ const CustomAddressSelector = ({
       <textarea
         placeholder="Detail Alamat (Akan terisi otomatis dari pilihan diatas)"
         rows="3"
-        className="w-full px-4 py-3.5 mt-1 rounded-2xl bg-gray-50 outline-none font-bold text-gray-800 text-sm border border-gray-100 focus:border-[#2D5A43]/30 focus:bg-white transition-all resize-none"
+        readOnly
+        aria-readonly="true"
+        className="w-full px-4 py-3.5 mt-1 rounded-2xl bg-gray-100 outline-none font-bold text-gray-500 text-sm border border-gray-100 resize-none cursor-not-allowed"
         value={alamatDetail}
-        onChange={(e) => setAlamatDetail(e.target.value)}
       />
     </div>
   );
