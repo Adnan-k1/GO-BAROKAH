@@ -134,13 +134,27 @@ export const CartProvider = ({ children }) => {
   const addToCart = async (product, quantity = 1) => {
     if (!user) return;
     const existing = cartItems.find((i) => i.id === product.id);
+    const requestedQuantity = (existing?.quantity || 0) + quantity;
+    const stock = Number(product.stock);
+    const criticalStock = Number(product.critical_stock);
+
+    if (
+      Number.isFinite(stock) &&
+      Number.isFinite(criticalStock) &&
+      stock - requestedQuantity <= criticalStock
+    ) {
+      const message = "Produk tidak dapat dipesan karena sudah mencapai batas stok minimum.";
+      toast.error(message);
+      throw new Error(message);
+    }
+
     try {
       const res = existing
         ? await cartService.updateItem(product.id, existing.quantity + quantity)
         : await cartService.addItem(product.id, quantity);
       syncCart(res.data);
     } catch (err) {
-      toast.error("Gagal menambah ke keranjang");
+      toast.error(err.response?.data?.message || "Gagal menambah ke keranjang");
       throw err;
     }
   };
