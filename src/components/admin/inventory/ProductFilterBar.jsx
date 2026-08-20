@@ -28,15 +28,15 @@ const ProductFilterBar = ({ search, onSearchChange, activecat, onCatChange, cate
   }, []);
 
   return (
-    <div className="bg-white px-3 sm:px-5 py-2 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row items-center gap-2 md:gap-4">
+    <div className="bg-white p-2 rounded-2xl shadow-sm flex flex-col md:flex-row items-center gap-2 transition-all focus-within:ring-1 focus-within:ring-emerald-500/20">
       <div className="relative w-full md:flex-1 md:min-w-0 group">
-        <Search size={16} className="absolute left-1 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#1a4d2e] transition-colors" />
+        <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#1a4d2e] transition-colors" />
         <input
           type="text"
-          placeholder="Cari berdasarkan nama atau email..."
+          placeholder="Cari nama barang..."
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full pl-8 pr-4 py-2 text-xs bg-transparent border-transparent rounded-xl focus:bg-slate-50 focus:outline-none focus:ring-0 focus:border-transparent transition-all font-medium"
+          className="w-full pl-11 pr-4 py-2.5 bg-transparent border-transparent focus:border-transparent focus:ring-0 outline-none text-xs font-bold text-slate-800 placeholder:text-slate-400 placeholder:font-medium shadow-none"
         />
       </div>
 
