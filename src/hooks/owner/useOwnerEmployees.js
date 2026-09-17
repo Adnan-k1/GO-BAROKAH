@@ -5,21 +5,29 @@ import ownerService from "../../services/owner/ownerService";
 export const useOwnerEmployees = () => {
   const [users, setUsers] = useState([]);
   const [admins, setAdmins] = useState([]);
+  const [cashiers, setCashiers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
 
   const fetchEmployees = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [usersRes, adminsRes] = await Promise.all([
+      const [usersRes, adminsRes, cashiersRes] = await Promise.allSettled([
         ownerService.getAllUsers(),
-        ownerService.getAllAdmins()
+        ownerService.getAllAdmins(),
+        ownerService.getAllCashiers(),
       ]);
-      const usersData = usersRes?.data || usersRes || [];
-      const adminsData = adminsRes?.data || adminsRes || [];
-      
+      const getResultData = (result) => {
+        if (result.status !== "fulfilled") return [];
+        return result.value?.data || result.value || [];
+      };
+      const usersData = getResultData(usersRes);
+      const adminsData = getResultData(adminsRes);
+      const cashiersData = getResultData(cashiersRes);
+
       setUsers(usersData);
       setAdmins(adminsData);
+      setCashiers(cashiersData);
     } catch (err) {
       toast.error(err?.response?.data?.message || err?.message || "Gagal memuat daftar pegawai");
     } finally {
@@ -59,13 +67,31 @@ export const useOwnerEmployees = () => {
     }
   };
 
+  const handleAssignCashier = async (email) => {
+    setActionLoading(true);
+    try {
+      await ownerService.assignCashier(email);
+      await fetchEmployees();
+      toast.success(`Berhasil menjadikan ${email} sebagai Cashier`);
+      return { success: true };
+    } catch (err) {
+      const msg = err?.response?.data?.message || err?.message || "Gagal menjadikan cashier";
+      toast.error(msg);
+      return { success: false, message: msg };
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   return {
     users,
     admins,
+    cashiers,
     isLoading,
     actionLoading,
     fetchEmployees,
     handlePromote,
-    handleDemote
+    handleDemote,
+    handleAssignCashier,
   };
 };

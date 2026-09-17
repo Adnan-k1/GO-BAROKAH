@@ -29,7 +29,7 @@ const ProductFilterBar = ({ search, onSearchChange, activecat, onCatChange, cate
 
   return (
     <div className="bg-white p-2 rounded-2xl shadow-sm flex flex-col md:flex-row items-center gap-2 transition-all focus-within:ring-1 focus-within:ring-emerald-500/20">
-      <div className="relative w-full md:flex-1 md:min-w-0 group">
+      <div className="relative w-full md:flex-[0_0_32%] md:min-w-[260px] group">
         <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#1a4d2e] transition-colors" />
         <input
           type="text"
@@ -42,7 +42,7 @@ const ProductFilterBar = ({ search, onSearchChange, activecat, onCatChange, cate
 
       <div className="hidden md:block w-px h-7 bg-slate-200 flex-shrink-0" />
 
-      <div ref={scrollRef} className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto no-scrollbar">
+      <div ref={scrollRef} className="flex items-center gap-1.5 overflow-x-auto w-full md:flex-1 md:min-w-0 no-scrollbar">
         {filterOptions.map((category) => {
           const isActive = category.id === "all"
             ? activeCategoryIds.length === 0
@@ -52,7 +52,7 @@ const ProductFilterBar = ({ search, onSearchChange, activecat, onCatChange, cate
             <button
               key={category.id}
               onClick={() => onCatChange(category.id === "all" ? "all" : category.id)}
-              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider whitespace-nowrap transition-all duration-200 border
+              className={`shrink-0 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider whitespace-nowrap transition-all duration-200 border
                 ${isActive
                   ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                   : "bg-white text-slate-400 border-transparent hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200"}`}

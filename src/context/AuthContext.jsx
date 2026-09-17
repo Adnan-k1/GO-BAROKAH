@@ -5,6 +5,7 @@ import {
   clearAuthSession,
   getSavedUser,
   getToken,
+  normalizeUser,
   setAuthSession,
   setSavedUser,
 } from "../utils/authStorage";
@@ -39,11 +40,8 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const response = await authService.getMe();
-        const serverUser = response?.user || response?.data?.user || response?.account || response;
-        const validUser = {
-          ...savedUser,
-          ...serverUser,
-        };
+        const serverUser = response?.data || response?.user || response?.account || response;
+        const validUser = normalizeUser(serverUser);
 
         setUser(validUser);
         setSavedUser(validUser);
@@ -70,9 +68,15 @@ export const AuthProvider = ({ children }) => {
     setSavedUser(newUserData);
   };
 
-  const logout = () => {
-    setUser(null);
-    clearAuthSession();
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } catch (err) {
+      console.error("Logout server gagal:", err);
+    } finally {
+      setUser(null);
+      clearAuthSession();
+    }
   };
 
   return (

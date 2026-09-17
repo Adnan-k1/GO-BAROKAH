@@ -45,12 +45,20 @@ const ownerService = {
     const response = await api.get("/api/owner/employee/admins");
     return response.data;
   },
+  getAllCashiers: async () => {
+    const response = await api.get("/api/owner/employee/cashiers");
+    return response.data;
+  },
   promoteUser: async (email) => {
     const response = await api.patch("/api/owner/employee/promote", { email });
     return response.data;
   },
   demoteAdmin: async (email) => {
     const response = await api.patch("/api/owner/employee/demote", { email });
+    return response.data;
+  },
+  assignCashier: async (email) => {
+    const response = await api.patch("/api/owner/employee/cashier", { email });
     return response.data;
   },
 };
