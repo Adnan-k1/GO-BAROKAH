@@ -12,7 +12,12 @@ const authService = {
   },
 
   getMe: async () => {
-    const response = await api.get('/me');
+    const response = await api.get('/api/users/me');
+    return response.data;
+  },
+
+  logout: async () => {
+    const response = await api.post('/api/auth/logout');
     return response.data;
   },
 

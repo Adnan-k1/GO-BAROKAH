@@ -167,7 +167,7 @@ const AddressModal = ({
             <div className="p-2.5 bg-green-50 text-[#2D5A43] rounded-xl">
               <MapPin size={20} />
             </div>
-            <h3 className="text-xl font-black text-gray-900 tracking-tighter uppercase">
+            <h3 className="text-xl font-black text-gray-900 tracking-tighter">
               {isEdit ? "Ubah Alamat" : "Tambah Alamat Baru"}
             </h3>
           </div>
@@ -310,12 +310,12 @@ const AddressModal = ({
             />
           </div>
           
-          <div className="flex gap-4 pt-6 sticky bottom-0 bg-white border-t border-gray-50">
+          <div className="flex flex-col-reverse sm:flex-row gap-3 pt-5 sticky bottom-0 bg-white border-t border-gray-50">
             <button
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="flex-1 py-4 font-black text-gray-400 uppercase text-[10px] tracking-widest disabled:opacity-50"
+              className="flex-1 h-12 rounded-2xl border border-gray-200 bg-white px-5 font-black text-gray-500 uppercase text-[10px] tracking-widest hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 active:scale-[0.98] transition-all disabled:opacity-50"
             >
               Batal
             </button>
@@ -324,7 +324,7 @@ const AddressModal = ({
               type="submit"
               variant="primary"
               isLoading={isLoading}
-              className="flex-[2] py-4 rounded-2xl shadow-xl shadow-green-900/10"
+              className="flex-[2] h-12 rounded-2xl px-5 shadow-xl shadow-green-900/10"
             >
               {isEdit ? "Simpan Perubahan" : "Tambah Alamat Baru"}
             </Button>

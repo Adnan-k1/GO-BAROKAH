@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import { Search, ChevronLeft, ChevronRight, CheckCircle2, XCircle, Shield, UserX, Loader2, Users, Menu, ShieldAlert } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, Shield, Loader2, Users, Menu, ShieldAlert, BadgeCheck } from "lucide-react";
 import OwnerSidebar from "../../components/owner/OwnerSidebar";
 import ConfirmModal from "../../components/forms/ConfirmModal";
 import { useOwnerEmployees } from "../../hooks/owner/useOwnerEmployees";
@@ -20,8 +20,8 @@ const LoadingSkeleton = () => (
 
 const OwnerEmployees = () => {
   const { 
-    users, admins, isLoading, actionLoading, 
-    fetchEmployees, handlePromote, handleDemote 
+    users, admins, cashiers, isLoading, actionLoading,
+    fetchEmployees, handlePromote, handleDemote, handleAssignCashier
   } = useOwnerEmployees();
 
   const [search, setSearch] = useState("");
@@ -48,8 +48,12 @@ const OwnerEmployees = () => {
   }, []);
 
   const allEmployees = useMemo(() => {
-    return [...users, ...admins];
-  }, [users, admins]);
+    const employeesByEmail = new Map();
+    [...users, ...admins, ...cashiers].forEach((employee) => {
+      if (employee.email) employeesByEmail.set(employee.email, employee);
+    });
+    return [...employeesByEmail.values()];
+  }, [users, admins, cashiers]);
 
   const filteredEmployees = useMemo(() => {
     let filtered = allEmployees;
@@ -79,6 +83,8 @@ const OwnerEmployees = () => {
       await handlePromote(email);
     } else if (type === "DEMOTE") {
       await handleDemote(email);
+    } else if (type === "CASHIER") {
+      await handleAssignCashier(email);
     }
   };
 
@@ -116,7 +122,7 @@ const OwnerEmployees = () => {
             </div>
             <div className="h-8 w-px bg-slate-200 hidden md:block"></div>
             <div className="flex gap-1 pr-0 md:pr-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 custom-scrollbar-x">
-              {['ALL', 'ADMIN', 'USER'].map(role => (
+              {['ALL', 'ADMIN', 'USER', 'CASHIER'].map(role => (
                 <button
                   key={role}
                   onClick={() => setFilterRole(role)}
@@ -162,6 +168,10 @@ const OwnerEmployees = () => {
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black text-emerald-600 bg-emerald-50 border border-emerald-200 uppercase tracking-wider">
                             <Shield size={10} /> Admin
                           </span>
+                        ) : emp.role === "cashier" ? (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black text-amber-600 bg-amber-50 border border-amber-200 uppercase tracking-wider">
+                            <BadgeCheck size={10} /> Cashier
+                          </span>
                         ) : (
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black text-slate-600 bg-slate-100 border border-slate-200 uppercase tracking-wider">
                             <Users size={10} /> User
@@ -178,13 +188,31 @@ const OwnerEmployees = () => {
                           >
                             <ShieldAlert size={12} /> Demote
                           </button>
+                        ) : emp.role === "user" ? (
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => setConfirmModal({ isOpen: true, type: "PROMOTE", email: emp.email, name: emp.name })}
+                              disabled={actionLoading}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-200 text-[10px] font-black text-emerald-600 hover:bg-emerald-50 transition-all uppercase tracking-widest disabled:opacity-50"
+                            >
+                              <Shield size={12} /> Promote
+                            </button>
+                            <button
+                              onClick={() => setConfirmModal({ isOpen: true, type: "CASHIER", email: emp.email, name: emp.name })}
+                              disabled={actionLoading}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-200 text-[10px] font-black text-amber-600 hover:bg-amber-50 transition-all uppercase tracking-widest disabled:opacity-50"
+                            >
+                              <BadgeCheck size={12} /> Kasir
+                            </button>
+                          </div>
                         ) : (
-                          <button 
-                            onClick={() => setConfirmModal({ isOpen: true, type: "PROMOTE", email: emp.email, name: emp.name })}
-                            disabled={actionLoading}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-200 text-[10px] font-black text-emerald-600 hover:bg-emerald-50 transition-all uppercase tracking-widest disabled:opacity-50"
+                          <button
+                            type="button"
+                            disabled
+                            title="Fitur demote cashier belum tersedia"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-[10px] font-black text-slate-300 uppercase tracking-widest cursor-not-allowed"
                           >
-                            <Shield size={12} /> Promote
+                            <ShieldAlert size={12} /> Demote
                           </button>
                         )}
                       </div>
@@ -227,10 +255,10 @@ const OwnerEmployees = () => {
         isOpen={confirmModal.isOpen} 
         onClose={() => setConfirmModal({ isOpen: false, type: null, email: null, name: null })} 
         onConfirm={onConfirmAction} 
-        title={confirmModal.type === "PROMOTE" ? "Promote ke Admin" : "Demote ke User"} 
-        message={`Apakah Anda yakin ingin menjadikan ${confirmModal.name} (${confirmModal.email}) sebagai ${confirmModal.type === "PROMOTE" ? "Admin" : "User"}?`} 
-        confirmText={confirmModal.type === "PROMOTE" ? "Promote" : "Demote"} 
-        confirmColor={confirmModal.type === "PROMOTE" ? "emerald" : "red"} 
+        title={confirmModal.type === "PROMOTE" ? "Promote ke Admin" : confirmModal.type === "CASHIER" ? "Jadikan Cashier" : "Demote ke User"}
+        message={`Apakah Anda yakin ingin menjadikan ${confirmModal.name} (${confirmModal.email}) sebagai ${confirmModal.type === "PROMOTE" ? "Admin" : confirmModal.type === "CASHIER" ? "Cashier" : "User"}?`}
+        confirmText={confirmModal.type === "PROMOTE" ? "Promote" : confirmModal.type === "CASHIER" ? "Jadikan Cashier" : "Demote"}
+        confirmColor={confirmModal.type === "PROMOTE" || confirmModal.type === "CASHIER" ? "emerald" : "red"}
       />
     </div>
   );

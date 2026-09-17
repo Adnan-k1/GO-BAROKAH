@@ -41,7 +41,7 @@ const CategorySection = ({
   if (!categories || categories.length === 0) return null;
 
   return (
-    <section className="w-full bg-[#FBFBFB] pt-8 md:pt-10 pb-0 border-t border-gray-100">
+    <section className="w-full bg-[#FBFBFB] pt-8 md:pt-10 pb-4 md:pb-6 border-t border-gray-100">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         
         {/* Header Section */}
@@ -104,14 +104,14 @@ const CategorySection = ({
             <div
               key={index}
               onClick={() => toggleFilter(cat)}
-              className={`shrink-0 flex-1 snap-start px-6 py-3 md:px-10 md:py-3.5 rounded-xl cursor-pointer transition-all border flex items-center justify-center min-w-[130px] md:min-w-[160px] ${
+              className={`w-[130px] md:w-[160px] min-h-12 shrink-0 snap-start px-4 py-2.5 rounded-xl cursor-pointer transition-all border flex items-center justify-center ${
                 activeFilters.includes(cat)
                   ? "border-[#2D5A43] bg-[#2D5A43] shadow-md"
                   : "bg-white border-gray-200 hover:border-[#2D5A43] hover:shadow-sm"
               }`}
             >
               <p
-                className={`font-black text-[10px] md:text-xs tracking-widest whitespace-nowrap transition-colors ${
+                className={`w-full overflow-hidden [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] break-words text-center font-black text-[10px] md:text-xs tracking-wide leading-tight transition-colors ${
                   activeFilters.includes(cat)
                     ? "text-white"
                     : "text-gray-500"

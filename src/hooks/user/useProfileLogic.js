@@ -69,8 +69,8 @@ export const useProfileLogic = () => {
 
   
 
-  const handleLogout = () => {
-    logout(); 
+  const handleLogout = async () => {
+    await logout();
     toast.success('Berhasil keluar!', {
       style: {
         borderRadius: '16px',
